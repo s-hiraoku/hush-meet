@@ -9,9 +9,10 @@ import {
   THEMES,
   type ThemeId,
 } from "../constants";
-import { t } from "../i18n";
+import { t, setLocale, onLocaleChange, type LocaleId } from "../i18n.ts";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { LocaleSwitcher } from "./LocaleSwitcher";
 
 interface HushMeetConfig {
   speechThreshold?: number;
@@ -50,6 +51,12 @@ export function Popup() {
   const [threshold, setThreshold] = useState<number>(DEFAULT_CONFIG.speechThreshold);
   const [gracePeriod, setGracePeriod] = useState<number>(DEFAULT_CONFIG.gracePeriod);
   const [theme, setTheme] = useState<ThemeId>(THEMES.default);
+  const [locale, setLocaleState] = useState<LocaleId>("auto");
+  const [, setRenderKey] = useState(0);
+
+  useEffect(() => {
+    return onLocaleChange(() => setRenderKey((k) => k + 1));
+  }, []);
 
   useEffect(() => {
     chrome.storage.local.get(
@@ -59,8 +66,12 @@ export function Popup() {
         STORAGE_KEYS.state,
         STORAGE_KEYS.level,
         STORAGE_KEYS.theme,
+        STORAGE_KEYS.locale,
       ],
       (result: HushMeetStorage) => {
+        const savedLocale = (result[STORAGE_KEYS.locale] as LocaleId) ?? "auto";
+        setLocaleState(savedLocale);
+        setLocale(savedLocale);
         const savedTheme = (result[STORAGE_KEYS.theme] as ThemeId) ?? THEMES.default;
         setTheme(savedTheme);
         applyTheme(savedTheme);
@@ -108,6 +119,11 @@ export function Popup() {
         setTheme(themeId);
         applyTheme(themeId);
       }
+      if (changes[STORAGE_KEYS.locale]) {
+        const loc = changes[STORAGE_KEYS.locale].newValue as LocaleId;
+        setLocaleState(loc);
+        setLocale(loc);
+      }
     };
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);
@@ -143,6 +159,10 @@ export function Popup() {
     applyTheme(themeId);
   };
 
+  const handleLocaleChange = (loc: LocaleId) => {
+    setLocaleState(loc);
+  };
+
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
   const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
   const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
@@ -157,6 +177,7 @@ export function Popup() {
         <h1>Hush Meet</h1>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span className="version">v{APP_VERSION}</span>
+          <LocaleSwitcher current={locale} onChange={handleLocaleChange} />
           <ThemeSwitcher current={theme} onChange={handleThemeChange} />
         </div>
       </div>

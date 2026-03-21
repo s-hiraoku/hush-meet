@@ -25,6 +25,7 @@ export const STORAGE_KEYS = {
   level: "hushMeetLevel",
   spectrum: "hushMeetSpectrum",
   theme: "hushMeetTheme",
+  locale: "hushMeetLocale",
 } as const;
 
 export const THEMES = {
