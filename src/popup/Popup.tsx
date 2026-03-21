@@ -46,6 +46,15 @@ export function Popup() {
         if (result.hushMeetConfig) {
           setThreshold(result.hushMeetConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
           setGracePeriod(result.hushMeetConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
+        } else {
+          // Store defaults on first launch
+          chrome.storage.local.set({
+            [STORAGE_KEYS.config]: {
+              speechThreshold: DEFAULT_CONFIG.speechThreshold,
+              silenceThreshold: DEFAULT_CONFIG.silenceThreshold,
+              gracePeriod: DEFAULT_CONFIG.gracePeriod,
+            },
+          });
         }
         setState(result.hushMeetState ?? "IDLE");
         setLevel(result.hushMeetLevel ?? 0);
@@ -55,6 +64,13 @@ export function Popup() {
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[STORAGE_KEYS.state]) setState(changes[STORAGE_KEYS.state].newValue as string);
       if (changes[STORAGE_KEYS.level]) setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
+      if (changes[STORAGE_KEYS.config]) {
+        const cfg = changes[STORAGE_KEYS.config].newValue as HushMeetConfig;
+        if (cfg) {
+          setThreshold(cfg.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
+          setGracePeriod(cfg.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
+        }
+      }
     };
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);
