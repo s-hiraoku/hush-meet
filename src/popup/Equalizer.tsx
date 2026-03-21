@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { STORAGE_KEYS } from "../constants";
+import { t } from "../i18n";
 import "./equalizer.css";
 
 const BAND_COUNT = 16;
@@ -31,7 +32,7 @@ export function Equalizer() {
 
   return (
     <div className="equalizer">
-      <div className="eq-label">スペクトラム</div>
+      <div className="eq-label">{t("spectrum")}</div>
       <div className="eq-bars">
         {bands.map((value, i) => {
           const activeSegments = Math.round(value * SEGMENTS);

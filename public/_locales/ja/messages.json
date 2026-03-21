@@ -1,0 +1,52 @@
+{
+  "extName": {
+    "message": "Hush Meet"
+  },
+  "extDescription": {
+    "message": "Google Meetで話していない時に自動でミュートし、雑音を防止します"
+  },
+  "autoMute": {
+    "message": "自動ミュート"
+  },
+  "stateIdle": {
+    "message": "無効"
+  },
+  "stateMuted": {
+    "message": "ミュート中（待機）"
+  },
+  "stateUnmuting": {
+    "message": "ミュート解除中…"
+  },
+  "stateSpeaking": {
+    "message": "発話中"
+  },
+  "stateGrace": {
+    "message": "猶予中…"
+  },
+  "micLevel": {
+    "message": "マイク入力レベル"
+  },
+  "spectrum": {
+    "message": "スペクトラム"
+  },
+  "sensitivity": {
+    "message": "発話検出の感度"
+  },
+  "graceTime": {
+    "message": "猶予時間（発話後ミュートまで）"
+  },
+  "secondsUnit": {
+    "message": "$VALUE$秒",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "footer": {
+    "message": "Google Meet タブで有効になります"
+  },
+  "themeSwitcher": {
+    "message": "テーマ切替"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "extName": {
+    "message": "Hush Meet"
+  },
+  "extDescription": {
+    "message": "Automatically mutes your microphone on Google Meet when you're not speaking"
+  },
+  "autoMute": {
+    "message": "Auto Mute"
+  },
+  "stateIdle": {
+    "message": "Disabled"
+  },
+  "stateMuted": {
+    "message": "Muted (standby)"
+  },
+  "stateUnmuting": {
+    "message": "Unmuting…"
+  },
+  "stateSpeaking": {
+    "message": "Speaking"
+  },
+  "stateGrace": {
+    "message": "Grace period…"
+  },
+  "micLevel": {
+    "message": "Mic Input Level"
+  },
+  "spectrum": {
+    "message": "Spectrum"
+  },
+  "sensitivity": {
+    "message": "Speech Detection Sensitivity"
+  },
+  "graceTime": {
+    "message": "Grace Period (after speech)"
+  },
+  "secondsUnit": {
+    "message": "$VALUE$s",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "footer": {
+    "message": "Active on Google Meet tabs"
+  },
+  "themeSwitcher": {
+    "message": "Switch Theme"
+  }
+}

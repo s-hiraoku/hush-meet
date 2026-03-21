@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { THEME_LIST, STORAGE_KEYS, type ThemeId } from "../constants";
+import { t } from "../i18n";
 
 interface Props {
   current: ThemeId;
@@ -36,7 +37,7 @@ export function ThemeSwitcher({ current, onChange }: Props) {
 
   return (
     <div className="theme-switcher" ref={ref}>
-      <button className="theme-btn" onClick={() => setOpen(!open)} title="テーマ切替">
+      <button className="theme-btn" onClick={() => setOpen(!open)} title={t("themeSwitcher")}>
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10a2.5 2.5 0 0 0 2.5-2.5c0-.61-.23-1.21-.64-1.67A.528.528 0 0 1 14.24 17H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
         </svg>

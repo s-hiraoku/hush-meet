@@ -2,9 +2,10 @@ import { defineManifest } from "@crxjs/vite-plugin";
 
 export default defineManifest({
   manifest_version: 3,
-  name: "Hush Meet",
+  name: "__MSG_extName__",
   version: "1.0.1",
-  description: "Google Meetで話していない時に自動でミュートし、雑音を防止します",
+  description: "__MSG_extDescription__",
+  default_locale: "en",
   permissions: ["storage"],
   host_permissions: ["https://meet.google.com/*"],
   action: {

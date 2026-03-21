@@ -9,6 +9,7 @@ import {
   THEMES,
   type ThemeId,
 } from "../constants";
+import { t } from "../i18n";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
@@ -26,19 +27,19 @@ interface HushMeetStorage {
   hushMeetLevel?: number;
 }
 
-const stateLabels: Record<string, { text: string; css: string }> = {
-  IDLE: { text: "無効", css: "" },
-  MUTED: { text: "ミュート中（待機）", css: "muted" },
-  UNMUTING: { text: "ミュート解除中…", css: "speaking" },
-  SPEAKING: { text: "発話中", css: "speaking" },
-  GRACE: { text: "猶予中…", css: "grace" },
+const stateLabels: Record<string, { key: string; css: string }> = {
+  IDLE: { key: "stateIdle", css: "" },
+  MUTED: { key: "stateMuted", css: "muted" },
+  UNMUTING: { key: "stateUnmuting", css: "speaking" },
+  SPEAKING: { key: "stateSpeaking", css: "speaking" },
+  GRACE: { key: "stateGrace", css: "grace" },
 };
 
-function applyTheme(t: ThemeId) {
-  if (t === THEMES.default) {
+function applyTheme(themeId: ThemeId) {
+  if (themeId === THEMES.default) {
     document.body.removeAttribute("data-theme");
   } else {
-    document.body.setAttribute("data-theme", t);
+    document.body.setAttribute("data-theme", themeId);
   }
 }
 
@@ -103,9 +104,9 @@ export function Popup() {
         }
       }
       if (changes[STORAGE_KEYS.theme]) {
-        const t = changes[STORAGE_KEYS.theme].newValue as ThemeId;
-        setTheme(t);
-        applyTheme(t);
+        const themeId = changes[STORAGE_KEYS.theme].newValue as ThemeId;
+        setTheme(themeId);
+        applyTheme(themeId);
       }
     };
     chrome.storage.onChanged.addListener(listener);
@@ -137,9 +138,9 @@ export function Popup() {
     saveConfig(threshold, val);
   };
 
-  const handleThemeChange = (t: ThemeId) => {
-    setTheme(t);
-    applyTheme(t);
+  const handleThemeChange = (themeId: ThemeId) => {
+    setTheme(themeId);
+    applyTheme(themeId);
   };
 
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
@@ -161,7 +162,7 @@ export function Popup() {
       </div>
 
       <div className="toggle-row">
-        <span className="toggle-label">自動ミュート</span>
+        <span className="toggle-label">{t("autoMute")}</span>
         <label className="toggle">
           <input
             type="checkbox"
@@ -174,11 +175,11 @@ export function Popup() {
 
       <div className="status">
         <span className={`status-dot ${stateInfo.css}`} />
-        <span className="status-text">{stateInfo.text}</span>
+        <span className="status-text">{t(stateInfo.key)}</span>
       </div>
 
       <div className="meter">
-        <div className="meter-label">マイク入力レベル</div>
+        <div className="meter-label">{t("micLevel")}</div>
         <div className="meter-bar-bg">
           <div
             className={`meter-bar ${level > threshold ? "hot" : ""}`}
@@ -193,7 +194,7 @@ export function Popup() {
       <div className="settings">
         <div className="setting">
           <div className="setting-header">
-            <span className="setting-label">発話検出の感度</span>
+            <span className="setting-label">{t("sensitivity")}</span>
             <span className="setting-value">{threshold.toFixed(3)}</span>
           </div>
           <input
@@ -208,8 +209,10 @@ export function Popup() {
 
         <div className="setting">
           <div className="setting-header">
-            <span className="setting-label">猶予時間（発話後ミュートまで）</span>
-            <span className="setting-value">{(gracePeriod / 1000).toFixed(1)}秒</span>
+            <span className="setting-label">{t("graceTime")}</span>
+            <span className="setting-value">
+              {t("secondsUnit", (gracePeriod / 1000).toFixed(1))}
+            </span>
           </div>
           <input
             type="range"
@@ -222,7 +225,7 @@ export function Popup() {
         </div>
       </div>
 
-      <div className="footer">Google Meet タブで有効になります</div>
+      <div className="footer">{t("footer")}</div>
     </div>
   );
 }
