@@ -3,6 +3,8 @@
  * Google Meet の自動ミュート制御
  */
 
+import { DEFAULT_CONFIG, SILENCE_RATIO, STORAGE_KEYS } from "../constants";
+
 const State = {
   IDLE: "IDLE",
   MUTED: "MUTED",
@@ -21,11 +23,7 @@ let micStream: MediaStream | null = null;
 let animFrameId: number | null = null;
 let graceTimer: ReturnType<typeof setTimeout> | null = null;
 
-let config = {
-  speechThreshold: 0.025,
-  silenceThreshold: 0.0125,
-  gracePeriod: 1500,
-};
+let config = { ...DEFAULT_CONFIG };
 
 const log = (msg: string, ...args: unknown[]) =>
   console.log(`[HushMeet] ${msg}`, ...args);
@@ -106,6 +104,13 @@ function toggleMeetMute(shouldMute: boolean) {
   }
 }
 
+function clearGraceTimer() {
+  if (graceTimer) {
+    clearTimeout(graceTimer);
+    graceTimer = null;
+  }
+}
+
 function transition(newState: StateType) {
   if (currentState === newState) return;
   const prev = currentState;
@@ -119,7 +124,7 @@ function transition(newState: StateType) {
       break;
 
     case State.GRACE:
-      if (graceTimer) clearTimeout(graceTimer);
+      clearGraceTimer();
       graceTimer = setTimeout(() => {
         if (currentState === State.GRACE) {
           transition(State.MUTED);
@@ -128,16 +133,16 @@ function transition(newState: StateType) {
       break;
 
     case State.MUTED:
-      if (graceTimer) clearTimeout(graceTimer);
+      clearGraceTimer();
       toggleMeetMute(true);
       break;
 
     case State.SPEAKING:
-      if (graceTimer) clearTimeout(graceTimer);
+      clearGraceTimer();
       break;
   }
 
-  chrome.storage.local.set({ hushMeetState: newState });
+  chrome.storage.local.set({ [STORAGE_KEYS.state]: newState });
 }
 
 function analyseLoop() {
@@ -172,7 +177,7 @@ function analyseLoop() {
       break;
   }
 
-  chrome.storage.local.set({ hushMeetLevel: rms });
+  chrome.storage.local.set({ [STORAGE_KEYS.level]: rms });
   animFrameId = requestAnimationFrame(analyseLoop);
 }
 
@@ -204,7 +209,7 @@ async function startListening() {
 
 function stopListening() {
   enabled = false;
-  if (graceTimer) clearTimeout(graceTimer);
+  clearGraceTimer();
 
   if (animFrameId) {
     cancelAnimationFrame(animFrameId);
@@ -224,12 +229,15 @@ function stopListening() {
   analyser = null;
   currentState = State.IDLE;
   log("マイク監視を停止しました");
-  chrome.storage.local.set({ hushMeetState: State.IDLE, hushMeetLevel: 0 });
+  chrome.storage.local.set({
+    [STORAGE_KEYS.state]: State.IDLE,
+    [STORAGE_KEYS.level]: 0,
+  });
 }
 
 chrome.storage.onChanged.addListener((changes) => {
-  if (changes.hushMeetEnabled) {
-    const newVal = changes.hushMeetEnabled.newValue;
+  if (changes[STORAGE_KEYS.enabled]) {
+    const newVal = changes[STORAGE_KEYS.enabled].newValue;
     if (newVal && !enabled) {
       enabled = true;
       startListening();
@@ -238,19 +246,29 @@ chrome.storage.onChanged.addListener((changes) => {
     }
   }
 
-  if (changes.hushMeetConfig) {
-    Object.assign(config, changes.hushMeetConfig.newValue);
+  if (changes[STORAGE_KEYS.config]) {
+    const newConfig = changes[STORAGE_KEYS.config].newValue;
+    config = {
+      speechThreshold: newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
+      silenceThreshold: (newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
+      gracePeriod: newConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
+    };
     log("設定を更新:", config);
   }
 });
 
 chrome.storage.local.get(
-  ["hushMeetEnabled", "hushMeetConfig"],
+  [STORAGE_KEYS.enabled, STORAGE_KEYS.config],
   (result) => {
-    if (result.hushMeetConfig) {
-      Object.assign(config, result.hushMeetConfig);
+    if (result[STORAGE_KEYS.config]) {
+      const saved = result[STORAGE_KEYS.config];
+      config = {
+        speechThreshold: saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
+        silenceThreshold: (saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
+        gracePeriod: saved.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
+      };
     }
-    if (result.hushMeetEnabled) {
+    if (result[STORAGE_KEYS.enabled]) {
       enabled = true;
       setTimeout(startListening, 2000);
     }

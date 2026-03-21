@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  DEFAULT_CONFIG,
+  THRESHOLD_RANGE,
+  GRACE_RANGE,
+  SILENCE_RATIO,
+  STORAGE_KEYS,
+  APP_VERSION,
+} from "../constants";
 
 interface HushMeetConfig {
   speechThreshold?: number;
@@ -7,6 +15,7 @@ interface HushMeetConfig {
 }
 
 interface HushMeetStorage {
+  [key: string]: boolean | HushMeetConfig | string | number | undefined;
   hushMeetEnabled?: boolean;
   hushMeetConfig?: HushMeetConfig;
   hushMeetState?: string;
@@ -25,17 +34,17 @@ export function Popup() {
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState("IDLE");
   const [level, setLevel] = useState(0);
-  const [threshold, setThreshold] = useState(0.025);
-  const [gracePeriod, setGracePeriod] = useState(1500);
+  const [threshold, setThreshold] = useState(DEFAULT_CONFIG.speechThreshold);
+  const [gracePeriod, setGracePeriod] = useState(DEFAULT_CONFIG.gracePeriod);
 
   useEffect(() => {
     chrome.storage.local.get(
-      ["hushMeetEnabled", "hushMeetConfig", "hushMeetState", "hushMeetLevel"],
+      [STORAGE_KEYS.enabled, STORAGE_KEYS.config, STORAGE_KEYS.state, STORAGE_KEYS.level],
       (result: HushMeetStorage) => {
         setEnabled(!!result.hushMeetEnabled);
         if (result.hushMeetConfig) {
-          setThreshold(result.hushMeetConfig.speechThreshold ?? 0.025);
-          setGracePeriod(result.hushMeetConfig.gracePeriod ?? 1500);
+          setThreshold(result.hushMeetConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
+          setGracePeriod(result.hushMeetConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
         }
         setState(result.hushMeetState ?? "IDLE");
         setLevel(result.hushMeetLevel ?? 0);
@@ -43,49 +52,47 @@ export function Popup() {
     );
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes.hushMeetState) setState(changes.hushMeetState.newValue as string);
-      if (changes.hushMeetLevel) setLevel((changes.hushMeetLevel.newValue as number) ?? 0);
+      if (changes[STORAGE_KEYS.state]) setState(changes[STORAGE_KEYS.state].newValue as string);
+      if (changes[STORAGE_KEYS.level]) setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
     };
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
+  const saveConfig = (speech: number, grace: number) => {
+    chrome.storage.local.set({
+      [STORAGE_KEYS.config]: {
+        speechThreshold: speech,
+        silenceThreshold: speech * SILENCE_RATIO,
+        gracePeriod: grace,
+      },
+    });
+  };
+
   const handleToggle = (checked: boolean) => {
     setEnabled(checked);
-    chrome.storage.local.set({ hushMeetEnabled: checked });
+    chrome.storage.local.set({ [STORAGE_KEYS.enabled]: checked });
   };
 
   const handleThresholdChange = (val: number) => {
     setThreshold(val);
-    chrome.storage.local.set({
-      hushMeetConfig: {
-        speechThreshold: val,
-        silenceThreshold: val * 0.5,
-        gracePeriod,
-      },
-    });
+    saveConfig(val, gracePeriod);
   };
 
   const handleGraceChange = (val: number) => {
     setGracePeriod(val);
-    chrome.storage.local.set({
-      hushMeetConfig: {
-        speechThreshold: threshold,
-        silenceThreshold: threshold * 0.5,
-        gracePeriod: val,
-      },
-    });
+    saveConfig(threshold, val);
   };
 
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
-  const levelPct = Math.min(100, (level / 0.1) * 100);
-  const thresholdPct = Math.min(100, (threshold / 0.1) * 100);
+  const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
+  const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
 
   return (
     <div className="popup">
       <div className="header">
         <h1>Hush Meet</h1>
-        <span className="version">v0.1.0</span>
+        <span className="version">v{APP_VERSION}</span>
       </div>
 
       <div className="toggle-row">
@@ -124,9 +131,9 @@ export function Popup() {
           </div>
           <input
             type="range"
-            min="0.005"
-            max="0.05"
-            step="0.001"
+            min={THRESHOLD_RANGE.min}
+            max={THRESHOLD_RANGE.max}
+            step={THRESHOLD_RANGE.step}
             value={threshold}
             onChange={(e) => handleThresholdChange(parseFloat(e.target.value))}
           />
@@ -139,9 +146,9 @@ export function Popup() {
           </div>
           <input
             type="range"
-            min="500"
-            max="4000"
-            step="100"
+            min={GRACE_RANGE.min}
+            max={GRACE_RANGE.max}
+            step={GRACE_RANGE.step}
             value={gracePeriod}
             onChange={(e) => handleGraceChange(parseInt(e.target.value))}
           />
