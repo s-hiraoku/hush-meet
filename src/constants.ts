@@ -43,4 +43,4 @@ export const THEME_LIST: { id: ThemeId; label: string }[] = [
   { id: THEMES.retroFuture, label: "Retro Future" },
 ];
 
-export const APP_VERSION = "1.0.0";
+export const APP_VERSION = "1.0.1";
