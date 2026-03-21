@@ -1,5 +1,18 @@
 import { useEffect, useState } from "react";
 
+interface HushMeetConfig {
+  speechThreshold?: number;
+  silenceThreshold?: number;
+  gracePeriod?: number;
+}
+
+interface HushMeetStorage {
+  hushMeetEnabled?: boolean;
+  hushMeetConfig?: HushMeetConfig;
+  hushMeetState?: string;
+  hushMeetLevel?: number;
+}
+
 const stateLabels: Record<string, { text: string; css: string }> = {
   IDLE: { text: "無効", css: "" },
   MUTED: { text: "ミュート中（待機）", css: "muted" },
@@ -12,16 +25,16 @@ export function Popup() {
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState("IDLE");
   const [level, setLevel] = useState(0);
-  const [threshold, setThreshold] = useState(0.015);
+  const [threshold, setThreshold] = useState(0.025);
   const [gracePeriod, setGracePeriod] = useState(1500);
 
   useEffect(() => {
     chrome.storage.local.get(
       ["hushMeetEnabled", "hushMeetConfig", "hushMeetState", "hushMeetLevel"],
-      (result) => {
+      (result: HushMeetStorage) => {
         setEnabled(!!result.hushMeetEnabled);
         if (result.hushMeetConfig) {
-          setThreshold(result.hushMeetConfig.speechThreshold ?? 0.015);
+          setThreshold(result.hushMeetConfig.speechThreshold ?? 0.025);
           setGracePeriod(result.hushMeetConfig.gracePeriod ?? 1500);
         }
         setState(result.hushMeetState ?? "IDLE");
@@ -30,8 +43,8 @@ export function Popup() {
     );
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes.hushMeetState) setState(changes.hushMeetState.newValue);
-      if (changes.hushMeetLevel) setLevel(changes.hushMeetLevel.newValue ?? 0);
+      if (changes.hushMeetState) setState(changes.hushMeetState.newValue as string);
+      if (changes.hushMeetLevel) setLevel((changes.hushMeetLevel.newValue as number) ?? 0);
     };
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);

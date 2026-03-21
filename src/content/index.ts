@@ -22,8 +22,8 @@ let animFrameId: number | null = null;
 let graceTimer: ReturnType<typeof setTimeout> | null = null;
 
 let config = {
-  speechThreshold: 0.015,
-  silenceThreshold: 0.008,
+  speechThreshold: 0.025,
+  silenceThreshold: 0.0125,
   gracePeriod: 1500,
 };
 
