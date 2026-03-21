@@ -177,7 +177,24 @@ function analyseLoop() {
       break;
   }
 
-  chrome.storage.local.set({ [STORAGE_KEYS.level]: rms });
+  // Spectrum data for equalizer (16 bands)
+  const freqData = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(freqData);
+  const bandCount = 16;
+  const bandSize = Math.floor(freqData.length / bandCount);
+  const spectrum: number[] = [];
+  for (let b = 0; b < bandCount; b++) {
+    let bandSum = 0;
+    for (let i = b * bandSize; i < (b + 1) * bandSize; i++) {
+      bandSum += freqData[i];
+    }
+    spectrum.push(bandSum / bandSize / 255);
+  }
+
+  chrome.storage.local.set({
+    [STORAGE_KEYS.level]: rms,
+    [STORAGE_KEYS.spectrum]: spectrum,
+  });
   animFrameId = requestAnimationFrame(analyseLoop);
 }
 

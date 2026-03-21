@@ -7,6 +7,7 @@ import {
   STORAGE_KEYS,
   APP_VERSION,
 } from "../constants";
+import { Equalizer } from "./Equalizer";
 
 interface HushMeetConfig {
   speechThreshold?: number;
@@ -122,6 +123,8 @@ export function Popup() {
           <div className="threshold-marker" style={{ left: `${thresholdPct}%` }} />
         </div>
       </div>
+
+      <Equalizer />
 
       <div className="settings">
         <div className="setting">

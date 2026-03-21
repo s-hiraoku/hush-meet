@@ -23,6 +23,7 @@ export const STORAGE_KEYS = {
   config: "hushMeetConfig",
   state: "hushMeetState",
   level: "hushMeetLevel",
+  spectrum: "hushMeetSpectrum",
 } as const;
 
 export const APP_VERSION = "1.0.0";
