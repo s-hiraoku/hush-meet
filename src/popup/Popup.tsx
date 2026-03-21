@@ -6,8 +6,11 @@ import {
   SILENCE_RATIO,
   STORAGE_KEYS,
   APP_VERSION,
+  THEMES,
+  type ThemeId,
 } from "../constants";
 import { Equalizer } from "./Equalizer";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 
 interface HushMeetConfig {
   speechThreshold?: number;
@@ -31,17 +34,35 @@ const stateLabels: Record<string, { text: string; css: string }> = {
   GRACE: { text: "猶予中…", css: "grace" },
 };
 
+function applyTheme(t: ThemeId) {
+  if (t === THEMES.default) {
+    document.body.removeAttribute("data-theme");
+  } else {
+    document.body.setAttribute("data-theme", t);
+  }
+}
+
 export function Popup() {
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState("IDLE");
   const [level, setLevel] = useState(0);
-  const [threshold, setThreshold] = useState(DEFAULT_CONFIG.speechThreshold);
-  const [gracePeriod, setGracePeriod] = useState(DEFAULT_CONFIG.gracePeriod);
+  const [threshold, setThreshold] = useState<number>(DEFAULT_CONFIG.speechThreshold);
+  const [gracePeriod, setGracePeriod] = useState<number>(DEFAULT_CONFIG.gracePeriod);
+  const [theme, setTheme] = useState<ThemeId>(THEMES.default);
 
   useEffect(() => {
     chrome.storage.local.get(
-      [STORAGE_KEYS.enabled, STORAGE_KEYS.config, STORAGE_KEYS.state, STORAGE_KEYS.level],
+      [
+        STORAGE_KEYS.enabled,
+        STORAGE_KEYS.config,
+        STORAGE_KEYS.state,
+        STORAGE_KEYS.level,
+        STORAGE_KEYS.theme,
+      ],
       (result: HushMeetStorage) => {
+        const savedTheme = (result[STORAGE_KEYS.theme] as ThemeId) ?? THEMES.default;
+        setTheme(savedTheme);
+        applyTheme(savedTheme);
         setEnabled(!!result.hushMeetEnabled);
         if (result.hushMeetConfig) {
           setThreshold(result.hushMeetConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
@@ -56,20 +77,35 @@ export function Popup() {
             },
           });
         }
-        setState(result.hushMeetState ?? "IDLE");
-        setLevel(result.hushMeetLevel ?? 0);
+        const loadedState = result.hushMeetState ?? "IDLE";
+        setState(loadedState);
+        if (loadedState === "IDLE") {
+          setLevel(0);
+          chrome.storage.local.set({
+            [STORAGE_KEYS.level]: 0,
+            [STORAGE_KEYS.spectrum]: [],
+          });
+        } else {
+          setLevel(result.hushMeetLevel ?? 0);
+        }
       },
     );
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[STORAGE_KEYS.state]) setState(changes[STORAGE_KEYS.state].newValue as string);
-      if (changes[STORAGE_KEYS.level]) setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
+      if (changes[STORAGE_KEYS.level])
+        setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
       if (changes[STORAGE_KEYS.config]) {
         const cfg = changes[STORAGE_KEYS.config].newValue as HushMeetConfig;
         if (cfg) {
           setThreshold(cfg.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
           setGracePeriod(cfg.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
         }
+      }
+      if (changes[STORAGE_KEYS.theme]) {
+        const t = changes[STORAGE_KEYS.theme].newValue as ThemeId;
+        setTheme(t);
+        applyTheme(t);
       }
     };
     chrome.storage.onChanged.addListener(listener);
@@ -101,15 +137,27 @@ export function Popup() {
     saveConfig(threshold, val);
   };
 
+  const handleThemeChange = (t: ThemeId) => {
+    setTheme(t);
+    applyTheme(t);
+  };
+
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
   const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
   const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
 
   return (
     <div className="popup">
+      <span className="screw screw-tl" />
+      <span className="screw screw-tr" />
+      <span className="screw screw-bl" />
+      <span className="screw screw-br" />
       <div className="header">
         <h1>Hush Meet</h1>
-        <span className="version">v{APP_VERSION}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span className="version">v{APP_VERSION}</span>
+          <ThemeSwitcher current={theme} onChange={handleThemeChange} />
+        </div>
       </div>
 
       <div className="toggle-row">

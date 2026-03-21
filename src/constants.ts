@@ -24,6 +24,23 @@ export const STORAGE_KEYS = {
   state: "hushMeetState",
   level: "hushMeetLevel",
   spectrum: "hushMeetSpectrum",
+  theme: "hushMeetTheme",
 } as const;
+
+export const THEMES = {
+  default: "default",
+  analogRadio: "analog-radio",
+  boombox: "boombox",
+  retroFuture: "retro-future",
+} as const;
+
+export type ThemeId = (typeof THEMES)[keyof typeof THEMES];
+
+export const THEME_LIST: { id: ThemeId; label: string }[] = [
+  { id: THEMES.default, label: "Default" },
+  { id: THEMES.analogRadio, label: "Analog Radio" },
+  { id: THEMES.boombox, label: "Boombox" },
+  { id: THEMES.retroFuture, label: "Retro Future" },
+];
 
 export const APP_VERSION = "1.0.0";

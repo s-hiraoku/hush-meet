@@ -23,12 +23,12 @@ let micStream: MediaStream | null = null;
 let animFrameId: number | null = null;
 let graceTimer: ReturnType<typeof setTimeout> | null = null;
 
-let config = { ...DEFAULT_CONFIG };
+let config: { speechThreshold: number; silenceThreshold: number; gracePeriod: number } = {
+  ...DEFAULT_CONFIG,
+};
 
-const log = (msg: string, ...args: unknown[]) =>
-  console.log(`[HushMeet] ${msg}`, ...args);
-const warn = (msg: string, ...args: unknown[]) =>
-  console.warn(`[HushMeet] ${msg}`, ...args);
+const log = (msg: string, ...args: unknown[]) => console.log(`[HushMeet] ${msg}`, ...args);
+const warn = (msg: string, ...args: unknown[]) => console.warn(`[HushMeet] ${msg}`, ...args);
 
 function findMuteButton(): HTMLElement | null {
   const selectors = [
@@ -249,6 +249,7 @@ function stopListening() {
   chrome.storage.local.set({
     [STORAGE_KEYS.state]: State.IDLE,
     [STORAGE_KEYS.level]: 0,
+    [STORAGE_KEYS.spectrum]: [],
   });
 }
 
@@ -264,32 +265,37 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 
   if (changes[STORAGE_KEYS.config]) {
-    const newConfig = changes[STORAGE_KEYS.config].newValue;
+    const newConfig = changes[STORAGE_KEYS.config].newValue as typeof config;
     config = {
       speechThreshold: newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
-      silenceThreshold: (newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
+      silenceThreshold:
+        (newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
       gracePeriod: newConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
     };
     log("設定を更新:", config);
   }
 });
 
-chrome.storage.local.get(
-  [STORAGE_KEYS.enabled, STORAGE_KEYS.config],
-  (result) => {
-    if (result[STORAGE_KEYS.config]) {
-      const saved = result[STORAGE_KEYS.config];
-      config = {
-        speechThreshold: saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
-        silenceThreshold: (saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
-        gracePeriod: saved.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
-      };
-    }
-    if (result[STORAGE_KEYS.enabled]) {
-      enabled = true;
-      setTimeout(startListening, 2000);
-    }
-  },
-);
+chrome.storage.local.get([STORAGE_KEYS.enabled, STORAGE_KEYS.config], (result) => {
+  if (result[STORAGE_KEYS.config]) {
+    const saved = result[STORAGE_KEYS.config] as typeof config;
+    config = {
+      speechThreshold: saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
+      silenceThreshold: (saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
+      gracePeriod: saved.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
+    };
+  }
+  if (result[STORAGE_KEYS.enabled]) {
+    enabled = true;
+    setTimeout(startListening, 2000);
+  }
+});
+
+// Clean up when the Meet tab is closed or navigated away
+window.addEventListener("beforeunload", () => {
+  if (enabled) {
+    stopListening();
+  }
+});
 
 log("Hush Meet content script loaded");

@@ -11,14 +11,18 @@ export function Equalizer() {
 
   useEffect(() => {
     chrome.storage.local.get([STORAGE_KEYS.spectrum], (result) => {
-      if (result[STORAGE_KEYS.spectrum]) {
-        setBands(result[STORAGE_KEYS.spectrum]);
+      const data = result[STORAGE_KEYS.spectrum];
+      if (Array.isArray(data) && data.length > 0) {
+        setBands(data);
+      } else {
+        setBands(EMPTY_BANDS);
       }
     });
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[STORAGE_KEYS.spectrum]) {
-        setBands(changes[STORAGE_KEYS.spectrum].newValue ?? EMPTY_BANDS);
+        const data = changes[STORAGE_KEYS.spectrum].newValue;
+        setBands(Array.isArray(data) && data.length > 0 ? data : EMPTY_BANDS);
       }
     };
     chrome.storage.onChanged.addListener(listener);
@@ -39,12 +43,7 @@ export function Equalizer() {
                 let color = "low";
                 if (segIndex >= SEGMENTS - 2) color = "peak";
                 else if (segIndex >= SEGMENTS - 4) color = "mid";
-                return (
-                  <div
-                    key={s}
-                    className={`eq-seg ${isActive ? `active ${color}` : ""}`}
-                  />
-                );
+                return <div key={s} className={`eq-seg ${isActive ? `active ${color}` : ""}`} />;
               })}
             </div>
           );

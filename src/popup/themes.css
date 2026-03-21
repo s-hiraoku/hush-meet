@@ -1,0 +1,724 @@
+/* ============================================================
+   THEME: Analog Radio — 70-80s warm vacuum-tube receiver
+   Wood grain texture, brass accents, VU meter glow, serif type
+   ============================================================ */
+body[data-theme="analog-radio"] {
+  --bg: #2c1e10;
+  --surface: #3a2816;
+  --border: #6b4c2a;
+  --primary: #d4884a;
+  --text: #f0e6d6;
+  --text-muted: #b8a48e;
+  --green: #7cb342;
+  --yellow: #e6a23c;
+  --slider-track: #5c4633;
+  --eq-bg: #1e1408;
+  --eq-inactive: #3d2d1c;
+  --font-display: Georgia, "Palatino Linotype", "Book Antiqua", serif;
+  --font-body: "Lucida Console", "Courier New", monospace;
+}
+
+/* Wood grain SVG texture overlay */
+body[data-theme="analog-radio"] {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.15' numOctaves='4' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.18 0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23w)'/%3E%3C/svg%3E"),
+    linear-gradient(170deg, #3a2510 0%, #2c1e10 40%, #231508 100%);
+}
+
+body[data-theme="analog-radio"] .popup {
+  background: transparent;
+}
+
+/* Brass corner screws — 4 decorative elements */
+.screw {
+  display: none;
+}
+body[data-theme="analog-radio"] .screw {
+  display: block;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e8c97a, #8b6914 60%, #5a4510);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  pointer-events: none;
+}
+body[data-theme="analog-radio"] .screw-tl { top: 6px; left: 6px; }
+body[data-theme="analog-radio"] .screw-tr { top: 6px; right: 6px; }
+body[data-theme="analog-radio"] .screw-bl { bottom: 6px; left: 6px; }
+body[data-theme="analog-radio"] .screw-br { bottom: 6px; right: 6px; }
+
+body[data-theme="analog-radio"] .header h1 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #e8c97a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+body[data-theme="analog-radio"] .version {
+  font-family: var(--font-body);
+  color: #8b7355;
+}
+
+/* Warm panel styling with inner bevel */
+body[data-theme="analog-radio"] .toggle-row,
+body[data-theme="analog-radio"] .status,
+body[data-theme="analog-radio"] .meter,
+body[data-theme="analog-radio"] .equalizer,
+body[data-theme="analog-radio"] .settings {
+  background:
+    linear-gradient(180deg, rgba(90, 65, 30, 0.4) 0%, rgba(40, 28, 12, 0.6) 100%);
+  border: 2px solid #6b4c2a;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(232, 201, 122, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* VU meter style for level bar */
+body[data-theme="analog-radio"] .meter-bar-bg {
+  height: 10px;
+  background:
+    linear-gradient(180deg, #1a1005, #2a1a08);
+  border: 1px solid #5a4020;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+body[data-theme="analog-radio"] .meter-bar {
+  background: linear-gradient(90deg, #5a8a20, #7cb342, #a0d450);
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(124, 179, 66, 0.4);
+}
+
+body[data-theme="analog-radio"] .meter-bar.hot {
+  background: linear-gradient(90deg, #d4884a, #e8a040, #ff6b35);
+  box-shadow: 0 0 8px rgba(212, 136, 74, 0.5);
+}
+
+/* Warm amber indicator light */
+body[data-theme="analog-radio"] .status-dot {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+body[data-theme="analog-radio"] .status-dot.speaking {
+  background: radial-gradient(circle at 40% 40%, #b8e86a, #5a8a20);
+  box-shadow: 0 0 8px rgba(124, 179, 66, 0.6);
+}
+body[data-theme="analog-radio"] .status-dot.muted {
+  background: radial-gradient(circle at 40% 40%, #ff9050, #d4884a);
+  box-shadow: 0 0 8px rgba(212, 136, 74, 0.6);
+}
+
+/* Knob-style slider thumb */
+body[data-theme="analog-radio"] input[type="range"] {
+  height: 6px;
+  background: linear-gradient(180deg, #1a1005, #3a2510);
+  border: 1px solid #5a4020;
+  border-radius: 3px;
+}
+body[data-theme="analog-radio"] input[type="range"]::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #e8c97a, #b8962e 50%, #8b6914);
+  border: 1px solid #5a4510;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Toggle as a brass lever */
+body[data-theme="analog-radio"] .slider {
+  background: linear-gradient(180deg, #2a1a08, #3a2510);
+  border: 1px solid #5a4020;
+  border-radius: 4px;
+}
+body[data-theme="analog-radio"] .slider::before {
+  background: radial-gradient(circle at 40% 35%, #e8c97a, #b8962e 60%, #8b6914);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+body[data-theme="analog-radio"] .toggle input:checked + .slider {
+  background: linear-gradient(180deg, #4a3018, #5a3820);
+  border-color: #8b6914;
+}
+
+/* Equalizer warm amber glow */
+body[data-theme="analog-radio"] .eq-bars {
+  background: linear-gradient(180deg, #0e0a04, #1a1005);
+  border: 1px solid #5a4020;
+  border-radius: 3px;
+}
+body[data-theme="analog-radio"] .eq-seg.active.low {
+  background: #7cb342;
+  box-shadow: 0 0 4px rgba(124, 179, 66, 0.5);
+}
+body[data-theme="analog-radio"] .eq-seg.active.mid {
+  background: #e6a23c;
+  box-shadow: 0 0 4px rgba(230, 162, 60, 0.5);
+}
+body[data-theme="analog-radio"] .eq-seg.active.peak {
+  background: #d4884a;
+  box-shadow: 0 0 6px rgba(212, 136, 74, 0.6);
+}
+
+body[data-theme="analog-radio"] .setting-label,
+body[data-theme="analog-radio"] .meter-label,
+body[data-theme="analog-radio"] .eq-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+body[data-theme="analog-radio"] .footer {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: #8b7355;
+}
+
+
+/* ============================================================
+   THEME: Boombox — 80s metallic cassette deck / boombox
+   Brushed metal texture, speaker grille, industrial UI
+   ============================================================ */
+body[data-theme="boombox"] {
+  --bg: #1e2025;
+  --surface: #2a2c32;
+  --border: #4a4d55;
+  --primary: #ff3333;
+  --text: #e0e2e8;
+  --text-muted: #888c96;
+  --green: #33cc66;
+  --yellow: #ffcc00;
+  --slider-track: #3a3d45;
+  --eq-bg: #141518;
+  --eq-inactive: #252830;
+  --font-display: Impact, "Arial Narrow", "Helvetica Neue", sans-serif;
+  --font-body: "Trebuchet MS", "Lucida Sans", sans-serif;
+}
+
+/* Brushed metal SVG texture */
+body[data-theme="boombox"] {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5 0.02' numOctaves='3' seed='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='300' height='300' fill='%23252830' /%3E%3Crect width='300' height='300' filter='url(%23m)'/%3E%3C/svg%3E");
+}
+
+body[data-theme="boombox"] .popup {
+  background: transparent;
+  position: relative;
+}
+
+/* Top chrome strip */
+body[data-theme="boombox"] .header {
+  background: linear-gradient(180deg, #4a4d55, #35383e, #4a4d55);
+  margin: -16px -16px 12px;
+  padding: 10px 16px;
+  border-bottom: 2px solid #555860;
+  z-index: 100;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="boombox"] .header h1 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #ff3333;
+  text-shadow:
+    0 0 10px rgba(255, 51, 51, 0.4),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+body[data-theme="boombox"] .version {
+  font-family: var(--font-body);
+  background: #1a1c20;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid #3a3d45;
+}
+
+/* Speaker grille pattern panels */
+body[data-theme="boombox"] .toggle-row,
+body[data-theme="boombox"] .status {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Ccircle cx='4' cy='4' r='1.2' fill='%23181a1e'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #2e3038, #252830);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+body[data-theme="boombox"] .meter,
+body[data-theme="boombox"] .equalizer,
+body[data-theme="boombox"] .settings {
+  background: linear-gradient(180deg, #2a2c32, #22242a);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Cassette window style meter */
+body[data-theme="boombox"] .meter-bar-bg {
+  height: 12px;
+  background: #0a0c10;
+  border: 2px solid #3a3d45;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+body[data-theme="boombox"] .meter-bar {
+  background: linear-gradient(90deg, #33cc66, #66ff99);
+  box-shadow: 0 0 8px rgba(51, 204, 102, 0.4);
+  border-radius: 0;
+}
+
+body[data-theme="boombox"] .meter-bar.hot {
+  background: linear-gradient(90deg, #ff3333, #ff6666);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+body[data-theme="boombox"] .threshold-marker {
+  width: 3px;
+  height: 16px;
+  top: -4px;
+  background: #ffcc00;
+  box-shadow: 0 0 4px rgba(255, 204, 0, 0.6);
+}
+
+/* Red LED indicators */
+body[data-theme="boombox"] .status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid #1a1c20;
+}
+body[data-theme="boombox"] .status-dot.speaking {
+  background: #33cc66;
+  box-shadow: 0 0 6px rgba(51, 204, 102, 0.8), 0 0 12px rgba(51, 204, 102, 0.3);
+}
+body[data-theme="boombox"] .status-dot.muted {
+  background: #ff3333;
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.8), 0 0 12px rgba(255, 51, 51, 0.3);
+}
+body[data-theme="boombox"] .status-dot.grace {
+  background: #ffcc00;
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.8);
+}
+
+/* Chunky industrial slider */
+body[data-theme="boombox"] input[type="range"] {
+  height: 8px;
+  background: #0a0c10;
+  border: 1px solid #3a3d45;
+  border-radius: 2px;
+}
+body[data-theme="boombox"] input[type="range"]::-webkit-slider-thumb {
+  width: 10px;
+  height: 20px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #606470, #4a4d55, #606470);
+  border: 1px solid #888c96;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Heavy-duty toggle */
+body[data-theme="boombox"] .slider {
+  background: #0a0c10;
+  border: 2px solid #3a3d45;
+  border-radius: 4px;
+}
+body[data-theme="boombox"] .slider::before {
+  border-radius: 3px;
+  background: linear-gradient(180deg, #888c96, #606470, #888c96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+body[data-theme="boombox"] .toggle input:checked + .slider {
+  background: #1a0808;
+  border-color: #ff3333;
+  box-shadow: 0 0 8px rgba(255, 51, 51, 0.3);
+}
+
+/* EQ in boombox style */
+body[data-theme="boombox"] .eq-bars {
+  background: #0a0c10;
+  border: 2px solid #3a3d45;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+body[data-theme="boombox"] .eq-seg {
+  border-radius: 0;
+}
+body[data-theme="boombox"] .eq-seg.active.low {
+  background: #33cc66;
+  box-shadow: 0 0 4px rgba(51, 204, 102, 0.5);
+}
+body[data-theme="boombox"] .eq-seg.active.mid {
+  background: #ffcc00;
+  box-shadow: 0 0 4px rgba(255, 204, 0, 0.5);
+}
+body[data-theme="boombox"] .eq-seg.active.peak {
+  background: #ff3333;
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.6);
+}
+
+body[data-theme="boombox"] .setting-label,
+body[data-theme="boombox"] .meter-label,
+body[data-theme="boombox"] .eq-label,
+body[data-theme="boombox"] .toggle-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+body[data-theme="boombox"] .footer {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 9px;
+}
+
+
+/* ============================================================
+   THEME: Retro Future — CRT synthwave / neon terminal
+   Scanlines, perspective grid, neon glow, phosphor green
+   ============================================================ */
+body[data-theme="retro-future"] {
+  --bg: #05050f;
+  --surface: #0a0a1e;
+  --border: #1a0a4a;
+  --primary: #ff2a6d;
+  --text: #d0d0ff;
+  --text-muted: #6060aa;
+  --green: #00ffaa;
+  --yellow: #00e5ff;
+  --slider-track: #15153a;
+  --eq-bg: #030308;
+  --eq-inactive: #0e0e25;
+  --font-display: "Courier New", "Lucida Console", monospace;
+  --font-body: "Courier New", monospace;
+}
+
+/* CRT background: perspective grid + scanlines */
+body[data-theme="retro-future"] {
+  background: #05050f;
+  position: relative;
+}
+
+body[data-theme="retro-future"] .popup {
+  background:
+    /* Scanlines */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 255, 170, 0.02) 2px,
+      rgba(0, 255, 170, 0.02) 4px
+    ),
+    /* Perspective grid floor */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2305050f'/%3E%3Cstop offset='1' stop-color='%230a0a1e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='200' fill='url(%23g)'/%3E%3Cg stroke='%231a0a6a' stroke-width='0.5' opacity='0.3'%3E%3Cline x1='0' y1='200' x2='150' y2='80'/%3E%3Cline x1='30' y1='200' x2='150' y2='80'/%3E%3Cline x1='60' y1='200' x2='150' y2='80'/%3E%3Cline x1='90' y1='200' x2='150' y2='80'/%3E%3Cline x1='120' y1='200' x2='150' y2='80'/%3E%3Cline x1='180' y1='200' x2='150' y2='80'/%3E%3Cline x1='210' y1='200' x2='150' y2='80'/%3E%3Cline x1='240' y1='200' x2='150' y2='80'/%3E%3Cline x1='270' y1='200' x2='150' y2='80'/%3E%3Cline x1='300' y1='200' x2='150' y2='80'/%3E%3Cline x1='0' y1='200' x2='300' y2='200'/%3E%3Cline x1='10' y1='185' x2='290' y2='185'/%3E%3Cline x1='30' y1='170' x2='270' y2='170'/%3E%3Cline x1='50' y1='155' x2='250' y2='155'/%3E%3Cline x1='70' y1='140' x2='230' y2='140'/%3E%3Cline x1='85' y1='125' x2='215' y2='125'/%3E%3C/g%3E%3C/svg%3E") no-repeat bottom center;
+  background-size: 100% auto, 100% 60%;
+  position: relative;
+}
+
+/* CRT vignette overlay */
+body[data-theme="retro-future"] .popup::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(5, 5, 15, 0.6) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ensure content above vignette */
+body[data-theme="retro-future"] .popup > * {
+  position: relative;
+  z-index: 2;
+}
+body[data-theme="retro-future"] .popup > .header {
+  z-index: 100;
+}
+
+body[data-theme="retro-future"] .header h1 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #00ffaa;
+  text-shadow:
+    0 0 10px rgba(0, 255, 170, 0.8),
+    0 0 20px rgba(0, 255, 170, 0.4),
+    0 0 40px rgba(0, 255, 170, 0.2);
+  animation: retro-flicker 4s infinite;
+}
+
+@keyframes retro-flicker {
+  0%, 97%, 100% { opacity: 1; }
+  97.5% { opacity: 0.85; }
+  98% { opacity: 1; }
+  98.5% { opacity: 0.9; }
+}
+
+body[data-theme="retro-future"] .version {
+  font-family: var(--font-body);
+  color: #ff2a6d;
+  text-shadow: 0 0 6px rgba(255, 42, 109, 0.5);
+}
+
+/* Neon-bordered panels */
+body[data-theme="retro-future"] .toggle-row,
+body[data-theme="retro-future"] .status,
+body[data-theme="retro-future"] .meter,
+body[data-theme="retro-future"] .equalizer,
+body[data-theme="retro-future"] .settings {
+  background: rgba(10, 10, 30, 0.8);
+  border: 1px solid rgba(0, 255, 170, 0.15);
+  border-radius: 2px;
+  box-shadow:
+    0 0 8px rgba(0, 255, 170, 0.05),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Neon meter bar */
+body[data-theme="retro-future"] .meter-bar-bg {
+  height: 8px;
+  background: #030308;
+  border: 1px solid rgba(0, 255, 170, 0.2);
+  border-radius: 1px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+body[data-theme="retro-future"] .meter-bar {
+  background: linear-gradient(90deg, #00ffaa, #00e5ff);
+  border-radius: 0;
+  box-shadow:
+    0 0 8px rgba(0, 255, 170, 0.6),
+    0 0 16px rgba(0, 255, 170, 0.2);
+}
+
+body[data-theme="retro-future"] .meter-bar.hot {
+  background: linear-gradient(90deg, #ff2a6d, #ff6090);
+  box-shadow:
+    0 0 8px rgba(255, 42, 109, 0.6),
+    0 0 16px rgba(255, 42, 109, 0.3);
+}
+
+body[data-theme="retro-future"] .threshold-marker {
+  background: #ff2a6d;
+  box-shadow: 0 0 6px rgba(255, 42, 109, 0.8);
+}
+
+/* Neon dot indicators */
+body[data-theme="retro-future"] .status-dot {
+  width: 8px;
+  height: 8px;
+}
+body[data-theme="retro-future"] .status-dot.speaking {
+  background: #00ffaa;
+  box-shadow:
+    0 0 6px rgba(0, 255, 170, 1),
+    0 0 12px rgba(0, 255, 170, 0.5),
+    0 0 20px rgba(0, 255, 170, 0.2);
+}
+body[data-theme="retro-future"] .status-dot.muted {
+  background: #ff2a6d;
+  box-shadow:
+    0 0 6px rgba(255, 42, 109, 1),
+    0 0 12px rgba(255, 42, 109, 0.5);
+}
+body[data-theme="retro-future"] .status-dot.grace {
+  background: #00e5ff;
+  box-shadow:
+    0 0 6px rgba(0, 229, 255, 1),
+    0 0 12px rgba(0, 229, 255, 0.5);
+}
+
+/* Synthwave slider */
+body[data-theme="retro-future"] input[type="range"] {
+  height: 4px;
+  background: #0e0e25;
+  border: 1px solid rgba(0, 255, 170, 0.15);
+  border-radius: 0;
+}
+body[data-theme="retro-future"] input[type="range"]::-webkit-slider-thumb {
+  width: 6px;
+  height: 18px;
+  border-radius: 1px;
+  background: #00ffaa;
+  border: none;
+  box-shadow:
+    0 0 6px rgba(0, 255, 170, 0.8),
+    0 0 12px rgba(0, 255, 170, 0.3);
+}
+
+/* Neon toggle */
+body[data-theme="retro-future"] .slider {
+  background: #0a0a1e;
+  border: 1px solid rgba(0, 255, 170, 0.15);
+  border-radius: 2px;
+}
+body[data-theme="retro-future"] .slider::before {
+  background: #6060aa;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(96, 96, 170, 0.4);
+}
+body[data-theme="retro-future"] .toggle input:checked + .slider {
+  background: rgba(255, 42, 109, 0.1);
+  border-color: rgba(255, 42, 109, 0.4);
+}
+body[data-theme="retro-future"] .toggle input:checked + .slider::before {
+  background: #ff2a6d;
+  box-shadow:
+    0 0 8px rgba(255, 42, 109, 0.8),
+    0 0 16px rgba(255, 42, 109, 0.3);
+}
+
+/* Neon EQ bars */
+body[data-theme="retro-future"] .eq-bars {
+  background: #030308;
+  border: 1px solid rgba(0, 255, 170, 0.1);
+  border-radius: 1px;
+}
+body[data-theme="retro-future"] .eq-seg {
+  border-radius: 0;
+}
+body[data-theme="retro-future"] .eq-seg.active.low {
+  background: #00ffaa;
+  box-shadow: 0 0 6px rgba(0, 255, 170, 0.6);
+}
+body[data-theme="retro-future"] .eq-seg.active.mid {
+  background: #00e5ff;
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+}
+body[data-theme="retro-future"] .eq-seg.active.peak {
+  background: #ff2a6d;
+  box-shadow: 0 0 8px rgba(255, 42, 109, 0.7);
+}
+
+body[data-theme="retro-future"] .setting-label,
+body[data-theme="retro-future"] .meter-label,
+body[data-theme="retro-future"] .eq-label,
+body[data-theme="retro-future"] .toggle-label,
+body[data-theme="retro-future"] .status-text,
+body[data-theme="retro-future"] .setting-value {
+  font-family: var(--font-body);
+  letter-spacing: 0.5px;
+}
+
+body[data-theme="retro-future"] .footer {
+  font-family: var(--font-body);
+  color: #6060aa;
+  text-shadow: 0 0 4px rgba(96, 96, 170, 0.3);
+}
+
+
+/* ============================================================
+   THEME SWITCHER — shared across all themes
+   ============================================================ */
+.theme-switcher {
+  position: relative;
+}
+
+.theme-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.theme-btn:hover {
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.theme-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 200;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.theme-option.active {
+  color: var(--primary);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.theme-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}

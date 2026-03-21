@@ -18,7 +18,7 @@
   justify-content: center;
   align-items: flex-end;
   height: 48px;
-  background: #0d1117;
+  background: var(--eq-bg);
   border-radius: 6px;
   padding: 6px 8px;
 }
@@ -33,7 +33,7 @@
 .eq-seg {
   height: 4px;
   border-radius: 1px;
-  background: #1a2332;
+  background: var(--eq-inactive);
   transition: background 0.06s;
 }
 
