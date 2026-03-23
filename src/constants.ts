@@ -27,6 +27,7 @@ export const STORAGE_KEYS = {
   theme: "hushMeetTheme",
   locale: "hushMeetLocale",
   error: "hushMeetError",
+  micDeviceId: "hushMeetMicDeviceId",
 } as const;
 
 export const THEMES = {

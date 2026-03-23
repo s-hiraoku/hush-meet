@@ -61,6 +61,21 @@
   "errorMicUnknown": {
     "message": "Failed to access microphone."
   },
+  "stateUserMuted": {
+    "message": "Manually muted"
+  },
+  "userMutedBanner": {
+    "message": "Auto-unmute paused (manually muted)"
+  },
+  "resumeAutoMute": {
+    "message": "Resume Auto"
+  },
+  "micDevice": {
+    "message": "Microphone"
+  },
+  "micDefault": {
+    "message": "System Default"
+  },
   "themeSwitcher": {
     "message": "Switch Theme"
   }

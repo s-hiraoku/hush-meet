@@ -35,6 +35,7 @@ const stateLabels: Record<string, { key: string; css: string }> = {
   SPEAKING: { key: "stateSpeaking", css: "speaking" },
   GRACE: { key: "stateGrace", css: "grace" },
   ERROR: { key: "stateError", css: "error" },
+  USER_MUTED: { key: "stateUserMuted", css: "user-muted" },
 };
 
 const errorMessages: Record<string, string> = {
@@ -61,10 +62,21 @@ export function Popup() {
   const [theme, setTheme] = useState<ThemeId>(THEMES.default);
   const [locale, setLocaleState] = useState<LocaleId>("auto");
   const [micError, setMicError] = useState<string | null>(null);
+  const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedMicId, setSelectedMicId] = useState("");
   const [, setRenderKey] = useState(0);
 
   useEffect(() => {
     return onLocaleChange(() => setRenderKey((k) => k + 1));
+  }, []);
+
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      setMicDevices(devices.filter((d) => d.kind === "audioinput"));
+    });
+    chrome.storage.local.get([STORAGE_KEYS.micDeviceId], (result) => {
+      setSelectedMicId((result[STORAGE_KEYS.micDeviceId] as string) ?? "");
+    });
   }, []);
 
   useEffect(() => {
@@ -186,6 +198,16 @@ export function Popup() {
     setLocaleState(loc);
   };
 
+  const handleMicChange = (deviceId: string) => {
+    setSelectedMicId(deviceId);
+    chrome.storage.local.set({ [STORAGE_KEYS.micDeviceId]: deviceId });
+  };
+
+  const handleResumeAutoMute = () => {
+    // Transition back from USER_MUTED to MUTED
+    chrome.storage.local.set({ [STORAGE_KEYS.state]: "MUTED" });
+  };
+
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
   const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
   const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
@@ -224,6 +246,15 @@ export function Popup() {
 
       {micError && (
         <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
+      )}
+
+      {state === "USER_MUTED" && (
+        <div className="user-muted-banner">
+          <span>{t("userMutedBanner")}</span>
+          <button className="resume-btn" onClick={handleResumeAutoMute}>
+            {t("resumeAutoMute")}
+          </button>
+        </div>
       )}
 
       <div className="meter">
@@ -272,6 +303,28 @@ export function Popup() {
           />
         </div>
       </div>
+
+      {micDevices.length > 0 && (
+        <div className="settings" style={{ marginTop: "12px" }}>
+          <div className="setting">
+            <div className="setting-header">
+              <span className="setting-label">{t("micDevice")}</span>
+            </div>
+            <select
+              className="mic-select"
+              value={selectedMicId}
+              onChange={(e) => handleMicChange(e.target.value)}
+            >
+              <option value="">{t("micDefault")}</option>
+              {micDevices.map((d) => (
+                <option key={d.deviceId} value={d.deviceId}>
+                  {d.label || d.deviceId.slice(0, 16)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       <div className="footer">{t("footer")}</div>
     </div>
