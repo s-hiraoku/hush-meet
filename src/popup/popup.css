@@ -136,6 +136,26 @@ body {
 .status-dot.grace {
   background: var(--yellow);
 }
+.status-dot.error {
+  background: var(--primary);
+  animation: pulse-error 1s infinite;
+}
+
+@keyframes pulse-error {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.error-banner {
+  background: rgba(233, 69, 96, 0.15);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--primary);
+  line-height: 1.4;
+}
 
 .status-text {
   font-size: 13px;

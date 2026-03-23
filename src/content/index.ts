@@ -3,7 +3,7 @@
  * Google Meet の自動ミュート制御
  */
 
-import { DEFAULT_CONFIG, SILENCE_RATIO, STORAGE_KEYS } from "../constants";
+import { DEFAULT_CONFIG, SILENCE_RATIO, STORAGE_KEYS } from "../constants.ts";
 
 const State = {
   IDLE: "IDLE",
@@ -11,16 +11,18 @@ const State = {
   UNMUTING: "UNMUTING",
   SPEAKING: "SPEAKING",
   GRACE: "GRACE",
+  ERROR: "ERROR",
 } as const;
 
 type StateType = (typeof State)[keyof typeof State];
 
 let currentState: StateType = State.IDLE;
 let enabled = false;
+let starting = false;
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let micStream: MediaStream | null = null;
-let animFrameId: number | null = null;
+let analyseTimerId: ReturnType<typeof setInterval> | null = null;
 let graceTimer: ReturnType<typeof setTimeout> | null = null;
 
 let config: { speechThreshold: number; silenceThreshold: number; gracePeriod: number } = {
@@ -142,11 +144,25 @@ function transition(newState: StateType) {
       break;
   }
 
-  chrome.storage.local.set({ [STORAGE_KEYS.state]: newState });
+  void chrome.storage.local.set({ [STORAGE_KEYS.state]: newState });
+}
+
+async function ensureAudioContextRunning() {
+  if (audioContext && audioContext.state === "suspended") {
+    log("AudioContext suspended, resuming...");
+    await audioContext.resume();
+    log(`AudioContext state: ${audioContext.state}`);
+  }
 }
 
 function analyseLoop() {
-  if (!enabled || !analyser) return;
+  if (!enabled || !analyser || !audioContext) return;
+
+  // Skip analysis if AudioContext is not running
+  if (audioContext.state !== "running") {
+    void ensureAudioContextRunning();
+    return;
+  }
 
   const dataArray = new Float32Array(analyser.fftSize);
   analyser.getFloatTimeDomainData(dataArray);
@@ -181,24 +197,31 @@ function analyseLoop() {
   const freqData = new Uint8Array(analyser.frequencyBinCount);
   analyser.getByteFrequencyData(freqData);
   const bandCount = 16;
-  const bandSize = Math.floor(freqData.length / bandCount);
+  const bandSize = Math.max(1, Math.floor(freqData.length / bandCount));
   const spectrum: number[] = [];
   for (let b = 0; b < bandCount; b++) {
     let bandSum = 0;
-    for (let i = b * bandSize; i < (b + 1) * bandSize; i++) {
+    for (let i = b * bandSize; i < (b + 1) * bandSize && i < freqData.length; i++) {
       bandSum += freqData[i];
     }
     spectrum.push(bandSum / bandSize / 255);
   }
 
-  chrome.storage.local.set({
+  void chrome.storage.local.set({
     [STORAGE_KEYS.level]: rms,
     [STORAGE_KEYS.spectrum]: spectrum,
   });
-  animFrameId = requestAnimationFrame(analyseLoop);
 }
 
+const ANALYSE_INTERVAL_MS = 50;
+
 async function startListening() {
+  if (starting) {
+    log("startListening already in progress, skipping");
+    return;
+  }
+  starting = true;
+
   try {
     micStream = await navigator.mediaDevices.getUserMedia({
       audio: {
@@ -209,18 +232,60 @@ async function startListening() {
     });
 
     audioContext = new AudioContext();
+
+    // Ensure AudioContext is running (may be suspended without user gesture)
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+
+    // Listen for future suspend/resume events
+    audioContext.addEventListener("statechange", () => {
+      log(`AudioContext state changed: ${audioContext?.state}`);
+      if (audioContext?.state === "suspended" && enabled) {
+        void ensureAudioContextRunning();
+      }
+    });
+
     const source = audioContext.createMediaStreamSource(micStream);
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = 0.3;
     source.connect(analyser);
 
+    enabled = true;
     log("マイク監視を開始しました");
     transition(State.MUTED);
-    analyseLoop();
+
+    // Use setInterval instead of requestAnimationFrame
+    // so analysis continues when the tab is in background
+    analyseTimerId = setInterval(analyseLoop, ANALYSE_INTERVAL_MS);
   } catch (err) {
-    warn("マイクの取得に失敗:", err);
+    const error = err as DOMException;
+    let errorMsg: string;
+
+    if (error.name === "NotAllowedError") {
+      errorMsg = "mic_permission_denied";
+      warn("マイクの権限が拒否されました。ブラウザの設定を確認してください。");
+    } else if (error.name === "NotFoundError") {
+      errorMsg = "mic_not_found";
+      warn("マイクデバイスが見つかりません。");
+    } else if (error.name === "NotReadableError") {
+      errorMsg = "mic_in_use";
+      warn("マイクが他のアプリケーションで使用中です。");
+    } else {
+      errorMsg = "mic_unknown_error";
+      warn("マイクの取得に失敗:", error.name, error.message);
+    }
+
     enabled = false;
+    currentState = State.ERROR;
+    void chrome.storage.local.set({
+      [STORAGE_KEYS.enabled]: false,
+      [STORAGE_KEYS.state]: State.ERROR,
+      [STORAGE_KEYS.error]: errorMsg,
+    });
+  } finally {
+    starting = false;
   }
 }
 
@@ -228,9 +293,9 @@ function stopListening() {
   enabled = false;
   clearGraceTimer();
 
-  if (animFrameId) {
-    cancelAnimationFrame(animFrameId);
-    animFrameId = null;
+  if (analyseTimerId) {
+    clearInterval(analyseTimerId);
+    analyseTimerId = null;
   }
 
   if (micStream) {
@@ -239,14 +304,14 @@ function stopListening() {
   }
 
   if (audioContext) {
-    audioContext.close();
+    void audioContext.close();
     audioContext = null;
   }
 
   analyser = null;
   currentState = State.IDLE;
   log("マイク監視を停止しました");
-  chrome.storage.local.set({
+  void chrome.storage.local.set({
     [STORAGE_KEYS.state]: State.IDLE,
     [STORAGE_KEYS.level]: 0,
     [STORAGE_KEYS.spectrum]: [],
@@ -256,9 +321,8 @@ function stopListening() {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes[STORAGE_KEYS.enabled]) {
     const newVal = changes[STORAGE_KEYS.enabled].newValue;
-    if (newVal && !enabled) {
-      enabled = true;
-      startListening();
+    if (newVal && !enabled && !starting) {
+      void startListening();
     } else if (!newVal && enabled) {
       stopListening();
     }
@@ -286,8 +350,7 @@ chrome.storage.local.get([STORAGE_KEYS.enabled, STORAGE_KEYS.config], (result) =
     };
   }
   if (result[STORAGE_KEYS.enabled]) {
-    enabled = true;
-    setTimeout(startListening, 2000);
+    setTimeout(() => void startListening(), 2000);
   }
 });
 

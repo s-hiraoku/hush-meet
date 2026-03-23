@@ -46,6 +46,21 @@
   "footer": {
     "message": "Active on Google Meet tabs"
   },
+  "stateError": {
+    "message": "Mic error"
+  },
+  "errorMicPermissionDenied": {
+    "message": "Microphone permission denied. Check browser settings."
+  },
+  "errorMicNotFound": {
+    "message": "No microphone found."
+  },
+  "errorMicInUse": {
+    "message": "Microphone is in use by another app."
+  },
+  "errorMicUnknown": {
+    "message": "Failed to access microphone."
+  },
   "themeSwitcher": {
     "message": "Switch Theme"
   }

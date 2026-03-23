@@ -46,6 +46,21 @@
   "footer": {
     "message": "Google Meet タブで有効になります"
   },
+  "stateError": {
+    "message": "マイクエラー"
+  },
+  "errorMicPermissionDenied": {
+    "message": "マイクの権限が拒否されました。ブラウザの設定を確認してください。"
+  },
+  "errorMicNotFound": {
+    "message": "マイクが見つかりません。"
+  },
+  "errorMicInUse": {
+    "message": "マイクが他のアプリで使用中です。"
+  },
+  "errorMicUnknown": {
+    "message": "マイクにアクセスできません。"
+  },
   "themeSwitcher": {
     "message": "テーマ切替"
   }

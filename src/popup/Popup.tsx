@@ -34,6 +34,14 @@ const stateLabels: Record<string, { key: string; css: string }> = {
   UNMUTING: { key: "stateUnmuting", css: "speaking" },
   SPEAKING: { key: "stateSpeaking", css: "speaking" },
   GRACE: { key: "stateGrace", css: "grace" },
+  ERROR: { key: "stateError", css: "error" },
+};
+
+const errorMessages: Record<string, string> = {
+  mic_permission_denied: "errorMicPermissionDenied",
+  mic_not_found: "errorMicNotFound",
+  mic_in_use: "errorMicInUse",
+  mic_unknown_error: "errorMicUnknown",
 };
 
 function applyTheme(themeId: ThemeId) {
@@ -52,6 +60,7 @@ export function Popup() {
   const [gracePeriod, setGracePeriod] = useState<number>(DEFAULT_CONFIG.gracePeriod);
   const [theme, setTheme] = useState<ThemeId>(THEMES.default);
   const [locale, setLocaleState] = useState<LocaleId>("auto");
+  const [micError, setMicError] = useState<string | null>(null);
   const [, setRenderKey] = useState(0);
 
   useEffect(() => {
@@ -91,6 +100,10 @@ export function Popup() {
         }
         const loadedState = result.hushMeetState ?? "IDLE";
         setState(loadedState);
+        if (loadedState === "ERROR") {
+          setMicError((result[STORAGE_KEYS.error] as string) ?? null);
+          setEnabled(false);
+        }
         if (loadedState === "IDLE") {
           setLevel(0);
           chrome.storage.local.set({
@@ -104,7 +117,17 @@ export function Popup() {
     );
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes[STORAGE_KEYS.state]) setState(changes[STORAGE_KEYS.state].newValue as string);
+      if (changes[STORAGE_KEYS.state]) {
+        const newState = changes[STORAGE_KEYS.state].newValue as string;
+        setState(newState);
+        if (newState !== "ERROR") setMicError(null);
+      }
+      if (changes[STORAGE_KEYS.error]) {
+        setMicError((changes[STORAGE_KEYS.error].newValue as string) ?? null);
+      }
+      if (changes[STORAGE_KEYS.enabled]) {
+        setEnabled(!!changes[STORAGE_KEYS.enabled].newValue);
+      }
       if (changes[STORAGE_KEYS.level])
         setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
       if (changes[STORAGE_KEYS.config]) {
@@ -198,6 +221,10 @@ export function Popup() {
         <span className={`status-dot ${stateInfo.css}`} />
         <span className="status-text">{t(stateInfo.key)}</span>
       </div>
+
+      {micError && (
+        <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
+      )}
 
       <div className="meter">
         <div className="meter-label">{t("micLevel")}</div>
