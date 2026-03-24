@@ -76,6 +76,12 @@
   "micDefault": {
     "message": "System Default"
   },
+  "gameLauncher": {
+    "message": "Games"
+  },
+  "gameBreakout": {
+    "message": "Breakout"
+  },
   "themeSwitcher": {
     "message": "Switch Theme"
   }

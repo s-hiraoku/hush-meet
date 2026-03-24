@@ -76,6 +76,12 @@
   "micDefault": {
     "message": "システムデフォルト"
   },
+  "gameLauncher": {
+    "message": "ゲーム"
+  },
+  "gameBreakout": {
+    "message": "ブレイクアウト"
+  },
   "themeSwitcher": {
     "message": "テーマ切替"
   }

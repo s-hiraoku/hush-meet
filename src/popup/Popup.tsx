@@ -13,6 +13,7 @@ import { t, setLocale, onLocaleChange, type LocaleId } from "../i18n.ts";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { GameLauncher } from "./GameLauncher";
 
 interface HushMeetConfig {
   speechThreshold?: number;
@@ -236,6 +237,7 @@ export function Popup() {
         <h1>Hush Meet</h1>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span className="version">v{APP_VERSION}</span>
+          <GameLauncher />
           <LocaleSwitcher current={locale} onChange={handleLocaleChange} />
           <ThemeSwitcher current={theme} onChange={handleThemeChange} />
         </div>
