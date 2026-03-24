@@ -62,7 +62,7 @@ export function Popup() {
   const [theme, setTheme] = useState<ThemeId>(THEMES.default);
   const [locale, setLocaleState] = useState<LocaleId>("auto");
   const [micError, setMicError] = useState<string | null>(null);
-  const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
+  const [micDevices, setMicDevices] = useState<{ deviceId: string; label: string }[]>([]);
   const [selectedMicId, setSelectedMicId] = useState("");
   const [, setRenderKey] = useState(0);
 
@@ -71,12 +71,26 @@ export function Popup() {
   }, []);
 
   useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      setMicDevices(devices.filter((d) => d.kind === "audioinput"));
-    });
-    chrome.storage.local.get([STORAGE_KEYS.micDeviceId], (result) => {
+    chrome.storage.local.get([STORAGE_KEYS.micDeviceId, STORAGE_KEYS.micDevices], (result) => {
       setSelectedMicId((result[STORAGE_KEYS.micDeviceId] as string) ?? "");
+      const devices = result[STORAGE_KEYS.micDevices] as { deviceId: string; label: string }[];
+      if (Array.isArray(devices)) {
+        setMicDevices(devices);
+      }
     });
+    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes[STORAGE_KEYS.micDevices]) {
+        const devices = changes[STORAGE_KEYS.micDevices].newValue as {
+          deviceId: string;
+          label: string;
+        }[];
+        if (Array.isArray(devices)) {
+          setMicDevices(devices);
+        }
+      }
+    };
+    chrome.storage.onChanged.addListener(listener);
+    return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
   useEffect(() => {

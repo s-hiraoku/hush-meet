@@ -328,6 +328,17 @@ async function startListening() {
     analyser.smoothingTimeConstant = 0.3;
     source.connect(analyser);
 
+    // Save available mic devices (permission granted, labels available now)
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const mics = devices
+        .filter((d) => d.kind === "audioinput")
+        .map((d) => ({ deviceId: d.deviceId, label: d.label }));
+      void chrome.storage.local.set({ [STORAGE_KEYS.micDevices]: mics });
+    } catch {
+      // Non-critical, ignore
+    }
+
     enabled = true;
     log("マイク監視を開始しました");
     transition(State.MUTED);
