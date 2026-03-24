@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hush Meet - Auto-Mute Chrome Extension for Google Meet</title>
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --border: #0f3460;
+      --primary: #e94560;
+      --text: #eee;
+      --text-muted: #8892a4;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 2.5rem; margin-bottom: 8px; }
+    .tagline { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 32px; }
+    h2 { font-size: 1.4rem; margin: 32px 0 12px; color: var(--primary); }
+    h3 { font-size: 1.1rem; margin: 20px 0 8px; }
+    p, li { color: var(--text-muted); }
+    ul { padding-left: 24px; margin-bottom: 16px; }
+    li { margin-bottom: 4px; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .flow { font-family: monospace; color: var(--text); margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--text); font-size: 0.9rem; }
+    td { color: var(--text-muted); font-size: 0.9rem; }
+    .footer { margin-top: 48px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+    .nav { margin-bottom: 32px; }
+    .nav a { margin-right: 16px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hush Meet</h1>
+    <p class="tagline">A Chrome extension that automatically mutes your microphone on Google Meet when you're not speaking, preventing background noise from reaching other participants.</p>
+
+    <nav class="nav">
+      <a href="../privacy-policy.html">Privacy Policy</a>
+      <a href="../architecture.html">Technical Docs</a>
+      <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
+      <a href="../">Japanese</a>
+    </nav>
+
+    <h2>Features</h2>
+    <div class="card">
+      <ul>
+        <li>Auto-unmutes when speech is detected, auto-mutes after you stop speaking</li>
+        <li>Independent audio monitoring (separate mic stream from Google Meet)</li>
+        <li>Asymmetric threshold design prevents chattering</li>
+        <li>Real-time audio level meter &amp; spectrum analyzer</li>
+        <li>Adjustable sensitivity and grace period</li>
+        <li>Manual mute detection &mdash; pauses auto-unmute when you intentionally mute</li>
+        <li>Microphone device selector &mdash; choose which mic to use</li>
+        <li>4 visual themes (Default / Analog Radio / Boombox / Retro Future)</li>
+        <li>English &amp; Japanese language support with manual switching</li>
+        <li>Bored in a meeting? Retro-future mini-games included (Breakout / Space Invaders)</li>
+      </ul>
+    </div>
+
+    <h2>How It Works</h2>
+    <div class="card">
+      <div class="flow">[Mic Input] &rarr; [Web Audio API (RMS)] &rarr; [Speech Detection] &rarr; [Meet Mute Button Control]</div>
+      <p>A separate microphone stream monitors audio levels. When speech is detected, the extension automatically clicks the Meet mute button to unmute. When silence returns, it re-mutes after a configurable grace period.</p>
+    </div>
+
+    <h2>Settings</h2>
+    <div class="card">
+      <table>
+        <tr><th>Setting</th><th>Description</th><th>Default</th></tr>
+        <tr><td>Speech Sensitivity</td><td>Volume threshold to trigger unmute</td><td>0.025</td></tr>
+        <tr><td>Grace Period</td><td>Delay before re-muting after speech</td><td>1.5s</td></tr>
+        <tr><td>Microphone</td><td>Audio input device to use</td><td>System Default</td></tr>
+        <tr><td>Theme</td><td>Popup visual theme (4 options)</td><td>Default</td></tr>
+        <tr><td>Language</td><td>UI language (Auto / English / Japanese)</td><td>Auto (browser language)</td></tr>
+      </table>
+    </div>
+
+    <h2>Manual Mute Detection</h2>
+    <div class="card">
+      <p>When you intentionally mute yourself, the extension detects it and pauses auto-unmute.</p>
+      <ul>
+        <li>Monitors the Meet mute button via MutationObserver</li>
+        <li>Distinguishes extension-initiated vs. user-initiated mute changes</li>
+        <li>Shows a notification banner in the popup when manual mute is detected</li>
+        <li>Resumes auto control when you unmute or click "Resume Auto" in the popup</li>
+      </ul>
+    </div>
+
+    <h2>Getting Started</h2>
+    <div class="card">
+      <ol style="padding-left: 24px; color: var(--text-muted);">
+        <li>Install from the Chrome Web Store</li>
+        <li>Join a Google Meet call</li>
+        <li>Click the Hush Meet icon in the toolbar</li>
+        <li>Toggle "Auto Mute" on</li>
+        <li>Allow microphone access when prompted</li>
+      </ol>
+    </div>
+
+    <h2>Tech Stack</h2>
+    <div class="card">
+      <ul>
+        <li>Chrome Extension Manifest V3</li>
+        <li>React 19 + TypeScript</li>
+        <li>Vite + CRXJS Vite Plugin</li>
+        <li>Web Audio API (AnalyserNode)</li>
+        <li>Chrome Storage API</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+    </div>
+  </div>
+</body>
+</html>
