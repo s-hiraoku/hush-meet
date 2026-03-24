@@ -27,7 +27,7 @@ function computeSpectrum(freqData: Uint8Array, bandCount: number): number[] {
   return spectrum;
 }
 
-type StateType = "IDLE" | "MUTED" | "SPEAKING" | "GRACE" | "UNMUTING";
+type StateType = "IDLE" | "MUTED" | "SPEAKING" | "GRACE" | "UNMUTING" | "USER_MUTED" | "ERROR";
 
 function nextState(
   current: StateType,
@@ -42,9 +42,57 @@ function nextState(
       return rms < silenceThreshold ? "GRACE" : "SPEAKING";
     case "GRACE":
       return rms > silenceThreshold ? "SPEAKING" : "GRACE";
+    case "USER_MUTED":
+      return "USER_MUTED"; // Never auto-transition out
     default:
       return current;
   }
+}
+
+/**
+ * Simulates manual mute detection logic.
+ * Returns new state when a mute button change is observed.
+ */
+function detectManualMute(
+  currentState: StateType,
+  meetMuted: boolean,
+  mutingByExtension: boolean,
+): StateType {
+  if (mutingByExtension) return currentState;
+  if (currentState === "IDLE" || currentState === "ERROR") return currentState;
+
+  if (meetMuted && currentState !== "MUTED" && currentState !== "USER_MUTED") {
+    return "USER_MUTED";
+  }
+  if (!meetMuted && currentState === "USER_MUTED") {
+    return "SPEAKING";
+  }
+  return currentState;
+}
+
+/**
+ * Simulates resume from USER_MUTED via popup button.
+ */
+function resumeAutoMute(currentState: StateType, requestedState: string): StateType {
+  if (requestedState === "MUTED" && currentState === "USER_MUTED") {
+    return "MUTED";
+  }
+  return currentState;
+}
+
+/**
+ * Builds getUserMedia audio constraints with optional deviceId.
+ */
+function buildAudioConstraints(deviceId: string | null): MediaTrackConstraints {
+  const constraints: MediaTrackConstraints = {
+    echoCancellation: true,
+    noiseSuppression: false,
+    autoGainControl: true,
+  };
+  if (deviceId) {
+    constraints.deviceId = { exact: deviceId };
+  }
+  return constraints;
 }
 
 describe("RMS computation", () => {
@@ -54,7 +102,6 @@ describe("RMS computation", () => {
   });
 
   it("returns correct RMS for known signal", () => {
-    // A constant signal of 0.5 has RMS = 0.5
     const samples = new Float32Array(1024).fill(0.5);
     expect(computeRms(samples)).toBeCloseTo(0.5);
   });
@@ -65,7 +112,6 @@ describe("RMS computation", () => {
     for (let i = 0; i < size; i++) {
       samples[i] = Math.sin((2 * Math.PI * i) / size);
     }
-    // RMS of a sine wave = 1/sqrt(2) ≈ 0.707
     expect(computeRms(samples)).toBeCloseTo(1 / Math.sqrt(2), 2);
   });
 
@@ -111,7 +157,6 @@ describe("spectrum computation", () => {
   });
 
   it("handles small frequency data gracefully", () => {
-    // bandSize = max(1, floor(8/16)) = 1
     const freqData = new Uint8Array(8).fill(128);
     const spectrum = computeSpectrum(freqData, 16);
     expect(spectrum).toHaveLength(16);
@@ -150,7 +195,108 @@ describe("state machine transitions", () => {
     expect(nextState("IDLE", THRESHOLD_RANGE.max, speech, silence)).toBe("IDLE");
   });
 
+  it("ERROR does not transition regardless of RMS", () => {
+    expect(nextState("ERROR", THRESHOLD_RANGE.max, speech, silence)).toBe("ERROR");
+  });
+
   it("silence threshold is always lower than speech threshold", () => {
     expect(silence).toBeLessThan(speech);
+  });
+});
+
+describe("USER_MUTED state", () => {
+  const speech = DEFAULT_CONFIG.speechThreshold;
+  const silence = speech * SILENCE_RATIO;
+
+  it("USER_MUTED does not auto-transition even with loud RMS", () => {
+    expect(nextState("USER_MUTED", 1.0, speech, silence)).toBe("USER_MUTED");
+  });
+
+  it("USER_MUTED does not transition on silence", () => {
+    expect(nextState("USER_MUTED", 0, speech, silence)).toBe("USER_MUTED");
+  });
+});
+
+describe("manual mute detection", () => {
+  it("detects user mute from SPEAKING → USER_MUTED", () => {
+    expect(detectManualMute("SPEAKING", true, false)).toBe("USER_MUTED");
+  });
+
+  it("detects user mute from GRACE → USER_MUTED", () => {
+    expect(detectManualMute("GRACE", true, false)).toBe("USER_MUTED");
+  });
+
+  it("ignores mute when mutingByExtension is true", () => {
+    expect(detectManualMute("SPEAKING", true, true)).toBe("SPEAKING");
+  });
+
+  it("does not re-enter USER_MUTED from MUTED", () => {
+    expect(detectManualMute("MUTED", true, false)).toBe("MUTED");
+  });
+
+  it("does not re-enter USER_MUTED when already USER_MUTED", () => {
+    expect(detectManualMute("USER_MUTED", true, false)).toBe("USER_MUTED");
+  });
+
+  it("user unmute from USER_MUTED → SPEAKING", () => {
+    expect(detectManualMute("USER_MUTED", false, false)).toBe("SPEAKING");
+  });
+
+  it("ignores unmute when not in USER_MUTED state", () => {
+    expect(detectManualMute("MUTED", false, false)).toBe("MUTED");
+  });
+
+  it("ignores changes in IDLE state", () => {
+    expect(detectManualMute("IDLE", true, false)).toBe("IDLE");
+    expect(detectManualMute("IDLE", false, false)).toBe("IDLE");
+  });
+
+  it("ignores changes in ERROR state", () => {
+    expect(detectManualMute("ERROR", true, false)).toBe("ERROR");
+    expect(detectManualMute("ERROR", false, false)).toBe("ERROR");
+  });
+});
+
+describe("resume auto mute from popup", () => {
+  it("USER_MUTED → MUTED when popup requests MUTED", () => {
+    expect(resumeAutoMute("USER_MUTED", "MUTED")).toBe("MUTED");
+  });
+
+  it("does not change state if not in USER_MUTED", () => {
+    expect(resumeAutoMute("SPEAKING", "MUTED")).toBe("SPEAKING");
+    expect(resumeAutoMute("GRACE", "MUTED")).toBe("GRACE");
+    expect(resumeAutoMute("IDLE", "MUTED")).toBe("IDLE");
+  });
+
+  it("does not change state for non-MUTED requests", () => {
+    expect(resumeAutoMute("USER_MUTED", "SPEAKING")).toBe("USER_MUTED");
+    expect(resumeAutoMute("USER_MUTED", "IDLE")).toBe("USER_MUTED");
+  });
+});
+
+describe("mic device selection constraints", () => {
+  it("uses default constraints when no deviceId", () => {
+    const c = buildAudioConstraints(null);
+    expect(c.deviceId).toBeUndefined();
+    expect(c.echoCancellation).toBe(true);
+    expect(c.noiseSuppression).toBe(false);
+    expect(c.autoGainControl).toBe(true);
+  });
+
+  it("uses empty string as no deviceId", () => {
+    const c = buildAudioConstraints("");
+    expect(c.deviceId).toBeUndefined();
+  });
+
+  it("adds exact deviceId when specified", () => {
+    const c = buildAudioConstraints("abc123");
+    expect(c.deviceId).toEqual({ exact: "abc123" });
+  });
+
+  it("preserves other constraints when deviceId is set", () => {
+    const c = buildAudioConstraints("mic-1");
+    expect(c.echoCancellation).toBe(true);
+    expect(c.noiseSuppression).toBe(false);
+    expect(c.autoGainControl).toBe(true);
   });
 });
