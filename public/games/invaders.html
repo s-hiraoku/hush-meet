@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Space Invaders - Hush Meet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #020010;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+    color: #d0d0ff;
+  }
+  /* Starfield shimmer */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(1px 1px at 20px 30px, #ff2a6d, transparent),
+      radial-gradient(1px 1px at 80px 120px, #00e5ff, transparent),
+      radial-gradient(1px 1px at 160px 60px, #d0d0ff, transparent),
+      radial-gradient(1px 1px at 240px 180px, #ff2a6d, transparent),
+      radial-gradient(1px 1px at 320px 90px, #00ffaa, transparent),
+      radial-gradient(1px 1px at 400px 200px, #d0d0ff, transparent),
+      radial-gradient(1px 1px at 50px 250px, #00e5ff, transparent),
+      radial-gradient(1px 1px at 130px 320px, #ff2a6d, transparent),
+      radial-gradient(1px 1px at 280px 280px, #00ffaa, transparent),
+      radial-gradient(1px 1px at 350px 340px, #d0d0ff, transparent),
+      radial-gradient(1px 1px at 420px 400px, #00e5ff, transparent),
+      radial-gradient(1px 1px at 100px 420px, #ff2a6d, transparent),
+      radial-gradient(1px 1px at 200px 480px, #00ffaa, transparent),
+      radial-gradient(1px 1px at 300px 510px, #d0d0ff, transparent),
+      radial-gradient(1px 1px at 380px 560px, #00e5ff, transparent),
+      radial-gradient(1px 1px at 60px 580px, #ff2a6d, transparent);
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    width: 440px;
+    padding: 8px 0;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    z-index: 1;
+  }
+  .hud-score { color: #ff2a6d; text-shadow: 0 0 8px rgba(255,42,109,0.6); }
+  .hud-lives { color: #00e5ff; text-shadow: 0 0 8px rgba(0,229,255,0.6); }
+  .hud-wave { color: #00ffaa; text-shadow: 0 0 8px rgba(0,255,170,0.6); }
+  canvas {
+    border: 1px solid rgba(255,42,109,0.25);
+    box-shadow: 0 0 20px rgba(255,42,109,0.08), inset 0 0 30px rgba(0,0,0,0.5);
+    z-index: 1;
+    position: relative;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(2,0,16,0.88);
+    cursor: pointer;
+  }
+  .overlay.hidden { display: none; pointer-events: none; }
+  .overlay h1 {
+    font-size: 24px;
+    color: #ff2a6d;
+    text-shadow: 0 0 12px rgba(255,42,109,0.8), 0 0 24px rgba(255,42,109,0.4);
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+  }
+  .overlay p {
+    font-size: 13px;
+    color: #6060aa;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .overlay .result {
+    font-size: 18px;
+    color: #00ffaa;
+    text-shadow: 0 0 8px rgba(0,255,170,0.6);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  .overlay .start-hint {
+    font-size: 12px;
+    color: #ff2a6d;
+    text-shadow: 0 0 6px rgba(255,42,109,0.5);
+    animation: blink 1.2s infinite;
+    margin-top: 16px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+<div class="hud">
+  <span class="hud-score">SCORE: <span id="score">0</span></span>
+  <span class="hud-wave">WAVE: <span id="wave">1</span></span>
+  <span class="hud-lives">LIVES: <span id="lives">3</span></span>
+</div>
+<canvas id="game" width="440" height="520"></canvas>
+<div class="overlay" id="overlay">
+  <h1>SPACE INVADERS</h1>
+  <p id="result-text" class="result"></p>
+  <p>ARROWS / A,D: move ship</p>
+  <p>SPACE: fire</p>
+  <p>P: pause</p>
+  <p class="start-hint">CLICK TO START</p>
+</div>
+
+<script src="invaders.js"></script>
+</body>
+</html>

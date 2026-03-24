@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { t } from "../i18n.ts";
 
-const GAMES = [{ id: "breakout", key: "gameBreakout", file: "games/breakout.html" }];
+const GAMES = [
+  { id: "breakout", key: "gameBreakout", file: "games/breakout.html" },
+  { id: "invaders", key: "gameInvaders", file: "games/invaders.html" },
+];
 
 export function GameLauncher() {
   const [open, setOpen] = useState(false);
@@ -20,12 +23,7 @@ export function GameLauncher() {
 
   const handleSelect = (file: string) => {
     setOpen(false);
-    chrome.windows.create({
-      url: chrome.runtime.getURL(file),
-      type: "popup",
-      width: 480,
-      height: 640,
-    });
+    chrome.runtime.sendMessage({ type: "openGame", file });
   };
 
   return (

@@ -82,6 +82,9 @@
   "gameBreakout": {
     "message": "ブレイクアウト"
   },
+  "gameInvaders": {
+    "message": "スペースインベーダー"
+  },
   "themeSwitcher": {
     "message": "テーマ切替"
   }

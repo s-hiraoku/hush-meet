@@ -3,10 +3,14 @@ import { defineManifest } from "@crxjs/vite-plugin";
 export default defineManifest({
   manifest_version: 3,
   name: "__MSG_extName__",
-  version: "1.0.4",
+  version: "1.0.5",
   description: "__MSG_extDescription__",
   default_locale: "en",
   permissions: ["storage"],
+  background: {
+    service_worker: "src/background/service-worker.ts",
+    type: "module" as const,
+  },
   host_permissions: ["https://meet.google.com/*"],
   action: {
     default_popup: "src/popup/index.html",
