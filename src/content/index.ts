@@ -3,141 +3,171 @@
  * Google Meet の自動ミュート制御
  */
 
-import { DEFAULT_CONFIG, SILENCE_RATIO, STORAGE_KEYS } from "../constants.ts";
-
-const State = {
-  IDLE: "IDLE",
-  MUTED: "MUTED",
-  UNMUTING: "UNMUTING",
-  SPEAKING: "SPEAKING",
-  GRACE: "GRACE",
-  ERROR: "ERROR",
-  USER_MUTED: "USER_MUTED",
-} as const;
-
-type StateType = (typeof State)[keyof typeof State];
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_SHORTCUT,
+  MODES,
+  STORAGE_KEYS,
+  normalizeMode,
+} from "../constants.ts";
+import type { ModeId } from "../constants.ts";
+import { isModeActive, shouldUsePushToTalkHold } from "../mode-control.ts";
+import {
+  consumeShortcutEvent,
+  shouldTriggerShortcutKeyDown,
+  shouldTriggerShortcutKeyUp,
+} from "./shortcut-controller.ts";
+import {
+  persistErrorState,
+  persistIdleSnapshot,
+  persistMeters,
+  persistState,
+} from "./storage-sync.ts";
+import { findMuteButton, inferMuteStateFromButton } from "./meet-dom.ts";
+import { clearIntervalTimer, clearTimer } from "./timers.ts";
+import { markExtensionMuteAction as runMuteAction } from "./mute-action.ts";
+import {
+  CONTENT_STATE,
+  type ContentState,
+  getNextAudioState,
+  getNextManualMuteState,
+} from "./state-machine.ts";
+import { buildAudioConstraints, normalizeConfig, type HushMeetConfig } from "./config.ts";
+const State = CONTENT_STATE;
+type StateType = ContentState;
 
 let currentState: StateType = State.IDLE;
-let enabled = false;
-let starting = false;
+let isListening = false;
+let isStarting = false;
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let micStream: MediaStream | null = null;
 let analyseTimerId: ReturnType<typeof setInterval> | null = null;
 let graceTimer: ReturnType<typeof setTimeout> | null = null;
 let muteObserver: MutationObserver | null = null;
+let muteObserverRetryId: ReturnType<typeof setInterval> | null = null;
+let startupTimerId: ReturnType<typeof setTimeout> | null = null;
 let mutingByExtension = false;
 let selectedMicDeviceId: string | null = null;
+let selectedMode: ModeId = MODES.off;
+let shortcutKey = DEFAULT_SHORTCUT;
+let pttKeyHeld = false;
+let listeningRunId = 0;
 
-let config: { speechThreshold: number; silenceThreshold: number; gracePeriod: number } = {
-  ...DEFAULT_CONFIG,
-};
+let dataArray: Float32Array<ArrayBuffer> | null = null;
+let freqData: Uint8Array<ArrayBuffer> | null = null;
+let lastMeterWriteTime = 0;
+
+let config: HushMeetConfig = { ...DEFAULT_CONFIG };
+
+const MUTE_BUTTON_ATTRS = ["aria-label", "aria-pressed", "data-tooltip", "data-is-muted"] as const;
 
 const log = (msg: string, ...args: unknown[]) => console.log(`[HushMeet] ${msg}`, ...args);
 const warn = (msg: string, ...args: unknown[]) => console.warn(`[HushMeet] ${msg}`, ...args);
 
-function findMuteButton(): HTMLElement | null {
-  const selectors = [
-    'button[aria-label*="マイク"]',
-    'button[aria-label*="microphone" i]',
-    'button[aria-label*="Mute" i]',
-    'button[aria-label*="ミュート"]',
-    '[data-tooltip*="マイク"]',
-    '[data-tooltip*="microphone" i]',
-  ];
-
-  for (const sel of selectors) {
-    const btn = document.querySelector<HTMLElement>(sel);
-    if (btn) return btn;
-  }
-  return null;
+function markExtensionMuteAction(action: () => void) {
+  mutingByExtension = true;
+  runMuteAction(action, () => {
+    mutingByExtension = false;
+  });
 }
 
 function isMeetMuted(): boolean | null {
-  const btn = findMuteButton();
-  if (!btn) return null;
-
-  if (btn.hasAttribute("data-is-muted")) {
-    return btn.getAttribute("data-is-muted") === "true";
-  }
-
-  const label = (
-    btn.getAttribute("aria-label") ??
-    btn.getAttribute("data-tooltip") ??
-    ""
-  ).toLowerCase();
-
-  if (
-    label.includes("ミュートを解除") ||
-    label.includes("unmute") ||
-    label.includes("turn on microphone")
-  ) {
-    return true;
-  }
-  if (
-    label.includes("ミュート") ||
-    label.includes("mute") ||
-    label.includes("turn off microphone")
-  ) {
-    return false;
-  }
-
-  return null;
+  return inferMuteStateFromButton(findMuteButton(warn));
 }
 
-function toggleMeetMute(shouldMute: boolean) {
-  const currentlyMuted = isMeetMuted();
-
+function toggleMeetMute(shouldMute: boolean): boolean {
+  const btn = findMuteButton(warn);
+  const currentlyMuted = inferMuteStateFromButton(btn);
   if (currentlyMuted === null) {
-    log("ミュートボタン未検出、Ctrl+D で試行");
-    mutingByExtension = true;
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "d",
-        code: "KeyD",
-        ctrlKey: true,
-        bubbles: true,
-      }),
-    );
-    setTimeout(() => {
-      mutingByExtension = false;
-    }, 500);
-    return;
+    warn("ミュートボタン未検出");
+    return false;
   }
-
-  if (currentlyMuted === shouldMute) return;
-
-  const btn = findMuteButton();
+  if (currentlyMuted === shouldMute) return true;
   if (btn) {
-    mutingByExtension = true;
-    btn.click();
+    markExtensionMuteAction(() => btn.click());
     log(shouldMute ? "ミュートしました" : "ミュート解除しました");
-    setTimeout(() => {
-      mutingByExtension = false;
-    }, 500);
+    return true;
   }
+  return false;
 }
 
 function clearGraceTimer() {
-  if (graceTimer) {
-    clearTimeout(graceTimer);
-    graceTimer = null;
+  graceTimer = clearTimer(graceTimer);
+}
+
+function startShortcutListener() {
+  // window レベルで登録（iframe内フォーカス時もトップフレームのwindowに届く）
+  window.addEventListener("keydown", handleShortcutKeyDown, true);
+  window.addEventListener("keyup", handleShortcutKeyUp, true);
+  log("ショートカットリスナー登録完了");
+}
+
+function stopShortcutListener() {
+  window.removeEventListener("keydown", handleShortcutKeyDown, true);
+  window.removeEventListener("keyup", handleShortcutKeyUp, true);
+}
+
+function handleShortcutKeyDown(e: KeyboardEvent) {
+  if (
+    !shouldTriggerShortcutKeyDown({
+      isListening,
+      event: e,
+      mode: selectedMode,
+      pttKeyHeld,
+      shortcut: shortcutKey,
+    })
+  ) {
+    return;
   }
+
+  consumeShortcutEvent(e);
+
+  if (shouldUsePushToTalkHold(selectedMode)) {
+    pttKeyHeld = true;
+    transition(State.UNMUTING);
+  } else {
+    const muted = isMeetMuted();
+    if (muted === true || currentState === State.MUTED) {
+      transition(State.UNMUTING);
+    } else if (muted === false || currentState === State.SPEAKING || currentState === State.GRACE) {
+      transition(State.MUTED);
+    }
+  }
+}
+
+function handleShortcutKeyUp(e: KeyboardEvent) {
+  if (!shouldUsePushToTalkHold(selectedMode)) return;
+  if (
+    !shouldTriggerShortcutKeyUp({
+      isListening,
+      event: e,
+      mode: selectedMode,
+      pttKeyHeld,
+      shortcut: shortcutKey,
+    })
+  ) {
+    return;
+  }
+
+  consumeShortcutEvent(e);
+  pttKeyHeld = false;
+  transition(State.GRACE);
 }
 
 function transition(newState: StateType) {
   if (currentState === newState) return;
   const prev = currentState;
-  currentState = newState;
-  log(`状態遷移: ${prev} → ${newState}`);
 
   switch (newState) {
-    case State.UNMUTING:
-      toggleMeetMute(false);
+    case State.UNMUTING: {
+      if (!toggleMeetMute(false)) return;
       currentState = State.SPEAKING;
       break;
+    }
 
     case State.GRACE:
+      currentState = State.GRACE;
       clearGraceTimer();
       graceTimer = setTimeout(() => {
         if (currentState === State.GRACE) {
@@ -147,16 +177,19 @@ function transition(newState: StateType) {
       break;
 
     case State.MUTED:
+      if (!toggleMeetMute(true)) return;
+      currentState = State.MUTED;
       clearGraceTimer();
-      toggleMeetMute(true);
       break;
 
     case State.SPEAKING:
+      currentState = State.SPEAKING;
       clearGraceTimer();
       break;
   }
 
-  void chrome.storage.local.set({ [STORAGE_KEYS.state]: newState });
+  log(`状態遷移: ${prev} → ${currentState}`);
+  persistState(currentState);
 }
 
 // Watch for user-initiated mute changes on the Meet mute button
@@ -164,45 +197,49 @@ function startMuteObserver() {
   stopMuteObserver();
 
   const checkForUserMute = () => {
-    if (mutingByExtension) return;
-    if (currentState === State.IDLE || currentState === State.ERROR) return;
-
-    const muted = isMeetMuted();
-    if (muted === true && currentState !== State.MUTED && currentState !== State.USER_MUTED) {
-      log("ユーザーが手動でミュートしました — 自動解除を一時停止");
-      clearGraceTimer();
-      currentState = State.USER_MUTED;
-      void chrome.storage.local.set({ [STORAGE_KEYS.state]: State.USER_MUTED });
-    } else if (muted === false && currentState === State.USER_MUTED) {
-      log("ユーザーが手動でミュート解除しました — 自動制御を再開");
-      transition(State.SPEAKING);
+    const nextState = getNextManualMuteState({
+      currentState,
+      meetMuted: isMeetMuted(),
+      mode: selectedMode,
+      mutingByExtension,
+    });
+    if (nextState === State.MUTED) {
+      log("ユーザーが手動でミュートしました");
+      transition(nextState);
+    } else if (nextState === State.SPEAKING) {
+      log("ユーザーが手動でミュート解除しました");
+      transition(nextState);
     }
   };
 
-  const btn = findMuteButton();
+  const btn = findMuteButton(warn);
   if (btn) {
     muteObserver = new MutationObserver(checkForUserMute);
     muteObserver.observe(btn, {
       attributes: true,
-      attributeFilter: ["aria-label", "data-tooltip", "data-is-muted"],
+      attributeFilter: [...MUTE_BUTTON_ATTRS],
     });
     log("ミュートボタン監視を開始");
   } else {
     // Button not found yet, retry periodically
-    const retryId = setInterval(() => {
-      const b = findMuteButton();
-      if (b && enabled) {
-        clearInterval(retryId);
+    muteObserverRetryId = setInterval(() => {
+      const b = findMuteButton(warn);
+      if (b && isListening) {
+        if (muteObserverRetryId) {
+          muteObserverRetryId = clearIntervalTimer(muteObserverRetryId);
+        }
         muteObserver = new MutationObserver(checkForUserMute);
         muteObserver.observe(b, {
           attributes: true,
-          attributeFilter: ["aria-label", "data-tooltip", "data-is-muted"],
+          attributeFilter: [...MUTE_BUTTON_ATTRS],
         });
         log("ミュートボタン監視を開始（リトライ）");
       }
     }, 2000);
     // Stop retrying after 30s
-    setTimeout(() => clearInterval(retryId), 30000);
+    setTimeout(() => {
+      muteObserverRetryId = clearIntervalTimer(muteObserverRetryId);
+    }, 30000);
   }
 }
 
@@ -210,6 +247,9 @@ function stopMuteObserver() {
   if (muteObserver) {
     muteObserver.disconnect();
     muteObserver = null;
+  }
+  if (muteObserverRetryId) {
+    muteObserverRetryId = clearIntervalTimer(muteObserverRetryId);
   }
 }
 
@@ -222,7 +262,7 @@ async function ensureAudioContextRunning() {
 }
 
 function analyseLoop() {
-  if (!enabled || !analyser || !audioContext) return;
+  if (!isListening || !analyser || !audioContext || !isModeActive(selectedMode)) return;
 
   // Skip analysis if AudioContext is not running
   if (audioContext.state !== "running") {
@@ -230,7 +270,8 @@ function analyseLoop() {
     return;
   }
 
-  const dataArray = new Float32Array(analyser.fftSize);
+  if (!dataArray || !freqData) return;
+
   analyser.getFloatTimeDomainData(dataArray);
 
   let sum = 0;
@@ -239,32 +280,18 @@ function analyseLoop() {
   }
   const rms = Math.sqrt(sum / dataArray.length);
 
-  switch (currentState) {
-    case State.MUTED:
-      if (rms > config.speechThreshold) {
-        transition(State.UNMUTING);
-      }
-      break;
-
-    case State.SPEAKING:
-      if (rms < config.silenceThreshold) {
-        transition(State.GRACE);
-      }
-      break;
-
-    case State.GRACE:
-      if (rms > config.silenceThreshold) {
-        transition(State.SPEAKING);
-      }
-      break;
-
-    case State.USER_MUTED:
-      // Do nothing — user manually muted, wait for user to unmute
-      break;
+  const nextState = getNextAudioState({
+    currentState,
+    mode: selectedMode,
+    rms,
+    speechThreshold: config.speechThreshold,
+    silenceThreshold: config.silenceThreshold,
+  });
+  if (nextState) {
+    transition(nextState);
   }
 
   // Spectrum data for equalizer (16 bands)
-  const freqData = new Uint8Array(analyser.frequencyBinCount);
   analyser.getByteFrequencyData(freqData);
   const bandCount = 16;
   const bandSize = Math.max(1, Math.floor(freqData.length / bandCount));
@@ -277,35 +304,49 @@ function analyseLoop() {
     spectrum.push(bandSum / bandSize / 255);
   }
 
-  void chrome.storage.local.set({
-    [STORAGE_KEYS.level]: rms,
-    [STORAGE_KEYS.spectrum]: spectrum,
-  });
+  const now = performance.now();
+  if (now - lastMeterWriteTime > 150) {
+    lastMeterWriteTime = now;
+    persistMeters(rms, spectrum);
+  }
 }
 
 const ANALYSE_INTERVAL_MS = 50;
 
+function clearStartupTimer() {
+  startupTimerId = clearTimer(startupTimerId);
+}
+
+function scheduleStartListening(delayMs = 0) {
+  clearStartupTimer();
+  if (!isModeActive(selectedMode)) return;
+  startupTimerId = setTimeout(() => {
+    startupTimerId = null;
+    void startListening();
+  }, delayMs);
+}
+
 async function startListening() {
-  if (starting) {
+  if (isStarting || isListening) {
     log("startListening already in progress, skipping");
     return;
   }
-  starting = true;
+  if (!isModeActive(selectedMode)) {
+    log("mode is off, skipping startListening");
+    return;
+  }
+  isStarting = true;
+  const runId = ++listeningRunId;
 
   try {
-    const audioConstraints: MediaTrackConstraints = {
-      echoCancellation: true,
-      noiseSuppression: false,
-      autoGainControl: true,
-    };
-
-    if (selectedMicDeviceId) {
-      audioConstraints.deviceId = { exact: selectedMicDeviceId };
-    }
-
     micStream = await navigator.mediaDevices.getUserMedia({
-      audio: audioConstraints,
+      audio: buildAudioConstraints(selectedMicDeviceId),
     });
+
+    if (runId !== listeningRunId || !isModeActive(selectedMode)) {
+      micStream.getTracks().forEach((t) => t.stop());
+      return;
+    }
 
     audioContext = new AudioContext();
 
@@ -314,10 +355,18 @@ async function startListening() {
       await audioContext.resume();
     }
 
+    if (runId !== listeningRunId || !isModeActive(selectedMode)) {
+      void audioContext.close();
+      micStream.getTracks().forEach((t) => t.stop());
+      audioContext = null;
+      micStream = null;
+      return;
+    }
+
     // Listen for future suspend/resume events
     audioContext.addEventListener("statechange", () => {
       log(`AudioContext state changed: ${audioContext?.state}`);
-      if (audioContext?.state === "suspended" && enabled) {
+      if (audioContext?.state === "suspended" && isListening) {
         void ensureAudioContextRunning();
       }
     });
@@ -327,6 +376,9 @@ async function startListening() {
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = 0.3;
     source.connect(analyser);
+
+    dataArray = new Float32Array(analyser.fftSize);
+    freqData = new Uint8Array(analyser.frequencyBinCount);
 
     // Save available mic devices (permission granted, labels available now)
     try {
@@ -339,7 +391,7 @@ async function startListening() {
       // Non-critical, ignore
     }
 
-    enabled = true;
+    isListening = true;
     log("マイク監視を開始しました");
     transition(State.MUTED);
 
@@ -349,6 +401,7 @@ async function startListening() {
 
     // Start observing user mute actions
     startMuteObserver();
+    startShortcutListener();
   } catch (err) {
     const error = err as DOMException;
     let errorMsg: string;
@@ -368,34 +421,34 @@ async function startListening() {
       // Retry without specific deviceId
       selectedMicDeviceId = null;
       void chrome.storage.local.set({ [STORAGE_KEYS.micDeviceId]: "" });
-      starting = false;
-      void startListening();
+      isStarting = false;
+      scheduleStartListening();
       return;
     } else {
       errorMsg = "mic_unknown_error";
       warn("マイクの取得に失敗:", error.name, error.message);
     }
 
-    enabled = false;
+    isListening = false;
     currentState = State.ERROR;
-    void chrome.storage.local.set({
-      [STORAGE_KEYS.enabled]: false,
-      [STORAGE_KEYS.state]: State.ERROR,
-      [STORAGE_KEYS.error]: errorMsg,
-    });
+    persistErrorState(errorMsg);
   } finally {
-    starting = false;
+    isStarting = false;
   }
 }
 
 function stopListening() {
-  enabled = false;
+  listeningRunId++;
+  isStarting = false;
+  isListening = false;
+  clearStartupTimer();
   clearGraceTimer();
   stopMuteObserver();
+  stopShortcutListener();
+  pttKeyHeld = false;
 
   if (analyseTimerId) {
-    clearInterval(analyseTimerId);
-    analyseTimerId = null;
+    analyseTimerId = clearIntervalTimer(analyseTimerId);
   }
 
   if (micStream) {
@@ -409,43 +462,40 @@ function stopListening() {
   }
 
   analyser = null;
+  dataArray = null;
+  freqData = null;
   currentState = State.IDLE;
   log("マイク監視を停止しました");
-  void chrome.storage.local.set({
-    [STORAGE_KEYS.state]: State.IDLE,
-    [STORAGE_KEYS.level]: 0,
-    [STORAGE_KEYS.spectrum]: [],
-  });
+  persistIdleSnapshot();
 }
 
 chrome.storage.onChanged.addListener((changes) => {
-  if (changes[STORAGE_KEYS.enabled]) {
-    const newVal = changes[STORAGE_KEYS.enabled].newValue;
-    if (newVal && !enabled && !starting) {
-      void startListening();
-    } else if (!newVal && enabled) {
-      stopListening();
-    }
-  }
-
-  // Handle "resume auto mute" from popup
-  if (changes[STORAGE_KEYS.state]) {
-    const newState = changes[STORAGE_KEYS.state].newValue as string;
-    if (newState === State.MUTED && currentState === State.USER_MUTED) {
-      log("ユーザーが自動ミュートを再開");
-      currentState = State.MUTED;
-    }
-  }
-
   if (changes[STORAGE_KEYS.config]) {
-    const newConfig = changes[STORAGE_KEYS.config].newValue as typeof config;
-    config = {
-      speechThreshold: newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
-      silenceThreshold:
-        (newConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
-      gracePeriod: newConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
-    };
+    config = normalizeConfig(changes[STORAGE_KEYS.config].newValue as Partial<HushMeetConfig>);
     log("設定を更新:", config);
+  }
+
+  if (changes[STORAGE_KEYS.mode]) {
+    const rawMode = changes[STORAGE_KEYS.mode].newValue;
+    const newMode = normalizeMode(rawMode);
+    if (rawMode !== undefined && rawMode !== newMode) {
+      void chrome.storage.local.set({ [STORAGE_KEYS.mode]: newMode });
+    }
+    if (newMode !== selectedMode) {
+      selectedMode = newMode;
+      pttKeyHeld = false;
+      log("モードを変更:", selectedMode);
+      if (!isModeActive(newMode)) {
+        stopListening();
+      } else if (!isListening && !isStarting) {
+        scheduleStartListening();
+      }
+    }
+  }
+
+  if (changes[STORAGE_KEYS.shortcutKey]) {
+    shortcutKey = (changes[STORAGE_KEYS.shortcutKey].newValue as string) || DEFAULT_SHORTCUT;
+    log("shortcut key changed:", shortcutKey);
   }
 
   if (changes[STORAGE_KEYS.micDeviceId]) {
@@ -453,36 +503,35 @@ chrome.storage.onChanged.addListener((changes) => {
     if (newId !== selectedMicDeviceId) {
       selectedMicDeviceId = newId;
       log("マイクデバイスを変更:", selectedMicDeviceId ?? "default");
-      if (enabled) {
+      if (isModeActive(selectedMode) && (isListening || isStarting)) {
         stopListening();
-        enabled = true;
-        void startListening();
+        scheduleStartListening();
       }
     }
   }
 });
 
 chrome.storage.local.get(
-  [STORAGE_KEYS.enabled, STORAGE_KEYS.config, STORAGE_KEYS.micDeviceId],
+  [STORAGE_KEYS.config, STORAGE_KEYS.micDeviceId, STORAGE_KEYS.mode, STORAGE_KEYS.shortcutKey],
   (result) => {
+    selectedMode = normalizeMode(result[STORAGE_KEYS.mode]);
+    if (result[STORAGE_KEYS.mode] === undefined || result[STORAGE_KEYS.mode] !== selectedMode) {
+      void chrome.storage.local.set({ [STORAGE_KEYS.mode]: selectedMode });
+    }
+    shortcutKey = (result[STORAGE_KEYS.shortcutKey] as string) || DEFAULT_SHORTCUT;
     if (result[STORAGE_KEYS.config]) {
-      const saved = result[STORAGE_KEYS.config] as typeof config;
-      config = {
-        speechThreshold: saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold,
-        silenceThreshold: (saved.speechThreshold ?? DEFAULT_CONFIG.speechThreshold) * SILENCE_RATIO,
-        gracePeriod: saved.gracePeriod ?? DEFAULT_CONFIG.gracePeriod,
-      };
+      config = normalizeConfig(result[STORAGE_KEYS.config] as Partial<HushMeetConfig>);
     }
     selectedMicDeviceId = (result[STORAGE_KEYS.micDeviceId] as string) || null;
-    if (result[STORAGE_KEYS.enabled]) {
-      setTimeout(() => void startListening(), 2000);
+    if (isModeActive(selectedMode)) {
+      scheduleStartListening(2000);
     }
   },
 );
 
 // Clean up when the Meet tab is closed or navigated away
 window.addEventListener("beforeunload", () => {
-  if (enabled) {
+  if (isListening || isStarting) {
     stopListening();
   }
 });

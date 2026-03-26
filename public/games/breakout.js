@@ -1,4 +1,4 @@
-(function() {
+(function () {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
   const overlay = document.getElementById("overlay");
@@ -113,7 +113,8 @@
       const angle = Math.random() * Math.PI * 2;
       const speed = 1 + Math.random() * 3;
       particles.push({
-        x, y,
+        x,
+        y,
         dx: Math.cos(angle) * speed,
         dy: Math.sin(angle) * speed,
         life: 20 + Math.random() * 10,
@@ -162,9 +163,21 @@
     ballX += ballDX;
     ballY += ballDY;
 
-    if (ballX - BALL_R < 0) { ballX = BALL_R; ballDX = Math.abs(ballDX); beep(300, 0.05); }
-    if (ballX + BALL_R > W) { ballX = W - BALL_R; ballDX = -Math.abs(ballDX); beep(300, 0.05); }
-    if (ballY - BALL_R < 0) { ballY = BALL_R; ballDY = Math.abs(ballDY); beep(300, 0.05); }
+    if (ballX - BALL_R < 0) {
+      ballX = BALL_R;
+      ballDX = Math.abs(ballDX);
+      beep(300, 0.05);
+    }
+    if (ballX + BALL_R > W) {
+      ballX = W - BALL_R;
+      ballDX = -Math.abs(ballDX);
+      beep(300, 0.05);
+    }
+    if (ballY - BALL_R < 0) {
+      ballY = BALL_R;
+      ballDY = Math.abs(ballDY);
+      beep(300, 0.05);
+    }
 
     if (ballY + BALL_R > H) {
       lives--;

@@ -46,10 +46,22 @@ body[data-theme="analog-radio"] .screw {
   z-index: 10;
   pointer-events: none;
 }
-body[data-theme="analog-radio"] .screw-tl { top: 6px; left: 6px; }
-body[data-theme="analog-radio"] .screw-tr { top: 6px; right: 6px; }
-body[data-theme="analog-radio"] .screw-bl { bottom: 6px; left: 6px; }
-body[data-theme="analog-radio"] .screw-br { bottom: 6px; right: 6px; }
+body[data-theme="analog-radio"] .screw-tl {
+  top: 6px;
+  left: 6px;
+}
+body[data-theme="analog-radio"] .screw-tr {
+  top: 6px;
+  right: 6px;
+}
+body[data-theme="analog-radio"] .screw-bl {
+  bottom: 6px;
+  left: 6px;
+}
+body[data-theme="analog-radio"] .screw-br {
+  bottom: 6px;
+  right: 6px;
+}
 
 body[data-theme="analog-radio"] .header h1 {
   font-family: var(--font-display);
@@ -71,8 +83,7 @@ body[data-theme="analog-radio"] .status,
 body[data-theme="analog-radio"] .meter,
 body[data-theme="analog-radio"] .equalizer,
 body[data-theme="analog-radio"] .settings {
-  background:
-    linear-gradient(180deg, rgba(90, 65, 30, 0.4) 0%, rgba(40, 28, 12, 0.6) 100%);
+  background: linear-gradient(180deg, rgba(90, 65, 30, 0.4) 0%, rgba(40, 28, 12, 0.6) 100%);
   border: 2px solid #6b4c2a;
   border-radius: 4px;
   box-shadow:
@@ -84,8 +95,7 @@ body[data-theme="analog-radio"] .settings {
 /* VU meter style for level bar */
 body[data-theme="analog-radio"] .meter-bar-bg {
   height: 10px;
-  background:
-    linear-gradient(180deg, #1a1005, #2a1a08);
+  background: linear-gradient(180deg, #1a1005, #2a1a08);
   border: 1px solid #5a4020;
   border-radius: 2px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
@@ -188,7 +198,6 @@ body[data-theme="analog-radio"] .footer {
   color: #8b7355;
 }
 
-
 /* ============================================================
    THEME: Boombox — 80s metallic cassette deck / boombox
    Brushed metal texture, speaker grille, industrial UI
@@ -211,8 +220,7 @@ body[data-theme="boombox"] {
 
 /* Brushed metal SVG texture */
 body[data-theme="boombox"] {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5 0.02' numOctaves='3' seed='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='300' height='300' fill='%23252830' /%3E%3Crect width='300' height='300' filter='url(%23m)'/%3E%3C/svg%3E");
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5 0.02' numOctaves='3' seed='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.12'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='300' height='300' fill='%23252830' /%3E%3Crect width='300' height='300' filter='url(%23m)'/%3E%3C/svg%3E");
 }
 
 body[data-theme="boombox"] .popup {
@@ -316,11 +324,15 @@ body[data-theme="boombox"] .status-dot {
 }
 body[data-theme="boombox"] .status-dot.speaking {
   background: #33cc66;
-  box-shadow: 0 0 6px rgba(51, 204, 102, 0.8), 0 0 12px rgba(51, 204, 102, 0.3);
+  box-shadow:
+    0 0 6px rgba(51, 204, 102, 0.8),
+    0 0 12px rgba(51, 204, 102, 0.3);
 }
 body[data-theme="boombox"] .status-dot.muted {
   background: #ff3333;
-  box-shadow: 0 0 6px rgba(255, 51, 51, 0.8), 0 0 12px rgba(255, 51, 51, 0.3);
+  box-shadow:
+    0 0 6px rgba(255, 51, 51, 0.8),
+    0 0 12px rgba(255, 51, 51, 0.3);
 }
 body[data-theme="boombox"] .status-dot.grace {
   background: #ffcc00;
@@ -402,7 +414,6 @@ body[data-theme="boombox"] .footer {
   font-size: 9px;
 }
 
-
 /* ============================================================
    THEME: Retro Future — CRT synthwave / neon terminal
    Scanlines, perspective grid, neon glow, phosphor green
@@ -440,8 +451,11 @@ body[data-theme="retro-future"] .popup {
       rgba(0, 255, 170, 0.02) 4px
     ),
     /* Perspective grid floor */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2305050f'/%3E%3Cstop offset='1' stop-color='%230a0a1e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='200' fill='url(%23g)'/%3E%3Cg stroke='%231a0a6a' stroke-width='0.5' opacity='0.3'%3E%3Cline x1='0' y1='200' x2='150' y2='80'/%3E%3Cline x1='30' y1='200' x2='150' y2='80'/%3E%3Cline x1='60' y1='200' x2='150' y2='80'/%3E%3Cline x1='90' y1='200' x2='150' y2='80'/%3E%3Cline x1='120' y1='200' x2='150' y2='80'/%3E%3Cline x1='180' y1='200' x2='150' y2='80'/%3E%3Cline x1='210' y1='200' x2='150' y2='80'/%3E%3Cline x1='240' y1='200' x2='150' y2='80'/%3E%3Cline x1='270' y1='200' x2='150' y2='80'/%3E%3Cline x1='300' y1='200' x2='150' y2='80'/%3E%3Cline x1='0' y1='200' x2='300' y2='200'/%3E%3Cline x1='10' y1='185' x2='290' y2='185'/%3E%3Cline x1='30' y1='170' x2='270' y2='170'/%3E%3Cline x1='50' y1='155' x2='250' y2='155'/%3E%3Cline x1='70' y1='140' x2='230' y2='140'/%3E%3Cline x1='85' y1='125' x2='215' y2='125'/%3E%3C/g%3E%3C/svg%3E") no-repeat bottom center;
-  background-size: 100% auto, 100% 60%;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2305050f'/%3E%3Cstop offset='1' stop-color='%230a0a1e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='200' fill='url(%23g)'/%3E%3Cg stroke='%231a0a6a' stroke-width='0.5' opacity='0.3'%3E%3Cline x1='0' y1='200' x2='150' y2='80'/%3E%3Cline x1='30' y1='200' x2='150' y2='80'/%3E%3Cline x1='60' y1='200' x2='150' y2='80'/%3E%3Cline x1='90' y1='200' x2='150' y2='80'/%3E%3Cline x1='120' y1='200' x2='150' y2='80'/%3E%3Cline x1='180' y1='200' x2='150' y2='80'/%3E%3Cline x1='210' y1='200' x2='150' y2='80'/%3E%3Cline x1='240' y1='200' x2='150' y2='80'/%3E%3Cline x1='270' y1='200' x2='150' y2='80'/%3E%3Cline x1='300' y1='200' x2='150' y2='80'/%3E%3Cline x1='0' y1='200' x2='300' y2='200'/%3E%3Cline x1='10' y1='185' x2='290' y2='185'/%3E%3Cline x1='30' y1='170' x2='270' y2='170'/%3E%3Cline x1='50' y1='155' x2='250' y2='155'/%3E%3Cline x1='70' y1='140' x2='230' y2='140'/%3E%3Cline x1='85' y1='125' x2='215' y2='125'/%3E%3C/g%3E%3C/svg%3E")
+      no-repeat bottom center;
+  background-size:
+    100% auto,
+    100% 60%;
   position: relative;
 }
 
@@ -450,11 +464,7 @@ body[data-theme="retro-future"] .popup::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 50%,
-    rgba(5, 5, 15, 0.6) 100%
-  );
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(5, 5, 15, 0.6) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -483,10 +493,20 @@ body[data-theme="retro-future"] .header h1 {
 }
 
 @keyframes retro-flicker {
-  0%, 97%, 100% { opacity: 1; }
-  97.5% { opacity: 0.85; }
-  98% { opacity: 1; }
-  98.5% { opacity: 0.9; }
+  0%,
+  97%,
+  100% {
+    opacity: 1;
+  }
+  97.5% {
+    opacity: 0.85;
+  }
+  98% {
+    opacity: 1;
+  }
+  98.5% {
+    opacity: 0.9;
+  }
 }
 
 body[data-theme="retro-future"] .version {
@@ -641,7 +661,6 @@ body[data-theme="retro-future"] .footer {
   text-shadow: 0 0 4px rgba(96, 96, 170, 0.3);
 }
 
-
 /* ============================================================
    THEME SWITCHER — shared across all themes
    ============================================================ */
@@ -701,7 +720,9 @@ body[data-theme="retro-future"] .footer {
   text-align: left;
   cursor: pointer;
   border-radius: 5px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .theme-option:hover {

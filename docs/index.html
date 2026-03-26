@@ -1,134 +1,264 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hush Meet - Google Meet 自動ミュート拡張機能</title>
-  <style>
-    :root {
-      --bg: #0f0f1a;
-      --surface: #1a1a2e;
-      --border: #0f3460;
-      --primary: #e94560;
-      --text: #eee;
-      --text-muted: #8892a4;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-    }
-    .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
-    h1 { font-size: 2.5rem; margin-bottom: 8px; }
-    .tagline { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 32px; }
-    h2 { font-size: 1.4rem; margin: 32px 0 12px; color: var(--primary); }
-    h3 { font-size: 1.1rem; margin: 20px 0 8px; }
-    p, li { color: var(--text-muted); }
-    ul { padding-left: 24px; margin-bottom: 16px; }
-    li { margin-bottom: 4px; }
-    a { color: var(--primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .flow { font-family: monospace; color: var(--text); margin: 12px 0; }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-    th { color: var(--text); font-size: 0.9rem; }
-    td { color: var(--text-muted); font-size: 0.9rem; }
-    .footer { margin-top: 48px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
-    .nav { margin-bottom: 32px; }
-    .nav a { margin-right: 16px; font-size: 0.9rem; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Hush Meet</h1>
-    <p class="tagline">Google Meet で話していない時に自動でミュートし、周囲の雑音が参加者に届くのを防ぐ Chrome 拡張機能です。</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hush Meet - Google Meet 自動ミュート拡張機能</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+      }
+      .tagline {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p,
+      li {
+        color: var(--text-muted);
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .flow {
+        font-family: monospace;
+        color: var(--text);
+        margin: 12px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      .nav {
+        margin-bottom: 32px;
+      }
+      .nav a {
+        margin-right: 16px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hush Meet</h1>
+      <p class="tagline">
+        Google Meet で話していない時に自動でミュートし、周囲の雑音が参加者に届くのを防ぐ Chrome
+        拡張機能です。
+      </p>
 
-    <nav class="nav">
-      <a href="privacy-policy.html">プライバシーポリシー</a>
-      <a href="architecture.html">技術ドキュメント</a>
-      <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
-      <a href="en/">English</a>
-    </nav>
+      <nav class="nav">
+        <a href="privacy-policy.html">プライバシーポリシー</a>
+        <a href="architecture.html">技術ドキュメント</a>
+        <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
+        <a href="en/">English</a>
+      </nav>
 
-    <h2>特徴</h2>
-    <div class="card">
-      <ul>
-        <li>発話を検出すると自動でミュート解除、発話終了後に自動ミュート</li>
-        <li>Google Meet 本体とは独立した音声監視（Meet のマイクとは別にストリームを取得）</li>
-        <li>非対称閾値設計によるチャタリング防止</li>
-        <li>リアルタイムの音声レベルメーター＆スペクトラム表示</li>
-        <li>感度・猶予時間のカスタマイズが可能</li>
-        <li>手動ミュート検出 — ユーザーが意図的にミュートした場合は自動解除を一時停止</li>
-        <li>マイクデバイス選択 — 使用するマイクを手動で指定可能</li>
-        <li>4種類のテーマ着せ替え（Default / Analog Radio / Boombox / Retro Future）</li>
-        <li>日本語・英語の手動切り替え対応</li>
-        <li>退屈な会議のおともに — レトロフューチャーなミニゲーム内蔵（Breakout / Space Invaders）。ゲームの効果音でミュートが解除される仕様です。感度をギリギリに設定して、バレないスリルもお楽しみください。</li>
-      </ul>
+      <h2>特徴</h2>
+      <div class="card">
+        <ul>
+          <li>発話を検出すると自動でミュート解除、発話終了後に自動ミュート</li>
+          <li>
+            4つの動作モード:
+            <ul>
+              <li><strong>Off</strong> — 拡張機能を無効化、Meetのデフォルト動作</li>
+              <li>
+                <strong>Auto</strong> — 音声検知で自動ミュート解除＆自動ミュート（静かな環境向け）
+              </li>
+              <li>
+                <strong>Auto-Off</strong> — Meet
+                手動操作またはショートカットでのみミュート解除、無音で自動ミュート（騒がしい環境向け）
+              </li>
+              <li><strong>Push-to-Talk</strong> — ショートカットキー長押し中のみ発話可能</li>
+            </ul>
+          </li>
+          <li>
+            カスタマイズ可能なショートカットキー（デフォルト: Ctrl+Shift+M）—
+            Off以外の全モードで利用可能
+          </li>
+          <li>Google Meet 本体とは独立した音声監視（Meet のマイクとは別にストリームを取得）</li>
+          <li>非対称閾値設計によるチャタリング防止</li>
+          <li>リアルタイムの音声レベルメーター＆スペクトラム表示</li>
+          <li>感度・猶予時間のカスタマイズが可能</li>
+          <li>手動ミュート検出 — Meet 側の手動ミュート/解除に状態を追従</li>
+          <li>マイクデバイス選択 — 使用するマイクを手動で指定可能</li>
+          <li>4種類のテーマ着せ替え（Default / Analog Radio / Boombox / Retro Future）</li>
+          <li>日本語・英語の手動切り替え対応</li>
+          <li>
+            退屈な会議のおともに — レトロフューチャーなミニゲーム内蔵（Breakout / Space
+            Invaders）。ゲームの効果音でミュートが解除される仕様です。感度をギリギリに設定して、バレないスリルもお楽しみください。
+          </li>
+        </ul>
+      </div>
+
+      <h2>仕組み</h2>
+      <div class="card">
+        <div class="flow">
+          [マイク入力] → [Web Audio API (RMS)] → [発話状態判定] → [Meet ミュートボタン操作]
+        </div>
+        <p>
+          Meet 本体とは別にマイクストリームを取得して音量を監視し、発話状態に応じて Meet
+          のミュートボタンを自動操作します。
+        </p>
+      </div>
+
+      <h2>設定項目</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>項目</th>
+            <th>説明</th>
+            <th>デフォルト</th>
+          </tr>
+          <tr>
+            <td>モード</td>
+            <td>Off / Auto / Auto-Off / Push-to-Talk</td>
+            <td>Auto</td>
+          </tr>
+          <tr>
+            <td>ショートカットキー</td>
+            <td>ミュート操作のキーボードショートカット（Off以外で有効）</td>
+            <td>Ctrl+Shift+M</td>
+          </tr>
+          <tr>
+            <td>発話検出の感度</td>
+            <td>音量がこの値を超えたらミュート解除</td>
+            <td>0.025</td>
+          </tr>
+          <tr>
+            <td>猶予時間</td>
+            <td>発話終了後、ミュートするまでの待機時間</td>
+            <td>1.5秒</td>
+          </tr>
+          <tr>
+            <td>マイク選択</td>
+            <td>音声入力に使用するマイクデバイス</td>
+            <td>システムデフォルト</td>
+          </tr>
+          <tr>
+            <td>テーマ</td>
+            <td>ポップアップの外観テーマ（4種類）</td>
+            <td>Default</td>
+          </tr>
+          <tr>
+            <td>言語</td>
+            <td>UIの表示言語（自動 / English / 日本語）</td>
+            <td>自動（ブラウザ言語）</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>手動ミュート検出</h2>
+      <div class="card">
+        <p>
+          ユーザーが Google Meet
+          側でマイクを手動操作した場合、拡張機能はモードを変えずに状態だけを追従します。
+        </p>
+        <ul>
+          <li>Meet のミュートボタンの属性変化を MutationObserver で監視</li>
+          <li>拡張機能による操作とユーザーによる操作をフラグで区別</li>
+          <li>手動ミュート時は `MUTED`、手動ミュート解除時は `SPEAKING` に追従</li>
+          <li>モード選択は維持される</li>
+        </ul>
+      </div>
+
+      <h2>使い方</h2>
+      <div class="card">
+        <ol style="padding-left: 24px; color: var(--text-muted)">
+          <li>Chrome Web Store からインストール</li>
+          <li>Google Meet の通話に参加</li>
+          <li>ツールバーの Hush Meet アイコンをクリック</li>
+          <li>モードを Off 以外に切り替える</li>
+          <li>マイクのアクセス許可を求められたら「許可」する</li>
+        </ol>
+      </div>
+
+      <h2>技術スタック</h2>
+      <div class="card">
+        <ul>
+          <li>Chrome Extension Manifest V3</li>
+          <li>React 19 + TypeScript</li>
+          <li>Vite + CRXJS Vite Plugin</li>
+          <li>Web Audio API (AnalyserNode)</li>
+          <li>Chrome Storage API</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
     </div>
-
-    <h2>仕組み</h2>
-    <div class="card">
-      <div class="flow">[マイク入力] → [Web Audio API (RMS)] → [発話状態判定] → [Meet ミュートボタン操作]</div>
-      <p>Meet 本体とは別にマイクストリームを取得して音量を監視し、発話状態に応じて Meet のミュートボタンを自動操作します。</p>
-    </div>
-
-    <h2>設定項目</h2>
-    <div class="card">
-      <table>
-        <tr><th>項目</th><th>説明</th><th>デフォルト</th></tr>
-        <tr><td>発話検出の感度</td><td>音量がこの値を超えたらミュート解除</td><td>0.025</td></tr>
-        <tr><td>猶予時間</td><td>発話終了後、ミュートするまでの待機時間</td><td>1.5秒</td></tr>
-        <tr><td>マイク選択</td><td>音声入力に使用するマイクデバイス</td><td>システムデフォルト</td></tr>
-        <tr><td>テーマ</td><td>ポップアップの外観テーマ（4種類）</td><td>Default</td></tr>
-        <tr><td>言語</td><td>UIの表示言語（自動 / English / 日本語）</td><td>自動（ブラウザ言語）</td></tr>
-      </table>
-    </div>
-
-    <h2>手動ミュート検出</h2>
-    <div class="card">
-      <p>ユーザーが意図的にミュートした場合、拡張機能がそれを検出し、自動ミュート解除を一時停止します。</p>
-      <ul>
-        <li>Meet のミュートボタンの属性変化を MutationObserver で監視</li>
-        <li>拡張機能による操作とユーザーによる操作をフラグで区別</li>
-        <li>手動ミュート検出時はポップアップにバナーで通知</li>
-        <li>ユーザーが自分でミュート解除するか、ポップアップの「自動に戻す」ボタンで復帰</li>
-      </ul>
-    </div>
-
-    <h2>使い方</h2>
-    <div class="card">
-      <ol style="padding-left: 24px; color: var(--text-muted);">
-        <li>Chrome Web Store からインストール</li>
-        <li>Google Meet の通話に参加</li>
-        <li>ツールバーの Hush Meet アイコンをクリック</li>
-        <li>「自動ミュート」トグルをオンにする</li>
-        <li>マイクのアクセス許可を求められたら「許可」する</li>
-      </ol>
-    </div>
-
-    <h2>技術スタック</h2>
-    <div class="card">
-      <ul>
-        <li>Chrome Extension Manifest V3</li>
-        <li>React 19 + TypeScript</li>
-        <li>Vite + CRXJS Vite Plugin</li>
-        <li>Web Audio API (AnalyserNode)</li>
-        <li>Chrome Storage API</li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

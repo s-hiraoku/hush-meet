@@ -108,6 +108,69 @@ body {
   transform: translateX(20px);
 }
 
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.mode-card:hover:not(.active) {
+  border-color: rgba(233, 69, 96, 0.4);
+  background: rgba(233, 69, 96, 0.06);
+}
+
+.mode-card.active {
+  border-color: var(--primary);
+  background: rgba(233, 69, 96, 0.12);
+}
+
+.mode-card.mode-off.active {
+  border-color: var(--text-muted);
+  background: rgba(136, 146, 164, 0.12);
+}
+
+.mode-icon {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.mode-card.active .mode-icon {
+  color: var(--primary);
+}
+
+.mode-card.mode-off.active .mode-icon {
+  color: var(--text-muted);
+}
+
+.mode-name {
+  font-size: 9px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.mode-card.active .mode-name {
+  color: var(--text);
+}
+
 .status {
   display: flex;
   align-items: center;
@@ -142,16 +205,16 @@ body {
 }
 
 @keyframes pulse-error {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
-.status-dot.user-muted {
-  background: var(--yellow);
-  animation: pulse-error 1.5s infinite;
-}
-
-.user-muted-banner {
+.smart-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,6 +244,29 @@ body {
 
 .resume-btn:hover {
   opacity: 0.85;
+}
+
+.shortcut-btn {
+  background: var(--slider-track);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.shortcut-btn:hover {
+  border-color: var(--primary);
+}
+
+.shortcut-btn.recording {
+  border-color: var(--primary);
+  color: var(--primary);
+  animation: pulse-error 1s infinite;
 }
 
 .mic-select {
@@ -328,4 +414,14 @@ input[type="range"]::-webkit-slider-thumb {
   text-align: center;
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.footer-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 10px;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }

@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { DEFAULT_CONFIG, SILENCE_RATIO, THRESHOLD_RANGE } from "../constants.ts";
+import {
+  DEFAULT_CONFIG,
+  MODES,
+  SILENCE_RATIO,
+  THRESHOLD_RANGE,
+  normalizeMode,
+} from "../constants.ts";
+import type { ModeId } from "../constants.ts";
+import { parseShortcut } from "../shortcut.ts";
 
 /**
  * Tests for audio analysis logic extracted from content script.
@@ -27,23 +35,23 @@ function computeSpectrum(freqData: Uint8Array, bandCount: number): number[] {
   return spectrum;
 }
 
-type StateType = "IDLE" | "MUTED" | "SPEAKING" | "GRACE" | "UNMUTING" | "USER_MUTED" | "ERROR";
+type StateType = "IDLE" | "MUTED" | "SPEAKING" | "GRACE" | "UNMUTING" | "ERROR";
 
 function nextState(
   current: StateType,
   rms: number,
   speechThreshold: number,
   silenceThreshold: number,
+  mode: ModeId = MODES.auto,
 ): StateType {
+  if (mode === MODES.off) return current;
   switch (current) {
     case "MUTED":
-      return rms > speechThreshold ? "UNMUTING" : "MUTED";
+      return rms > speechThreshold && mode === MODES.auto ? "UNMUTING" : "MUTED";
     case "SPEAKING":
       return rms < silenceThreshold ? "GRACE" : "SPEAKING";
     case "GRACE":
       return rms > silenceThreshold ? "SPEAKING" : "GRACE";
-    case "USER_MUTED":
-      return "USER_MUTED"; // Never auto-transition out
     default:
       return current;
   }
@@ -51,33 +59,25 @@ function nextState(
 
 /**
  * Simulates manual mute detection logic.
- * Returns new state when a mute button change is observed.
+ * Manual Meet mute/unmute changes state, but never changes mode.
  */
 function detectManualMute(
   currentState: StateType,
   meetMuted: boolean,
   mutingByExtension: boolean,
-): StateType {
-  if (mutingByExtension) return currentState;
-  if (currentState === "IDLE" || currentState === "ERROR") return currentState;
+  mode: ModeId,
+): { state: StateType; mode: ModeId } {
+  if (mutingByExtension) return { state: currentState, mode };
+  if (currentState === "IDLE" || currentState === "ERROR") return { state: currentState, mode };
+  if (mode === MODES.off) return { state: currentState, mode };
 
-  if (meetMuted && currentState !== "MUTED" && currentState !== "USER_MUTED") {
-    return "USER_MUTED";
+  if (meetMuted && currentState !== "MUTED") {
+    return { state: "MUTED", mode };
   }
-  if (!meetMuted && currentState === "USER_MUTED") {
-    return "SPEAKING";
+  if (!meetMuted && currentState === "MUTED") {
+    return { state: "SPEAKING", mode };
   }
-  return currentState;
-}
-
-/**
- * Simulates resume from USER_MUTED via popup button.
- */
-function resumeAutoMute(currentState: StateType, requestedState: string): StateType {
-  if (requestedState === "MUTED" && currentState === "USER_MUTED") {
-    return "MUTED";
-  }
-  return currentState;
+  return { state: currentState, mode };
 }
 
 /**
@@ -204,73 +204,115 @@ describe("state machine transitions", () => {
   });
 });
 
-describe("USER_MUTED state", () => {
+describe("Off mode", () => {
   const speech = DEFAULT_CONFIG.speechThreshold;
   const silence = speech * SILENCE_RATIO;
 
-  it("USER_MUTED does not auto-transition even with loud RMS", () => {
-    expect(nextState("USER_MUTED", 1.0, speech, silence)).toBe("USER_MUTED");
+  it("no transitions in Off mode regardless of RMS", () => {
+    expect(nextState("MUTED", speech + 0.01, speech, silence, MODES.off)).toBe("MUTED");
+    expect(nextState("SPEAKING", silence - 0.001, speech, silence, MODES.off)).toBe("SPEAKING");
+    expect(nextState("IDLE", 1.0, speech, silence, MODES.off)).toBe("IDLE");
   });
 
-  it("USER_MUTED does not transition on silence", () => {
-    expect(nextState("USER_MUTED", 0, speech, silence)).toBe("USER_MUTED");
+  it("manual Meet unmute is ignored while Off", () => {
+    const r = detectManualMute("MUTED", false, false, MODES.off);
+    expect(r.state).toBe("MUTED");
+    expect(r.mode).toBe(MODES.off);
   });
 });
 
 describe("manual mute detection", () => {
-  it("detects user mute from SPEAKING → USER_MUTED", () => {
-    expect(detectManualMute("SPEAKING", true, false)).toBe("USER_MUTED");
+  it("user mute from SPEAKING transitions to MUTED without changing mode", () => {
+    const r = detectManualMute("SPEAKING", true, false, MODES.auto);
+    expect(r.state).toBe("MUTED");
+    expect(r.mode).toBe(MODES.auto);
   });
 
-  it("detects user mute from GRACE → USER_MUTED", () => {
-    expect(detectManualMute("GRACE", true, false)).toBe("USER_MUTED");
+  it("user mute from GRACE transitions to MUTED without changing mode", () => {
+    const r = detectManualMute("GRACE", true, false, MODES.auto);
+    expect(r.state).toBe("MUTED");
+    expect(r.mode).toBe(MODES.auto);
   });
 
   it("ignores mute when mutingByExtension is true", () => {
-    expect(detectManualMute("SPEAKING", true, true)).toBe("SPEAKING");
+    const r = detectManualMute("SPEAKING", true, true, MODES.auto);
+    expect(r.state).toBe("SPEAKING");
+    expect(r.mode).toBe(MODES.auto);
   });
 
-  it("does not re-enter USER_MUTED from MUTED", () => {
-    expect(detectManualMute("MUTED", true, false)).toBe("MUTED");
+  it("does not switch from MUTED (extension already muted)", () => {
+    const r = detectManualMute("MUTED", true, false, MODES.auto);
+    expect(r.mode).toBe(MODES.auto);
   });
 
-  it("does not re-enter USER_MUTED when already USER_MUTED", () => {
-    expect(detectManualMute("USER_MUTED", true, false)).toBe("USER_MUTED");
+  it("user unmute from MUTED transitions to SPEAKING", () => {
+    const r = detectManualMute("MUTED", false, false, MODES.autoOff);
+    expect(r.state).toBe("SPEAKING");
+    expect(r.mode).toBe(MODES.autoOff);
   });
 
-  it("user unmute from USER_MUTED → SPEAKING", () => {
-    expect(detectManualMute("USER_MUTED", false, false)).toBe("SPEAKING");
-  });
-
-  it("ignores unmute when not in USER_MUTED state", () => {
-    expect(detectManualMute("MUTED", false, false)).toBe("MUTED");
+  it("Auto-Off keeps mode when user manually mutes from SPEAKING", () => {
+    const r = detectManualMute("SPEAKING", true, false, MODES.autoOff);
+    expect(r.state).toBe("MUTED");
+    expect(r.mode).toBe(MODES.autoOff);
   });
 
   it("ignores changes in IDLE state", () => {
-    expect(detectManualMute("IDLE", true, false)).toBe("IDLE");
-    expect(detectManualMute("IDLE", false, false)).toBe("IDLE");
+    const r = detectManualMute("IDLE", true, false, MODES.auto);
+    expect(r.state).toBe("IDLE");
+    expect(r.mode).toBe(MODES.auto);
   });
 
-  it("ignores changes in ERROR state", () => {
-    expect(detectManualMute("ERROR", true, false)).toBe("ERROR");
-    expect(detectManualMute("ERROR", false, false)).toBe("ERROR");
+  it("ignores when already Off mode", () => {
+    const r = detectManualMute("IDLE", true, false, MODES.off);
+    expect(r.state).toBe("IDLE");
+    expect(r.mode).toBe(MODES.off);
   });
 });
 
-describe("resume auto mute from popup", () => {
-  it("USER_MUTED → MUTED when popup requests MUTED", () => {
-    expect(resumeAutoMute("USER_MUTED", "MUTED")).toBe("MUTED");
+describe("mode normalization", () => {
+  it("maps unknown modes to auto", () => {
+    expect(normalizeMode("smart")).toBe(MODES.auto);
+    expect(normalizeMode("manual")).toBe(MODES.auto);
+    expect(normalizeMode(undefined)).toBe(MODES.auto);
+  });
+});
+
+describe("Auto-Off mode state transitions", () => {
+  const speech = DEFAULT_CONFIG.speechThreshold;
+  const silence = speech * SILENCE_RATIO;
+
+  it("MUTED does NOT transition to UNMUTING when RMS exceeds threshold in auto-off mode", () => {
+    expect(nextState("MUTED", speech + 0.01, speech, silence, MODES.autoOff)).toBe("MUTED");
   });
 
-  it("does not change state if not in USER_MUTED", () => {
-    expect(resumeAutoMute("SPEAKING", "MUTED")).toBe("SPEAKING");
-    expect(resumeAutoMute("GRACE", "MUTED")).toBe("GRACE");
-    expect(resumeAutoMute("IDLE", "MUTED")).toBe("IDLE");
+  it("MUTED still transitions to UNMUTING in auto mode", () => {
+    expect(nextState("MUTED", speech + 0.01, speech, silence, MODES.auto)).toBe("UNMUTING");
   });
 
-  it("does not change state for non-MUTED requests", () => {
-    expect(resumeAutoMute("USER_MUTED", "SPEAKING")).toBe("USER_MUTED");
-    expect(resumeAutoMute("USER_MUTED", "IDLE")).toBe("USER_MUTED");
+  it("MUTED stays MUTED even with very loud RMS in auto-off mode", () => {
+    expect(nextState("MUTED", 1.0, speech, silence, MODES.autoOff)).toBe("MUTED");
+  });
+
+  it("user manual unmute from MUTED → SPEAKING in auto-off mode", () => {
+    const r = detectManualMute("MUTED", false, false, MODES.autoOff);
+    expect(r.state).toBe("SPEAKING");
+  });
+
+  it("SPEAKING → GRACE on silence works the same in auto-off mode", () => {
+    expect(nextState("SPEAKING", silence - 0.001, speech, silence, MODES.autoOff)).toBe("GRACE");
+  });
+
+  it("GRACE → SPEAKING on speech works the same in auto-off mode", () => {
+    expect(nextState("GRACE", silence + 0.01, speech, silence, MODES.autoOff)).toBe("SPEAKING");
+  });
+
+  it("GRACE stays GRACE on silence in auto-off mode", () => {
+    expect(nextState("GRACE", silence - 0.001, speech, silence, MODES.autoOff)).toBe("GRACE");
+  });
+
+  it("does not auto-unmute again after auto-muting back to MUTED", () => {
+    expect(nextState("MUTED", speech + 0.03, speech, silence, MODES.autoOff)).toBe("MUTED");
   });
 });
 
@@ -298,5 +340,64 @@ describe("mic device selection constraints", () => {
     expect(c.echoCancellation).toBe(true);
     expect(c.noiseSuppression).toBe(false);
     expect(c.autoGainControl).toBe(true);
+  });
+});
+
+describe("Push-to-Talk mode", () => {
+  const speech = DEFAULT_CONFIG.speechThreshold;
+  const silence = speech * SILENCE_RATIO;
+
+  it("MUTED does NOT auto-unmute on speech", () => {
+    expect(nextState("MUTED", speech + 0.01, speech, silence, MODES.pushToTalk)).toBe("MUTED");
+  });
+
+  it("SPEAKING to GRACE on silence", () => {
+    expect(nextState("SPEAKING", silence - 0.001, speech, silence, MODES.pushToTalk)).toBe("GRACE");
+  });
+
+  it("GRACE to SPEAKING on sound", () => {
+    expect(nextState("GRACE", silence + 0.01, speech, silence, MODES.pushToTalk)).toBe("SPEAKING");
+  });
+
+  it("manual Meet unmute still tracks speaking state without changing mode", () => {
+    const r = detectManualMute("MUTED", false, false, MODES.pushToTalk);
+    expect(r.state).toBe("SPEAKING");
+    expect(r.mode).toBe(MODES.pushToTalk);
+  });
+});
+
+describe("shortcut key parsing", () => {
+  it("Ctrl+Shift+M", () => {
+    expect(parseShortcut("Ctrl+Shift+M")).toEqual({
+      ctrlKey: true,
+      shiftKey: true,
+      altKey: false,
+      metaKey: false,
+      key: "m",
+    });
+  });
+
+  it("Alt+K", () => {
+    expect(parseShortcut("Alt+K")).toEqual({
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: true,
+      metaKey: false,
+      key: "k",
+    });
+  });
+
+  it("Cmd+Shift+X", () => {
+    expect(parseShortcut("Cmd+Shift+X")).toEqual({
+      ctrlKey: false,
+      shiftKey: true,
+      altKey: false,
+      metaKey: true,
+      key: "x",
+    });
+  });
+
+  it("single key F1", () => {
+    expect(parseShortcut("F1").key).toBe("f1");
   });
 });

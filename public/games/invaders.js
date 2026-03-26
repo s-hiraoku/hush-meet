@@ -18,32 +18,32 @@
 
   // Pixel art patterns (8x8 grids, 1=filled)
   const INVADER_A = [
-    [0,0,1,0,0,0,1,0],
-    [0,0,0,1,0,1,0,0],
-    [0,0,1,1,1,1,1,0],
-    [0,1,1,0,1,0,1,1],
-    [1,1,1,1,1,1,1,1],
-    [1,0,1,1,1,1,0,1],
-    [1,0,1,0,0,1,0,1],
-    [0,0,0,1,1,0,0,0],
+    [0, 0, 1, 0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 0, 1, 0, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [0, 0, 0, 1, 1, 0, 0, 0],
   ];
   const INVADER_B = [
-    [0,0,0,1,1,0,0,0],
-    [0,0,1,1,1,1,0,0],
-    [0,1,1,1,1,1,1,0],
-    [1,1,0,1,1,0,1,1],
-    [1,1,1,1,1,1,1,1],
-    [0,0,1,0,0,1,0,0],
-    [0,1,0,1,1,0,1,0],
-    [1,0,1,0,0,1,0,1],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 0, 1, 1, 0, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 1, 0, 1, 1, 0, 1, 0],
+    [1, 0, 1, 0, 0, 1, 0, 1],
   ];
 
   const SHIP_PATTERN = [
-    [0,0,0,1,0,0,0],
-    [0,0,1,1,1,0,0],
-    [0,0,1,1,1,0,0],
-    [1,1,1,1,1,1,1],
-    [1,1,1,1,1,1,1],
+    [0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1],
   ];
 
   const PIXEL = 3;
@@ -159,7 +159,8 @@
       const angle = Math.random() * Math.PI * 2;
       const speed = 1 + Math.random() * 3;
       particles.push({
-        x, y,
+        x,
+        y,
         dx: Math.cos(angle) * speed,
         dy: Math.sin(angle) * speed,
         life: 15 + Math.random() * 15,
@@ -182,7 +183,9 @@
       }
     }
   });
-  document.addEventListener("keyup", (e) => { keys[e.code] = false; });
+  document.addEventListener("keyup", (e) => {
+    keys[e.code] = false;
+  });
 
   overlay.addEventListener("click", () => {
     if (state === "START" || state === "GAME_OVER" || state === "PAUSED") {
@@ -262,10 +265,7 @@
     for (const b of bullets) {
       for (const inv of invaders) {
         if (!inv.alive) continue;
-        if (
-          b.x >= inv.x && b.x <= inv.x + INVADER_W &&
-          b.y >= inv.y && b.y <= inv.y + INVADER_H
-        ) {
+        if (b.x >= inv.x && b.x <= inv.x + INVADER_W && b.y >= inv.y && b.y <= inv.y + INVADER_H) {
           inv.alive = false;
           b.y = -100;
           score += inv.points;
@@ -276,7 +276,8 @@
           // Speed up remaining invaders
           const remaining = invaders.filter((i) => i.alive).length;
           if (remaining > 0) {
-            invaderSpeed = (0.5 + wave * 0.15) * (1 + (invaders.length - remaining) / invaders.length * 2);
+            invaderSpeed =
+              (0.5 + wave * 0.15) * (1 + ((invaders.length - remaining) / invaders.length) * 2);
           }
           break;
         }
@@ -285,10 +286,7 @@
 
     // Enemy bullet-ship collision
     for (const b of enemyBullets) {
-      if (
-        b.x >= shipX && b.x <= shipX + SHIP_W &&
-        b.y >= H - 35 && b.y <= H - 35 + SHIP_H
-      ) {
+      if (b.x >= shipX && b.x <= shipX + SHIP_W && b.y >= H - 35 && b.y <= H - 35 + SHIP_H) {
         b.y = H + 100;
         lives--;
         livesEl.textContent = lives;
@@ -330,7 +328,10 @@
     // Update stars
     for (const s of stars) {
       s.y += s.speed;
-      if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+      if (s.y > H) {
+        s.y = 0;
+        s.x = Math.random() * W;
+      }
       s.brightness = 0.3 + Math.sin(frameCount * 0.02 + s.x) * 0.3;
     }
   }

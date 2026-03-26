@@ -1,72 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>技術ドキュメント - Hush Meet</title>
-  <style>
-    :root {
-      --bg: #0f0f1a;
-      --surface: #1a1a2e;
-      --border: #0f3460;
-      --primary: #e94560;
-      --text: #eee;
-      --text-muted: #8892a4;
-      --code-bg: #0d1b2a;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-    }
-    .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
-    h1 { font-size: 2rem; margin-bottom: 8px; }
-    .subtitle { color: var(--text-muted); margin-bottom: 24px; }
-    h2 { font-size: 1.3rem; margin: 32px 0 12px; color: var(--primary); }
-    h3 { font-size: 1.1rem; margin: 20px 0 8px; }
-    p { color: var(--text-muted); margin-bottom: 12px; }
-    ul, ol { padding-left: 24px; margin-bottom: 16px; }
-    li { color: var(--text-muted); margin-bottom: 4px; }
-    a { color: var(--primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-    pre {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      overflow-x: auto;
-      margin: 12px 0;
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
-    pre code { background: none; padding: 0; }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .back { margin-bottom: 24px; display: inline-block; font-size: 0.9rem; }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-    th { color: var(--text); font-size: 0.9rem; }
-    td { color: var(--text-muted); font-size: 0.9rem; }
-    .footer { margin-top: 48px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <a href="index.html" class="back">&larr; トップに戻る</a>
-    <h1>技術ドキュメント</h1>
-    <p class="subtitle">Hush Meet のアーキテクチャと設計について</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>技術ドキュメント - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+        --code-bg: #0d1b2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="index.html" class="back">&larr; トップに戻る</a>
+      <h1>技術ドキュメント</h1>
+      <p class="subtitle">Hush Meet のアーキテクチャと設計について</p>
 
-    <h2>アーキテクチャ概要</h2>
-    <div class="card">
-      <pre><code>┌─────────────────────────────────────────────────────┐
+      <h2>アーキテクチャ概要</h2>
+      <div class="card">
+        <pre><code>┌─────────────────────────────────────────────────────┐
 │  Chrome Extension (Manifest V3)                     │
 │                                                     │
 │  ┌──────────────┐     ┌───────────────────────────┐ │
@@ -93,48 +161,80 @@
 │         └─── Chrome Storage API (設定/状態の同期) ──┘
 │                                                     │
 └─────────────────────────────────────────────────────┘</code></pre>
-    </div>
+      </div>
 
-    <h2>プロジェクト構成</h2>
-    <div class="card">
-      <pre><code>src/
+      <h2>プロジェクト構成</h2>
+      <div class="card">
+        <pre><code>src/
+├── constants.ts          # 定数・モード・閾値・ストレージキー定義
+├── messages.ts           # i18n メッセージ（EN/JA）
+├── i18n.ts               # ロケール管理
 ├── manifest.ts           # Chrome拡張マニフェスト定義
+├── background/
+│   └── service-worker.ts # Service Worker（ゲーム起動等）
 ├── content/
-│   └── index.ts          # Content Script（自動ミュート制御）
+│   └── index.ts          # Content Script（状態マシン・モード制御・ショートカット）
 └── popup/
     ├── index.html        # Popup エントリHTML
     ├── main.tsx          # React マウント
     ├── Popup.tsx         # Popup UIコンポーネント
-    └── popup.css         # スタイル</code></pre>
-    </div>
+    ├── popup.css         # スタイル
+    ├── Equalizer.tsx     # スペクトラムアナライザー
+    ├── ThemeSwitcher.tsx # テーマ切替
+    ├── LocaleSwitcher.tsx# 言語切替
+    └── GameLauncher.tsx  # ミニゲーム起動</code></pre>
+      </div>
 
-    <h2>コンポーネント詳細</h2>
+      <h2>コンポーネント詳細</h2>
 
-    <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
-    <p>Google Meet のページに注入されるスクリプトです。主に以下の責務を持ちます：</p>
+      <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
+      <p>Google Meet のページに注入されるスクリプトです。主に以下の責務を持ちます：</p>
 
-    <h3>1.1 音声解析エンジン</h3>
-    <div class="card">
-      <p>Web Audio API の <code>AnalyserNode</code> を使用して、マイク入力の音量をリアルタイムに測定します。</p>
-      <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
+      <h3>1.1 音声解析エンジン</h3>
+      <div class="card">
+        <p>
+          Web Audio API の
+          <code>AnalyserNode</code> を使用して、マイク入力の音量をリアルタイムに測定します。
+        </p>
+        <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
                                                     getFloatTimeDomainData()
                                                           │
                                                     RMS (二乗平均平方根) 算出</code></pre>
-      <p>設定パラメータ：</p>
-      <table>
-        <tr><th>パラメータ</th><th>値</th><th>説明</th></tr>
-        <tr><td><code>fftSize</code></td><td>2048</td><td>FFTウィンドウサイズ</td></tr>
-        <tr><td><code>smoothingTimeConstant</code></td><td>0.3</td><td>時間方向の平滑化係数</td></tr>
-        <tr><td><code>echoCancellation</code></td><td>true</td><td>エコーキャンセルを有効化</td></tr>
-        <tr><td><code>noiseSuppression</code></td><td>false</td><td>ノイズ抑制はオフ（VAD精度のため）</td></tr>
-      </table>
-    </div>
+        <p>設定パラメータ：</p>
+        <table>
+          <tr>
+            <th>パラメータ</th>
+            <th>値</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td><code>fftSize</code></td>
+            <td>2048</td>
+            <td>FFTウィンドウサイズ</td>
+          </tr>
+          <tr>
+            <td><code>smoothingTimeConstant</code></td>
+            <td>0.3</td>
+            <td>時間方向の平滑化係数</td>
+          </tr>
+          <tr>
+            <td><code>echoCancellation</code></td>
+            <td>true</td>
+            <td>エコーキャンセルを有効化</td>
+          </tr>
+          <tr>
+            <td><code>noiseSuppression</code></td>
+            <td>false</td>
+            <td>ノイズ抑制はオフ（VAD精度のため）</td>
+          </tr>
+        </table>
+      </div>
 
-    <h3>1.2 状態マシン</h3>
-    <div class="card">
-      <p>5つの状態を持つ有限状態マシンで発話状態を管理します。</p>
-      <pre><code>IDLE ──(有効化)──► MUTED ──(音量 > speechThreshold)──► UNMUTING ──► SPEAKING
+      <h3>1.2 状態マシン</h3>
+      <div class="card">
+        <p>5つの状態を持つ有限状態マシンで発話状態を管理します。</p>
+        <pre><code>IDLE ──(Off 以外のモード選択)──► MUTED ──(音量 > speechThreshold)──► UNMUTING ──► SPEAKING
                      ▲                                                │
                      │                              (音量 < silenceThreshold)
                      │                                                │
@@ -143,21 +243,101 @@
                                      (音量 > silenceThreshold)
                                             │
                                             ▼
-                                        SPEAKING</code></pre>
-      <table>
-        <tr><th>状態</th><th>説明</th><th>Meet操作</th></tr>
-        <tr><td>IDLE</td><td>拡張が無効/未初期化</td><td>なし</td></tr>
-        <tr><td>MUTED</td><td>無音 → ミュート中</td><td>ミュート</td></tr>
-        <tr><td>UNMUTING</td><td>音声検出 → 解除中</td><td>ミュート解除</td></tr>
-        <tr><td>SPEAKING</td><td>発話中</td><td>なし</td></tr>
-        <tr><td>GRACE</td><td>発話終了 → 猶予期間</td><td>なし</td></tr>
-      </table>
-    </div>
+                                        SPEAKING
 
-    <h3>1.3 非対称閾値設計</h3>
-    <div class="card">
-      <p>ミュート解除とミュートで異なる閾値を使用することで、チャタリング（頻繁な切り替わり）を防止しています。</p>
-      <pre><code>speechThreshold (発話開始)  = 0.025  (デフォルト)
+※ ユーザーが手動で Meet のマイクを触った場合も、モードは変えず状態だけ追従します。</code></pre>
+        <table>
+          <tr>
+            <th>状態</th>
+            <th>説明</th>
+            <th>Meet操作</th>
+          </tr>
+          <tr>
+            <td>IDLE</td>
+            <td>Off モードまたは未初期化</td>
+            <td>なし</td>
+          </tr>
+          <tr>
+            <td>MUTED</td>
+            <td>無音 → ミュート中</td>
+            <td>ミュート</td>
+          </tr>
+          <tr>
+            <td>UNMUTING</td>
+            <td>音声検出 → 解除中</td>
+            <td>ミュート解除</td>
+          </tr>
+          <tr>
+            <td>SPEAKING</td>
+            <td>発話中</td>
+            <td>なし</td>
+          </tr>
+          <tr>
+            <td>GRACE</td>
+            <td>発話終了 → 猶予期間</td>
+            <td>なし</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.3 動作モード</h3>
+      <div class="card">
+        <p>4つのモードで状態遷移の挙動を切り替えられます。Off が制御停止モードです。</p>
+        <table>
+          <tr>
+            <th>モード</th>
+            <th>ミュート解除</th>
+            <th>ミュート</th>
+            <th>ショートカット</th>
+          </tr>
+          <tr>
+            <td>Off</td>
+            <td>なし</td>
+            <td>なし</td>
+            <td>無効</td>
+          </tr>
+          <tr>
+            <td>Auto</td>
+            <td>音声検知で自動</td>
+            <td>無音で自動</td>
+            <td>トグル</td>
+          </tr>
+          <tr>
+            <td>Auto-Off</td>
+            <td>手動/ショートカット</td>
+            <td>無音で自動</td>
+            <td>トグル</td>
+          </tr>
+          <tr>
+            <td>Push-to-Talk</td>
+            <td>キー押下中のみ</td>
+            <td>キー離す→Grace→ミュート</td>
+            <td>ホールド</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.4 ショートカットキー</h3>
+      <div class="card">
+        <p>
+          カスタマイズ可能なキーボードショートカット（デフォルト:
+          <code>Ctrl+Shift+M</code>）を提供します。
+        </p>
+        <ul>
+          <li>Off: 無効</li>
+          <li>Auto: ミュートのトグル操作</li>
+          <li>Auto-Off: ミュートのトグル操作</li>
+          <li>Push-to-Talk: キー押下中のみミュート解除（ホールド操作）</li>
+        </ul>
+        <p>ショートカットキーはポップアップの設定から自由に変更できます。</p>
+      </div>
+
+      <h3>1.5 非対称閾値設計</h3>
+      <div class="card">
+        <p>
+          ミュート解除とミュートで異なる閾値を使用することで、チャタリング（頻繁な切り替わり）を防止しています。
+        </p>
+        <pre><code>speechThreshold (発話開始)  = 0.025  (デフォルト)
 silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
 
   音量
@@ -167,89 +347,155 @@ silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
    │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← これを下回ったら猶予開始
    │
    └──────────────────────────────────────────► 時間</code></pre>
-    </div>
+      </div>
 
-    <h3>1.4 ミュートボタン検出</h3>
-    <div class="card">
-      <p>Google Meet のミュートボタンを複数の戦略で検出します：</p>
-      <ol>
-        <li><code>aria-label</code> 属性による検索（日本語/英語対応）</li>
-        <li><code>data-tooltip</code> 属性による検索</li>
-        <li>フォールバック: <code>Ctrl+D</code> キーボードショートカットのシミュレーション</li>
-      </ol>
-      <p>ミュート状態の判定は <code>data-is-muted</code> 属性または <code>aria-label</code> の文言から行います。</p>
-    </div>
+      <h3>1.6 ミュートボタン検出</h3>
+      <div class="card">
+        <p>Google Meet のミュートボタンを複数の戦略で検出します：</p>
+        <ol>
+          <li><code>aria-label</code> 属性による検索（日本語/英語対応）</li>
+          <li><code>data-tooltip</code> 属性による検索</li>
+          <li>フォールバック: <code>Ctrl+D</code> キーボードショートカットのシミュレーション</li>
+        </ol>
+        <p>
+          ミュート状態の判定は <code>data-is-muted</code> 属性または
+          <code>aria-label</code> の文言から行います。
+        </p>
+      </div>
 
-    <h3>2. Popup UI (<code>src/popup/</code>)</h3>
-    <div class="card">
-      <p>React 19 で構築された設定UIです。Chrome Storage API を介して Content Script とリアルタイムに状態を同期します。</p>
-      <ul>
-        <li><strong>自動ミュート トグル</strong>: 有効/無効の切り替え</li>
-        <li><strong>状態表示</strong>: 現在の状態（ミュート中/発話中/猶予中）をドットインジケーターで表示</li>
-        <li><strong>レベルメーター</strong>: マイク入力レベルをリアルタイムに表示（閾値マーカー付き）</li>
-        <li><strong>感度スライダー</strong>: <code>speechThreshold</code> の調整（0.005〜0.05）</li>
-        <li><strong>猶予時間スライダー</strong>: <code>gracePeriod</code> の調整（500ms〜4000ms）</li>
-      </ul>
-    </div>
+      <h3>2. Popup UI (<code>src/popup/</code>)</h3>
+      <div class="card">
+        <p>
+          React 19 で構築された設定UIです。Chrome Storage API を介して Content Script
+          とリアルタイムに状態を同期します。
+        </p>
+        <ul>
+          <li><strong>モードセレクタ</strong>: Off / Auto / Auto-Off / Push-to-Talk の切り替え</li>
+          <li>
+            <strong>状態表示</strong>:
+            現在の状態（ミュート中/発話中/猶予中）をドットインジケーターで表示
+          </li>
+          <li>
+            <strong>レベルメーター</strong>:
+            マイク入力レベルをリアルタイムに表示（閾値マーカー付き）
+          </li>
+          <li>
+            <strong>感度スライダー</strong>: <code>speechThreshold</code> の調整（0.005〜0.1）
+          </li>
+          <li>
+            <strong>猶予時間スライダー</strong>: <code>gracePeriod</code> の調整（500ms〜4000ms）
+          </li>
+          <li><strong>ショートカットキー設定</strong>: キー記録UIによるカスタマイズ</li>
+          <li><strong>マイクデバイス選択</strong>: 使用するマイクの手動選択</li>
+        </ul>
+      </div>
 
-    <h2>データフロー</h2>
-    <div class="card">
-      <pre><code>Popup → Chrome Storage → Content Script
+      <h2>データフロー</h2>
+      <div class="card">
+        <pre><code>Popup → Chrome Storage → Content Script
   │                            │
-  │  hushMeetEnabled: bool     │  (有効/無効の制御)
   │  hushMeetConfig: object    │  (感度/猶予時間の設定)
+  │  hushMeetMode: string      │  (動作モード)
+  │  hushMeetShortcutKey: str  │  (ショートカットキー)
   │                            │
   │                            ▼
   │                      Content Script → Chrome Storage → Popup
   │                            │
   │                            │  hushMeetState: string  (現在の状態)
   │                            │  hushMeetLevel: number  (音量レベル)
+  │                            │  hushMeetSpectrum: array (スペクトラム)
   └────────────────────────────┘</code></pre>
-      <p>Popup と Content Script は直接通信せず、Chrome Storage API の変更イベントを介して双方向に通信します。</p>
-    </div>
+        <p>
+          Popup と Content Script は直接通信せず、Chrome Storage API
+          の変更イベントを介して双方向に通信します。
+        </p>
+      </div>
 
-    <h2>ビルドシステム</h2>
-    <div class="card">
-      <table>
-        <tr><th>ツール</th><th>バージョン</th><th>用途</th></tr>
-        <tr><td>Vite</td><td>6.x</td><td>ビルド・開発サーバー</td></tr>
-        <tr><td>CRXJS Vite Plugin</td><td>2.x</td><td>Chrome拡張のHMR・manifest生成</td></tr>
-        <tr><td>React</td><td>19.x</td><td>Popup UI</td></tr>
-        <tr><td>TypeScript</td><td>5.9.x</td><td>型安全性</td></tr>
-        <tr><td>pnpm</td><td>10.x</td><td>パッケージマネージャー</td></tr>
-      </table>
-      <h3>コマンド</h3>
-      <table>
-        <tr><th>コマンド</th><th>説明</th></tr>
-        <tr><td><code>pnpm dev</code></td><td>開発サーバー起動（HMR対応）</td></tr>
-        <tr><td><code>pnpm build</code></td><td>プロダクションビルド</td></tr>
-        <tr><td><code>pnpm zip</code></td><td>ビルド + Chrome Web Store 提出用 zip 生成</td></tr>
-        <tr><td><code>pnpm lint</code></td><td>ESLint によるコード検査</td></tr>
-      </table>
-    </div>
+      <h2>ビルドシステム</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>ツール</th>
+            <th>バージョン</th>
+            <th>用途</th>
+          </tr>
+          <tr>
+            <td>Vite+</td>
+            <td>toolchain</td>
+            <td>依存管理・ビルド・テスト・検証</td>
+          </tr>
+          <tr>
+            <td>Vite</td>
+            <td>8.x</td>
+            <td>内部ビルド基盤</td>
+          </tr>
+          <tr>
+            <td>CRXJS Vite Plugin</td>
+            <td>2.x</td>
+            <td>Chrome拡張のHMR・manifest生成</td>
+          </tr>
+          <tr>
+            <td>React</td>
+            <td>19.x</td>
+            <td>Popup UI</td>
+          </tr>
+          <tr>
+            <td>TypeScript</td>
+            <td>5.9.x</td>
+            <td>型安全性</td>
+          </tr>
+        </table>
+        <h3>コマンド</h3>
+        <table>
+          <tr>
+            <th>コマンド</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td><code>vp install</code></td>
+            <td>依存関係のインストール</td>
+          </tr>
+          <tr>
+            <td><code>vp build</code></td>
+            <td>プロダクションビルド</td>
+          </tr>
+          <tr>
+            <td><code>vp test</code></td>
+            <td>テスト実行</td>
+          </tr>
+          <tr>
+            <td><code>vp check</code></td>
+            <td>format / lint / typecheck</td>
+          </tr>
+        </table>
+      </div>
 
-    <h2>既知の制限事項</h2>
-    <div class="card">
-      <ul>
-        <li>音声検出は RMS（音量）ベースのため、大きな環境雑音で誤反応する可能性がある</li>
-        <li>Google Meet の UI 変更でミュートボタンの検出が壊れる可能性がある</li>
-        <li>発話の最初の一瞬が切れる場合がある（閾値の調整で軽減可能）</li>
-      </ul>
-    </div>
+      <h2>既知の制限事項</h2>
+      <div class="card">
+        <ul>
+          <li>
+            音声検出は RMS（音量）ベースのため、大きな環境雑音で誤反応する可能性がある（Auto-Off
+            モードで軽減可能）
+          </li>
+          <li>Google Meet の UI 変更でミュートボタンの検出が壊れる可能性がある</li>
+          <li>発話の最初の一瞬が切れる場合がある（閾値の調整で軽減可能）</li>
+          <li>ショートカットキーは Google Meet タブがフォーカスされている時のみ動作する</li>
+        </ul>
+      </div>
 
-    <h2>今後の改善案</h2>
-    <div class="card">
-      <ul>
-        <li>Silero VAD（ML ベース）への置き換えで検出精度向上</li>
-        <li>発話開始前のバッファリングで冒頭欠落を軽減</li>
-        <li>Meet の UI 変更に追従する自動検出ロジック</li>
-        <li>ステータスバッジ（アイコン上の状態表示）</li>
-      </ul>
-    </div>
+      <h2>今後の改善案</h2>
+      <div class="card">
+        <ul>
+          <li>Silero VAD（ML ベース）への置き換えで検出精度向上</li>
+          <li>発話開始前のバッファリングで冒頭欠落を軽減</li>
+          <li>Meet の UI 変更に追従する自動検出ロジック</li>
+          <li>ステータスバッジ（アイコン上の状態表示）</li>
+        </ul>
+      </div>
 
-    <div class="footer">
-      <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

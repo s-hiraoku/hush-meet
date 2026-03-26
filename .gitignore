@@ -1,5 +1,6 @@
 node_modules/
 dist/
+coverage/
 *.local
 hush-meet.zip
 .DS_Store

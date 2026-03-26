@@ -5,9 +5,6 @@
   "extDescription": {
     "message": "Google Meetで話していない時に自動でミュートし、雑音を防止します"
   },
-  "autoMute": {
-    "message": "自動ミュート"
-  },
   "stateIdle": {
     "message": "無効"
   },
@@ -61,20 +58,44 @@
   "errorMicUnknown": {
     "message": "マイクにアクセスできません。"
   },
-  "stateUserMuted": {
-    "message": "手動ミュート中"
-  },
-  "userMutedBanner": {
-    "message": "手動ミュート中のため自動解除を一時停止"
-  },
-  "resumeAutoMute": {
-    "message": "自動に戻す"
-  },
   "micDevice": {
     "message": "マイク"
   },
   "micDefault": {
     "message": "システムデフォルト"
+  },
+  "modeLabel": {
+    "message": "モード"
+  },
+  "modeOff": {
+    "message": "オフ"
+  },
+  "modeOffDesc": {
+    "message": "拡張機能を無効化 — Meetのデフォルト動作"
+  },
+  "modeAuto": {
+    "message": "オート"
+  },
+  "modeAutoOff": {
+    "message": "オートオフ"
+  },
+  "stateWaitingManualUnmute": {
+    "message": "手動ミュート解除待ち"
+  },
+  "modePushToTalk": {
+    "message": "プッシュトゥトーク"
+  },
+  "shortcutLabel": {
+    "message": "ショートカットキー"
+  },
+  "shortcutRecording": {
+    "message": "キーを押してください..."
+  },
+  "statePushToTalk": {
+    "message": "ショートカットキー長押しで発話"
+  },
+  "footerDocsLink": {
+    "message": "詳細・ドキュメント"
   },
   "gameLauncher": {
     "message": "ゲーム"

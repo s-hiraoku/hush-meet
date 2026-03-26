@@ -3,6 +3,7 @@
 ## [1.0.0] - 2026-03-21
 
 ### Added
+
 - Google Meet での自動ミュート機能
   - 発話検出による自動ミュート解除
   - 発話終了後の猶予時間経過で自動ミュート
@@ -20,6 +21,7 @@
 - Chrome Web Store 提出用アセット
 
 ### Technical
+
 - Vite+ (Rolldown) + CRXJS Vite Plugin によるビルド環境
 - 共通定数ファイル（`src/constants.ts`）による設定値の一元管理
 - TypeScript による型安全な実装

@@ -1,33 +1,28 @@
 import { useEffect, useState } from "react";
 import {
-  DEFAULT_CONFIG,
   THRESHOLD_RANGE,
   GRACE_RANGE,
-  SILENCE_RATIO,
-  STORAGE_KEYS,
   APP_VERSION,
   THEMES,
+  MODES,
   type ThemeId,
+  type ModeId,
 } from "../constants";
-import { t, setLocale, onLocaleChange, type LocaleId } from "../i18n.ts";
+import { isModeActive } from "../mode-control.ts";
+import { t, onLocaleChange, type LocaleId } from "../i18n.ts";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GameLauncher } from "./GameLauncher";
-
-interface HushMeetConfig {
-  speechThreshold?: number;
-  silenceThreshold?: number;
-  gracePeriod?: number;
-}
-
-interface HushMeetStorage {
-  [key: string]: boolean | HushMeetConfig | string | number | undefined;
-  hushMeetEnabled?: boolean;
-  hushMeetConfig?: HushMeetConfig;
-  hushMeetState?: string;
-  hushMeetLevel?: number;
-}
+import { ModeGrid } from "./ModeGrid";
+import { usePopupStorage } from "./usePopupStorage";
+import { ShortcutSetting } from "./ShortcutSetting";
+import {
+  savePopupConfig,
+  savePopupMicDevice,
+  savePopupMode,
+  savePopupShortcut,
+} from "./storage-actions";
 
 const stateLabels: Record<string, { key: string; css: string }> = {
   IDLE: { key: "stateIdle", css: "" },
@@ -36,7 +31,6 @@ const stateLabels: Record<string, { key: string; css: string }> = {
   SPEAKING: { key: "stateSpeaking", css: "speaking" },
   GRACE: { key: "stateGrace", css: "grace" },
   ERROR: { key: "stateError", css: "error" },
-  USER_MUTED: { key: "stateUserMuted", css: "user-muted" },
 };
 
 const errorMessages: Record<string, string> = {
@@ -54,144 +48,46 @@ function applyTheme(themeId: ThemeId) {
   }
 }
 
+function getStatusText(state: string, mode: ModeId, stateInfo: { key: string }) {
+  if (mode === MODES.off) return t("modeOffDesc");
+  if (state === "MUTED") {
+    if (mode === MODES.autoOff) return t("stateWaitingManualUnmute");
+    if (mode === MODES.pushToTalk) return t("statePushToTalk");
+  }
+  return t(stateInfo.key);
+}
+
 export function Popup() {
-  const [enabled, setEnabled] = useState(false);
-  const [state, setState] = useState("IDLE");
-  const [level, setLevel] = useState(0);
-  const [threshold, setThreshold] = useState<number>(DEFAULT_CONFIG.speechThreshold);
-  const [gracePeriod, setGracePeriod] = useState<number>(DEFAULT_CONFIG.gracePeriod);
-  const [theme, setTheme] = useState<ThemeId>(THEMES.default);
-  const [locale, setLocaleState] = useState<LocaleId>("auto");
-  const [micError, setMicError] = useState<string | null>(null);
-  const [micDevices, setMicDevices] = useState<{ deviceId: string; label: string }[]>([]);
-  const [selectedMicId, setSelectedMicId] = useState("");
+  const [recordingShortcut, setRecordingShortcut] = useState(false);
   const [, setRenderKey] = useState(0);
+  const {
+    gracePeriod,
+    isLoaded,
+    level,
+    locale,
+    micDevices,
+    micError,
+    mode,
+    selectedMicId,
+    setGracePeriod,
+    setLocaleState,
+    setMode,
+    setSelectedMicId,
+    setShortcutKey,
+    setTheme,
+    setThreshold,
+    shortcutKey,
+    state,
+    theme,
+    threshold,
+  } = usePopupStorage({ applyTheme });
 
   useEffect(() => {
     return onLocaleChange(() => setRenderKey((k) => k + 1));
   }, []);
 
-  useEffect(() => {
-    chrome.storage.local.get([STORAGE_KEYS.micDeviceId, STORAGE_KEYS.micDevices], (result) => {
-      setSelectedMicId((result[STORAGE_KEYS.micDeviceId] as string) ?? "");
-      const devices = result[STORAGE_KEYS.micDevices] as { deviceId: string; label: string }[];
-      if (Array.isArray(devices)) {
-        setMicDevices(devices);
-      }
-    });
-    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes[STORAGE_KEYS.micDevices]) {
-        const devices = changes[STORAGE_KEYS.micDevices].newValue as {
-          deviceId: string;
-          label: string;
-        }[];
-        if (Array.isArray(devices)) {
-          setMicDevices(devices);
-        }
-      }
-    };
-    chrome.storage.onChanged.addListener(listener);
-    return () => chrome.storage.onChanged.removeListener(listener);
-  }, []);
-
-  useEffect(() => {
-    chrome.storage.local.get(
-      [
-        STORAGE_KEYS.enabled,
-        STORAGE_KEYS.config,
-        STORAGE_KEYS.state,
-        STORAGE_KEYS.level,
-        STORAGE_KEYS.theme,
-        STORAGE_KEYS.locale,
-      ],
-      (result: HushMeetStorage) => {
-        const savedLocale = (result[STORAGE_KEYS.locale] as LocaleId) ?? "auto";
-        setLocaleState(savedLocale);
-        setLocale(savedLocale);
-        const savedTheme = (result[STORAGE_KEYS.theme] as ThemeId) ?? THEMES.default;
-        setTheme(savedTheme);
-        applyTheme(savedTheme);
-        setEnabled(!!result.hushMeetEnabled);
-        if (result.hushMeetConfig) {
-          setThreshold(result.hushMeetConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
-          setGracePeriod(result.hushMeetConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
-        } else {
-          // Store defaults on first launch
-          chrome.storage.local.set({
-            [STORAGE_KEYS.config]: {
-              speechThreshold: DEFAULT_CONFIG.speechThreshold,
-              silenceThreshold: DEFAULT_CONFIG.silenceThreshold,
-              gracePeriod: DEFAULT_CONFIG.gracePeriod,
-            },
-          });
-        }
-        const loadedState = result.hushMeetState ?? "IDLE";
-        setState(loadedState);
-        if (loadedState === "ERROR") {
-          setMicError((result[STORAGE_KEYS.error] as string) ?? null);
-          setEnabled(false);
-        }
-        if (loadedState === "IDLE") {
-          setLevel(0);
-          chrome.storage.local.set({
-            [STORAGE_KEYS.level]: 0,
-            [STORAGE_KEYS.spectrum]: [],
-          });
-        } else {
-          setLevel(result.hushMeetLevel ?? 0);
-        }
-      },
-    );
-
-    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      if (changes[STORAGE_KEYS.state]) {
-        const newState = changes[STORAGE_KEYS.state].newValue as string;
-        setState(newState);
-        if (newState !== "ERROR") setMicError(null);
-      }
-      if (changes[STORAGE_KEYS.error]) {
-        setMicError((changes[STORAGE_KEYS.error].newValue as string) ?? null);
-      }
-      if (changes[STORAGE_KEYS.enabled]) {
-        setEnabled(!!changes[STORAGE_KEYS.enabled].newValue);
-      }
-      if (changes[STORAGE_KEYS.level])
-        setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
-      if (changes[STORAGE_KEYS.config]) {
-        const cfg = changes[STORAGE_KEYS.config].newValue as HushMeetConfig;
-        if (cfg) {
-          setThreshold(cfg.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
-          setGracePeriod(cfg.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
-        }
-      }
-      if (changes[STORAGE_KEYS.theme]) {
-        const themeId = changes[STORAGE_KEYS.theme].newValue as ThemeId;
-        setTheme(themeId);
-        applyTheme(themeId);
-      }
-      if (changes[STORAGE_KEYS.locale]) {
-        const loc = changes[STORAGE_KEYS.locale].newValue as LocaleId;
-        setLocaleState(loc);
-        setLocale(loc);
-      }
-    };
-    chrome.storage.onChanged.addListener(listener);
-    return () => chrome.storage.onChanged.removeListener(listener);
-  }, []);
-
   const saveConfig = (speech: number, grace: number) => {
-    chrome.storage.local.set({
-      [STORAGE_KEYS.config]: {
-        speechThreshold: speech,
-        silenceThreshold: speech * SILENCE_RATIO,
-        gracePeriod: grace,
-      },
-    });
-  };
-
-  const handleToggle = (checked: boolean) => {
-    setEnabled(checked);
-    chrome.storage.local.set({ [STORAGE_KEYS.enabled]: checked });
+    savePopupConfig(speech, grace);
   };
 
   const handleThresholdChange = (val: number) => {
@@ -215,17 +111,36 @@ export function Popup() {
 
   const handleMicChange = (deviceId: string) => {
     setSelectedMicId(deviceId);
-    chrome.storage.local.set({ [STORAGE_KEYS.micDeviceId]: deviceId });
+    savePopupMicDevice(deviceId);
   };
 
-  const handleResumeAutoMute = () => {
-    // Transition back from USER_MUTED to MUTED
-    chrome.storage.local.set({ [STORAGE_KEYS.state]: "MUTED" });
+  const handleModeChange = (newMode: ModeId) => {
+    setMode(newMode);
+    savePopupMode(newMode);
+  };
+
+  const handleShortcutRecord = (e: React.KeyboardEvent) => {
+    e.preventDefault();
+    const parts: string[] = [];
+    if (e.ctrlKey) parts.push("Ctrl");
+    if (e.shiftKey) parts.push("Shift");
+    if (e.altKey) parts.push("Alt");
+    if (e.metaKey) parts.push("Cmd");
+    if (e.key !== "Control" && e.key !== "Shift" && e.key !== "Alt" && e.key !== "Meta") {
+      parts.push(e.key.length === 1 ? e.key.toUpperCase() : e.key);
+      const sc = parts.join("+");
+      setShortcutKey(sc);
+      setRecordingShortcut(false);
+      savePopupShortcut(sc);
+    }
   };
 
   const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
   const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
   const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
+  const resolvedMode = mode ?? MODES.off;
+  const isOff = resolvedMode === MODES.off;
+  const showShortcutSetting = isModeActive(resolvedMode);
 
   return (
     <div className="popup">
@@ -243,34 +158,17 @@ export function Popup() {
         </div>
       </div>
 
-      <div className="toggle-row">
-        <span className="toggle-label">{t("autoMute")}</span>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(e) => handleToggle(e.target.checked)}
-          />
-          <span className="slider" />
-        </label>
-      </div>
+      <ModeGrid isLoaded={isLoaded} mode={resolvedMode} onSelect={handleModeChange} />
 
       <div className="status">
-        <span className={`status-dot ${stateInfo.css}`} />
-        <span className="status-text">{t(stateInfo.key)}</span>
+        <span className={`status-dot ${isOff ? "" : stateInfo.css}`} />
+        <span className="status-text">
+          {isLoaded ? getStatusText(state, resolvedMode, stateInfo) : "Loading…"}
+        </span>
       </div>
 
       {micError && (
         <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
-      )}
-
-      {state === "USER_MUTED" && (
-        <div className="user-muted-banner">
-          <span>{t("userMutedBanner")}</span>
-          <button className="resume-btn" onClick={handleResumeAutoMute}>
-            {t("resumeAutoMute")}
-          </button>
-        </div>
       )}
 
       <div className="meter">
@@ -318,6 +216,16 @@ export function Popup() {
             onChange={(e) => handleGraceChange(parseInt(e.target.value))}
           />
         </div>
+
+        {showShortcutSetting && (
+          <ShortcutSetting
+            recordingShortcut={recordingShortcut}
+            shortcutKey={shortcutKey}
+            onBlur={() => setRecordingShortcut(false)}
+            onClick={() => setRecordingShortcut(true)}
+            onKeyDown={handleShortcutRecord}
+          />
+        )}
       </div>
 
       {micDevices.length > 0 && (
@@ -342,7 +250,17 @@ export function Popup() {
         </div>
       )}
 
-      <div className="footer">{t("footer")}</div>
+      <div className="footer">
+        <div>{t("footer")}</div>
+        <a
+          className="footer-link"
+          href="https://s-hiraoku.github.io/hush-meet/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t("footerDocsLink")}
+        </a>
+      </div>
     </div>
   );
 }

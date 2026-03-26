@@ -5,9 +5,6 @@
   "extDescription": {
     "message": "Automatically mutes your microphone on Google Meet when you're not speaking"
   },
-  "autoMute": {
-    "message": "Auto Mute"
-  },
   "stateIdle": {
     "message": "Disabled"
   },
@@ -61,20 +58,44 @@
   "errorMicUnknown": {
     "message": "Failed to access microphone."
   },
-  "stateUserMuted": {
-    "message": "Manually muted"
-  },
-  "userMutedBanner": {
-    "message": "Auto-unmute paused (manually muted)"
-  },
-  "resumeAutoMute": {
-    "message": "Resume Auto"
-  },
   "micDevice": {
     "message": "Microphone"
   },
   "micDefault": {
     "message": "System Default"
+  },
+  "modeLabel": {
+    "message": "Mode"
+  },
+  "modeOff": {
+    "message": "Off"
+  },
+  "modeOffDesc": {
+    "message": "Extension disabled — Meet default behavior"
+  },
+  "modeAuto": {
+    "message": "Auto"
+  },
+  "modeAutoOff": {
+    "message": "Auto-Off"
+  },
+  "stateWaitingManualUnmute": {
+    "message": "Waiting for manual unmute"
+  },
+  "modePushToTalk": {
+    "message": "Push-to-Talk"
+  },
+  "shortcutLabel": {
+    "message": "Shortcut Key"
+  },
+  "shortcutRecording": {
+    "message": "Press keys..."
+  },
+  "statePushToTalk": {
+    "message": "Hold shortcut to talk"
+  },
+  "footerDocsLink": {
+    "message": "Docs & Details"
   },
   "gameLauncher": {
     "message": "Games"
