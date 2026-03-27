@@ -28,7 +28,8 @@ export function getNextAudioState(args: {
       }
       return null;
     case CONTENT_STATE.SPEAKING:
-      if (rms < silenceThreshold) {
+      // PTTモードではキー離すまでSPEAKINGを維持（音量による自動遷移しない）
+      if (mode !== MODES.pushToTalk && rms < silenceThreshold) {
         return CONTENT_STATE.GRACE;
       }
       return null;

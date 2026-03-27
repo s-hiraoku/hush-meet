@@ -94,6 +94,9 @@
   "statePushToTalk": {
     "message": "ショートカットキー長押しで発話"
   },
+  "shortcutHintPopup": {
+    "message": "ショートカットキーはMeetタブで操作してください。このポップアップを閉じてお試しください。"
+  },
   "footerDocsLink": {
     "message": "詳細・ドキュメント"
   },

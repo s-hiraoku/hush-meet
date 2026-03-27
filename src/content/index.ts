@@ -152,7 +152,7 @@ function handleShortcutKeyUp(e: KeyboardEvent) {
 
   consumeShortcutEvent(e);
   pttKeyHeld = false;
-  transition(State.GRACE);
+  transition(State.MUTED);
 }
 
 function transition(newState: StateType) {

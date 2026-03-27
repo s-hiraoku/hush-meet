@@ -94,6 +94,9 @@
   "statePushToTalk": {
     "message": "Hold shortcut to talk"
   },
+  "shortcutHintPopup": {
+    "message": "Shortcut keys work on the Meet tab. Close this popup and try again."
+  },
   "footerDocsLink": {
     "message": "Docs & Details"
   },

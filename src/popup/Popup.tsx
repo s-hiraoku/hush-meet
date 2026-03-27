@@ -9,6 +9,7 @@ import {
   type ModeId,
 } from "../constants";
 import { isModeActive } from "../mode-control.ts";
+import { matchesShortcut } from "../shortcut.ts";
 import { t, onLocaleChange, type LocaleId } from "../i18n.ts";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
@@ -59,6 +60,7 @@ function getStatusText(state: string, mode: ModeId, stateInfo: { key: string }) 
 
 export function Popup() {
   const [recordingShortcut, setRecordingShortcut] = useState(false);
+  const [shortcutHint, setShortcutHint] = useState(false);
   const [, setRenderKey] = useState(0);
   const {
     gracePeriod,
@@ -85,6 +87,19 @@ export function Popup() {
   useEffect(() => {
     return onLocaleChange(() => setRenderKey((k) => k + 1));
   }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (recordingShortcut) return;
+      if (shortcutKey && matchesShortcut(e, shortcutKey)) {
+        e.preventDefault();
+        setShortcutHint(true);
+        setTimeout(() => setShortcutHint(false), 4000);
+      }
+    };
+    window.addEventListener("keydown", handler, true);
+    return () => window.removeEventListener("keydown", handler, true);
+  }, [shortcutKey, recordingShortcut]);
 
   const saveConfig = (speech: number, grace: number) => {
     savePopupConfig(speech, grace);
@@ -170,6 +185,8 @@ export function Popup() {
       {micError && (
         <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
       )}
+
+      {shortcutHint && <div className="shortcut-hint">{t("shortcutHintPopup")}</div>}
 
       <div className="meter">
         <div className="meter-label">{t("micLevel")}</div>

@@ -296,6 +296,29 @@ body {
   color: var(--text);
 }
 
+.shortcut-hint {
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--green);
+  line-height: 1.4;
+  animation: fade-in 0.2s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .error-banner {
   background: rgba(233, 69, 96, 0.15);
   border: 1px solid var(--primary);

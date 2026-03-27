@@ -39,6 +39,9 @@ export const en: Messages = {
   shortcutLabel: { message: "Shortcut Key" },
   shortcutRecording: { message: "Press keys..." },
   statePushToTalk: { message: "Hold shortcut to talk" },
+  shortcutHintPopup: {
+    message: "Shortcut keys work on the Meet tab. Close this popup and try again.",
+  },
   footerDocsLink: { message: "Docs & Details" },
   gameLauncher: { message: "Games" },
   gameBreakout: { message: "Breakout" },
@@ -86,6 +89,10 @@ export const ja: Messages = {
   shortcutLabel: { message: "ショートカットキー" },
   shortcutRecording: { message: "キーを押してください..." },
   statePushToTalk: { message: "ショートカットキー長押しで発話" },
+  shortcutHintPopup: {
+    message:
+      "ショートカットキーはMeetタブで操作してください。このポップアップを閉じてお試しください。",
+  },
   footerDocsLink: { message: "詳細・ドキュメント" },
   gameLauncher: { message: "ゲーム" },
   gameBreakout: { message: "ブレイクアウト" },
