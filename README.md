@@ -1,97 +1,100 @@
 # Hush Meet
 
-Google Meet で話していない時に自動でミュートし、周囲の雑音が参加者に届くのを防ぐ Chrome 拡張機能です。
+A Chrome extension that automatically mutes your microphone on Google Meet when you're not speaking, preventing background noise from reaching other participants.
 
-## インストール
+[日本語](README.ja.md)
 
-Chrome Web Store からインストール（準備中）
+## Install
 
-## 使い方
+[Chrome Web Store](https://chromewebstore.google.com/) (coming soon)
 
-1. Google Meet の通話に参加する
-2. ツールバーの Hush Meet アイコンをクリック
-3. モードを `Off` 以外に切り替える
-4. マイクのアクセス許可を求められたら「許可」する
+## Usage
 
-### 動作モード
+1. Join a Google Meet call
+2. Click the Hush Meet icon in the toolbar
+3. Choose a mode (Auto, Auto-Off, or Push-to-Talk)
+4. Allow microphone access when prompted
+5. Use `Ctrl+Shift+M` to toggle mute or hold-to-talk (Push-to-Talk)
 
-| モード       | 挙動                                                       |
-| ------------ | ---------------------------------------------------------- |
-| Off          | 拡張機能の制御を停止                                       |
-| Auto         | 発話で自動ミュート解除、無音で自動ミュート                 |
-| Auto-Off     | ミュート解除は手動またはショートカット、無音で自動ミュート |
-| Push-to-Talk | ショートカット長押し中のみミュート解除                     |
+### Operating Modes
 
-### 設定項目
+| Mode | Behavior |
+|------|----------|
+| Off | Extension disabled — Meet default behavior |
+| Auto | Speech-triggered unmute, auto-mute on silence |
+| Auto-Off | Manual or shortcut unmute only, auto-mute on silence |
+| Push-to-Talk | Hold shortcut key to speak, instant mute on release |
 
-| 項目               | 説明                                                 | デフォルト         |
-| ------------------ | ---------------------------------------------------- | ------------------ |
-| モード             | Off / Auto / Auto-Off / Push-to-Talk                 | Off                |
-| ショートカットキー | Auto-Off / Push-to-Talk 用のキーボードショートカット | Ctrl+Shift+M       |
-| 発話検出の感度     | 音量がこの値を超えたらミュート解除                   | 0.025              |
-| 猶予時間           | 発話終了後、ミュートするまでの待機時間               | 1.5秒              |
-| マイク             | 音声監視に使うマイクデバイス                         | システムデフォルト |
+### Settings
 
-## 仕組み
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Mode | Off / Auto / Auto-Off / Push-to-Talk | Auto |
+| Shortcut Key | Keyboard shortcut for mute control | Ctrl+Shift+M |
+| Speech Sensitivity | Volume threshold to trigger unmute | 0.025 |
+| Grace Period | Delay before re-muting after speech | 1.5s |
+| Microphone | Audio input device | System Default |
+
+## How It Works
 
 ```
-[マイク入力] → [Web Audio API (RMS)] → [発話状態判定] → [Meet ミュートボタン操作]
+[Mic Input] → [Web Audio API (RMS)] → [Speech Detection] → [Meet Mute Button Control]
 ```
 
-- Meet 本体とは別にマイクストリームを取得して音量を監視
-- 発話開始 → ミュート解除、発話終了 + 猶予時間 → ミュート
-- 非対称閾値設計: 発話開始の閾値 > 無音判定の閾値（チャタリング防止）
+- Monitors audio via a separate mic stream (independent from Meet)
+- Speech detected → unmute; silence + grace period → mute
+- Asymmetric thresholds: speech threshold > silence threshold (prevents chattering)
 
-## 開発
+## Development
 
-### 必要なもの
+### Prerequisites
 
 - Node.js 22.x
-- `vp`
+- pnpm
 
-### セットアップ
+### Setup
 
 ```bash
-vp install
+pnpm install
 ```
 
-### コマンド
+### Commands
 
-| コマンド   | 説明                      |
-| ---------- | ------------------------- |
-| `vp dev`   | 開発サーバー起動          |
-| `vp build` | プロダクションビルド      |
-| `vp test`  | テスト実行                |
-| `vp check` | format / lint / typecheck |
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start dev server |
+| `pnpm build` | Production build |
+| `pnpm test` | Run tests |
+| `pnpm run check` | Format / lint / typecheck |
 
-### 開発モードでの動作確認
+### Load in Chrome
 
-1. `vp build` を実行
-2. Chrome で `chrome://extensions` を開く
-3. 右上の **「デベロッパーモード」** をオンにする
-4. **「パッケージ化されていない拡張機能を読み込む」** をクリック
-5. `dist` フォルダを選択
+1. Run `pnpm build`
+2. Open `chrome://extensions`
+3. Enable **Developer mode**
+4. Click **Load unpacked** → select `dist` folder
 
-## 技術スタック
+## Tech Stack
 
 - Chrome Extension Manifest V3
 - React 19 + TypeScript
 - Vite + CRXJS Vite Plugin
-- Vite+
 - Web Audio API (AnalyserNode)
 - Chrome Storage API
 
-## 既知の制限事項
+## Known Limitations
 
-- 音声検出は RMS（音量）ベースのため、大きな雑音で誤反応する可能性あり
-- Google Meet の UI 変更でミュートボタンの検出が壊れる可能性あり
-- 発話の最初の一瞬が切れる場合がある（閾値で調整）
+- RMS-based detection may trigger on loud ambient noise (use Auto-Off mode)
+- Google Meet UI changes may break mute button detection
+- First syllable may be clipped (adjustable via sensitivity)
+- Shortcut keys only work when the Meet tab is focused
 
-## ドキュメント
+## Documentation
 
-- [技術ドキュメント](https://s-hiraoku.github.io/hush-meet/architecture.html)
-- [プライバシーポリシー](https://s-hiraoku.github.io/hush-meet/privacy-policy.html)
+- [Website](https://s-hiraoku.github.io/hush-meet/en/)
+- [Technical Docs](https://s-hiraoku.github.io/hush-meet/architecture.html)
+- [Privacy Policy](https://s-hiraoku.github.io/hush-meet/privacy-policy.html)
 
-## ライセンス
+## License
 
 MIT
