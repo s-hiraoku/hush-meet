@@ -6,7 +6,7 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 
 ## Install
 
-[Chrome Web Store](https://chromewebstore.google.com/) (coming soon)
+[Chrome Web Store](https://chromewebstore.google.com/detail/hush-meet/afmigfhmekjdkbaceempfecmcefmlceb)
 
 ## Usage
 

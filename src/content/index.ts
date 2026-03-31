@@ -57,6 +57,7 @@ let listeningRunId = 0;
 let dataArray: Float32Array<ArrayBuffer> | null = null;
 let freqData: Uint8Array<ArrayBuffer> | null = null;
 let lastMeterWriteTime = 0;
+let cachedMuteButton: HTMLElement | null = null;
 
 let config: HushMeetConfig = { ...DEFAULT_CONFIG };
 
@@ -72,12 +73,18 @@ function markExtensionMuteAction(action: () => void) {
   });
 }
 
+function getCachedMuteButton(): HTMLElement | null {
+  if (cachedMuteButton && cachedMuteButton.isConnected) return cachedMuteButton;
+  cachedMuteButton = findMuteButton(warn);
+  return cachedMuteButton;
+}
+
 function isMeetMuted(): boolean | null {
-  return inferMuteStateFromButton(findMuteButton(warn));
+  return inferMuteStateFromButton(getCachedMuteButton());
 }
 
 function toggleMeetMute(shouldMute: boolean): boolean {
-  const btn = findMuteButton(warn);
+  const btn = getCachedMuteButton();
   const currentlyMuted = inferMuteStateFromButton(btn);
   if (currentlyMuted === null) {
     warn("ミュートボタン未検出");
@@ -311,7 +318,7 @@ function analyseLoop() {
   }
 }
 
-const ANALYSE_INTERVAL_MS = 50;
+const ANALYSE_INTERVAL_MS = 20;
 
 function clearStartupTimer() {
   startupTimerId = clearTimer(startupTimerId);
@@ -373,7 +380,7 @@ async function startListening() {
 
     const source = audioContext.createMediaStreamSource(micStream);
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 2048;
+    analyser.fftSize = 512;
     analyser.smoothingTimeConstant = 0.3;
     source.connect(analyser);
 
@@ -393,7 +400,31 @@ async function startListening() {
 
     isListening = true;
     log("マイク監視を開始しました");
-    transition(State.MUTED);
+
+    // Ensure Meet is muted before starting analysis.
+    // If the mute button isn't found yet, retry until it is.
+    if (!toggleMeetMute(true)) {
+      log("ミュートボタン未検出、リトライ開始");
+      const ensureMuteId = setInterval(() => {
+        if (!isListening) {
+          clearInterval(ensureMuteId);
+          return;
+        }
+        if (toggleMeetMute(true)) {
+          currentState = State.MUTED;
+          persistState(currentState);
+          log("初期ミュート完了（リトライ）");
+          clearInterval(ensureMuteId);
+        }
+      }, 500);
+      // Give up after 15s
+      setTimeout(() => clearInterval(ensureMuteId), 15000);
+      currentState = State.MUTED;
+      persistState(currentState);
+    } else {
+      currentState = State.MUTED;
+      persistState(currentState);
+    }
 
     // Use setInterval instead of requestAnimationFrame
     // so analysis continues when the tab is in background
@@ -464,6 +495,7 @@ function stopListening() {
   analyser = null;
   dataArray = null;
   freqData = null;
+  cachedMuteButton = null;
   currentState = State.IDLE;
   log("マイク監視を停止しました");
   persistIdleSnapshot();

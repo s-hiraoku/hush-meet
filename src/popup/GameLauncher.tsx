@@ -4,6 +4,8 @@ import { t } from "../i18n.ts";
 const GAMES = [
   { id: "breakout", key: "gameBreakout", file: "games/breakout.html" },
   { id: "invaders", key: "gameInvaders", file: "games/invaders.html" },
+  { id: "2048", key: "game2048", file: "games/2048.html" },
+  { id: "flappy", key: "gameFlappy", file: "games/flappy.html" },
 ];
 
 export function GameLauncher() {

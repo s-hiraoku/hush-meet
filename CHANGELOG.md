@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.10] - 2026-03-31
+
+### Improved
+
+- Faster speech detection: analysis interval 50ms→20ms, FFT window 2048→512 for quicker onset response
+- Cache mute button DOM lookup to reduce latency in the analysis loop
+- Force mute on monitoring start to prevent mic leak when joining a call
+
+## [1.0.9] - 2026-03-31
+
+### Added
+
+- Mode-aware toolbar icon: icon color changes by mode (grey=Off, green=Auto, amber=Auto-Off, blue=PTT) with badge indicator
+- 2048 puzzle mini-game
+- Flappy Bird mini-game
+
+### Changed
+
+- Increase mic sensitivity slider max from 0.1 to 0.25
+
 ## [1.0.8] - 2026-03-27
 
 ### Added

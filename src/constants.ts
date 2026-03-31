@@ -6,7 +6,7 @@ export const DEFAULT_CONFIG = {
 
 export const THRESHOLD_RANGE = {
   min: 0.005,
-  max: 0.1,
+  max: 0.25,
   step: 0.001,
 } as const;
 
@@ -71,4 +71,4 @@ export const THEME_LIST: { id: ThemeId; label: string }[] = [
 
 export const DEFAULT_SHORTCUT = "Ctrl+Shift+M";
 
-export const APP_VERSION = "1.0.8";
+export const APP_VERSION = "1.0.10";
