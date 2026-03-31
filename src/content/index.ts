@@ -58,6 +58,8 @@ let dataArray: Float32Array<ArrayBuffer> | null = null;
 let freqData: Uint8Array<ArrayBuffer> | null = null;
 let lastMeterWriteTime = 0;
 let cachedMuteButton: HTMLElement | null = null;
+let ensureMuteTimerId: ReturnType<typeof setInterval> | null = null;
+let ensureMuteTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 let config: HushMeetConfig = { ...DEFAULT_CONFIG };
 
@@ -101,6 +103,16 @@ function toggleMeetMute(shouldMute: boolean): boolean {
 
 function clearGraceTimer() {
   graceTimer = clearTimer(graceTimer);
+}
+
+function clearEnsureMuteTimers() {
+  if (ensureMuteTimerId) {
+    ensureMuteTimerId = clearIntervalTimer(ensureMuteTimerId);
+  }
+  if (ensureMuteTimeoutId) {
+    clearTimeout(ensureMuteTimeoutId);
+    ensureMuteTimeoutId = null;
+  }
 }
 
 function startShortcutListener() {
@@ -402,28 +414,26 @@ async function startListening() {
     log("マイク監視を開始しました");
 
     // Ensure Meet is muted before starting analysis.
-    // If the mute button isn't found yet, retry until it is.
-    if (!toggleMeetMute(true)) {
+    // Use transition() so state only advances when the mute action succeeds.
+    const currentRunId = listeningRunId;
+    transition(State.MUTED);
+
+    // If the mute button wasn't found, retry until it is.
+    if (currentState !== State.MUTED) {
       log("ミュートボタン未検出、リトライ開始");
-      const ensureMuteId = setInterval(() => {
-        if (!isListening) {
-          clearInterval(ensureMuteId);
+      clearEnsureMuteTimers();
+      ensureMuteTimerId = setInterval(() => {
+        if (!isListening || listeningRunId !== currentRunId) {
+          clearEnsureMuteTimers();
           return;
         }
-        if (toggleMeetMute(true)) {
-          currentState = State.MUTED;
-          persistState(currentState);
+        transition(State.MUTED);
+        if (currentState === State.MUTED) {
           log("初期ミュート完了（リトライ）");
-          clearInterval(ensureMuteId);
+          clearEnsureMuteTimers();
         }
       }, 500);
-      // Give up after 15s
-      setTimeout(() => clearInterval(ensureMuteId), 15000);
-      currentState = State.MUTED;
-      persistState(currentState);
-    } else {
-      currentState = State.MUTED;
-      persistState(currentState);
+      ensureMuteTimeoutId = setTimeout(() => clearEnsureMuteTimers(), 15000);
     }
 
     // Use setInterval instead of requestAnimationFrame
@@ -474,6 +484,7 @@ function stopListening() {
   isListening = false;
   clearStartupTimer();
   clearGraceTimer();
+  clearEnsureMuteTimers();
   stopMuteObserver();
   stopShortcutListener();
   pttKeyHeld = false;
