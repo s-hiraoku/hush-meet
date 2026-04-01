@@ -6,6 +6,8 @@ const GAMES = [
   { id: "invaders", key: "gameInvaders", file: "games/invaders.html" },
   { id: "2048", key: "game2048", file: "games/2048.html" },
   { id: "flappy", key: "gameFlappy", file: "games/flappy.html" },
+  { id: "tetris", key: "gameTetris", file: "games/tetris.html" },
+  { id: "reversi", key: "gameReversi", file: "games/reversi.html" },
 ];
 
 export function GameLauncher() {
