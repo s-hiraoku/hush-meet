@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.11] - 2026-04-01
+
+### Added
+
+- Voice-weighted noise gate: speech detection now emphasizes human voice frequencies (300Hz–3kHz), reducing false triggers from keyboard, fan, and ambient noise
+
 ## [1.0.10] - 2026-03-31
 
 ### Improved
@@ -7,6 +13,11 @@
 - Faster speech detection: analysis interval 50ms→20ms, FFT window 2048→512 for quicker onset response
 - Cache mute button DOM lookup to reduce latency in the analysis loop
 - Force mute on monitoring start to prevent mic leak when joining a call
+
+### Fixed
+
+- Initial mute state leak: UI no longer shows "Muted" when mute button is not yet found
+- Stale retry timer: initial mute retry is now properly cancelled on mode/device changes
 
 ## [1.0.9] - 2026-03-31
 

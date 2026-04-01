@@ -12,6 +12,7 @@ import {
 } from "../constants.ts";
 import type { ModeId } from "../constants.ts";
 import { isModeActive, shouldUsePushToTalkHold } from "../mode-control.ts";
+import { computeVoiceBins, computeVoiceWeightedRms } from "./voice-detection.ts";
 import {
   consumeShortcutEvent,
   shouldTriggerShortcutKeyDown,
@@ -58,6 +59,8 @@ let dataArray: Float32Array<ArrayBuffer> | null = null;
 let freqData: Uint8Array<ArrayBuffer> | null = null;
 let lastMeterWriteTime = 0;
 let cachedMuteButton: HTMLElement | null = null;
+let voiceStartBin = 0;
+let voiceEndBin = 0;
 let ensureMuteTimerId: ReturnType<typeof setInterval> | null = null;
 let ensureMuteTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -292,6 +295,7 @@ function analyseLoop() {
   if (!dataArray || !freqData) return;
 
   analyser.getFloatTimeDomainData(dataArray);
+  analyser.getByteFrequencyData(freqData);
 
   let sum = 0;
   for (let i = 0; i < dataArray.length; i++) {
@@ -299,10 +303,13 @@ function analyseLoop() {
   }
   const rms = Math.sqrt(sum / dataArray.length);
 
+  // Voice-weighted RMS: suppress non-voice noise (keyboard, fan, etc.)
+  const { weightedRms } = computeVoiceWeightedRms(rms, freqData, voiceStartBin, voiceEndBin);
+
   const nextState = getNextAudioState({
     currentState,
     mode: selectedMode,
-    rms,
+    rms: weightedRms,
     speechThreshold: config.speechThreshold,
     silenceThreshold: config.silenceThreshold,
   });
@@ -311,7 +318,6 @@ function analyseLoop() {
   }
 
   // Spectrum data for equalizer (16 bands)
-  analyser.getByteFrequencyData(freqData);
   const bandCount = 16;
   const bandSize = Math.max(1, Math.floor(freqData.length / bandCount));
   const spectrum: number[] = [];
@@ -398,6 +404,10 @@ async function startListening() {
 
     dataArray = new Float32Array(analyser.fftSize);
     freqData = new Uint8Array(analyser.frequencyBinCount);
+
+    const bins = computeVoiceBins(audioContext.sampleRate, analyser.fftSize);
+    voiceStartBin = bins.start;
+    voiceEndBin = bins.end;
 
     // Save available mic devices (permission granted, labels available now)
     try {
@@ -507,6 +517,8 @@ function stopListening() {
   dataArray = null;
   freqData = null;
   cachedMuteButton = null;
+  voiceStartBin = 0;
+  voiceEndBin = 0;
   currentState = State.IDLE;
   log("マイク監視を停止しました");
   persistIdleSnapshot();

@@ -43,6 +43,7 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 
 - Monitors audio via a separate mic stream (independent from Meet)
 - Speech detected → unmute; silence + grace period → mute
+- Voice-weighted noise gate: emphasizes 300Hz–3kHz to reduce false triggers from keyboard/fan noise
 - Asymmetric thresholds: speech threshold > silence threshold (prevents chattering)
 
 ## Development

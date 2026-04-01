@@ -8,6 +8,7 @@ import {
 } from "../constants.ts";
 import type { ModeId } from "../constants.ts";
 import { parseShortcut } from "../shortcut.ts";
+import { computeVoiceBins, computeVoiceWeightedRms } from "../content/voice-detection.ts";
 
 /**
  * Tests for audio analysis logic extracted from content script.
@@ -399,5 +400,81 @@ describe("shortcut key parsing", () => {
 
   it("single key F1", () => {
     expect(parseShortcut("F1").key).toBe("f1");
+  });
+});
+
+describe("voice bin computation", () => {
+  it("returns correct bins for 48000 Hz / fftSize 512", () => {
+    const bins = computeVoiceBins(48000, 512);
+    // binWidth = 48000/512 = 93.75 Hz
+    // 300/93.75 = 3.2 → round to 3, 3000/93.75 = 32
+    expect(bins.start).toBe(3);
+    expect(bins.end).toBe(32);
+  });
+
+  it("returns correct bins for 44100 Hz / fftSize 512", () => {
+    const bins = computeVoiceBins(44100, 512);
+    // binWidth = 44100/512 = 86.13 Hz
+    // 300/86.13 = 3.48 → 3, 3000/86.13 = 34.83 → 35
+    expect(bins.start).toBe(3);
+    expect(bins.end).toBe(35);
+  });
+
+  it("clamps start to at least 1", () => {
+    const bins = computeVoiceBins(48000, 512);
+    expect(bins.start).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("voice-weighted RMS", () => {
+  it("returns 0 for silent spectrum", () => {
+    const freqData = new Uint8Array(256).fill(0);
+    const result = computeVoiceWeightedRms(0.05, freqData, 3, 32);
+    expect(result.weightedRms).toBe(0);
+    expect(result.voiceRatio).toBe(0);
+  });
+
+  it("voice-dominant spectrum yields high weightedRms", () => {
+    const freqData = new Uint8Array(256).fill(0);
+    // Put energy only in voice band (bins 3-32)
+    for (let i = 3; i <= 32; i++) freqData[i] = 200;
+    const result = computeVoiceWeightedRms(0.05, freqData, 3, 32);
+    expect(result.voiceRatio).toBeCloseTo(1.0, 1);
+    expect(result.weightedRms).toBeCloseTo(0.05, 2);
+  });
+
+  it("broadband noise yields reduced weightedRms", () => {
+    const freqData = new Uint8Array(256).fill(100);
+    freqData[0] = 0; // skip DC
+    const result = computeVoiceWeightedRms(0.05, freqData, 3, 32);
+    // Voice bins: 30 out of 255 → ratio ~0.118
+    expect(result.voiceRatio).toBeLessThan(0.2);
+    expect(result.weightedRms).toBeLessThan(0.05);
+  });
+
+  it("low-frequency noise yields very low weightedRms", () => {
+    const freqData = new Uint8Array(256).fill(0);
+    // Energy only below voice band
+    freqData[1] = 200;
+    freqData[2] = 200;
+    const result = computeVoiceWeightedRms(0.05, freqData, 3, 32);
+    expect(result.voiceRatio).toBe(0);
+    expect(result.weightedRms).toBe(0);
+  });
+
+  it("exponent=0 disables weighting (returns raw RMS)", () => {
+    const freqData = new Uint8Array(256).fill(50);
+    const result = computeVoiceWeightedRms(0.05, freqData, 3, 32, 0);
+    // voiceRatio^0 = 1, so weightedRms = rms
+    expect(result.weightedRms).toBeCloseTo(0.05);
+  });
+
+  it("exponent=1 gives maximum weighting", () => {
+    const freqData = new Uint8Array(256).fill(100);
+    freqData[0] = 0;
+    const resultHalf = computeVoiceWeightedRms(0.05, freqData, 3, 32, 0.5);
+    const resultFull = computeVoiceWeightedRms(0.05, freqData, 3, 32, 1.0);
+    // Higher exponent = more suppression for non-voice
+    expect(resultFull.weightedRms).toBeLessThan(resultHalf.weightedRms);
   });
 });

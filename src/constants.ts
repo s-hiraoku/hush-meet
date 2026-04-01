@@ -18,6 +18,10 @@ export const GRACE_RANGE = {
 
 export const SILENCE_RATIO = 0.5;
 
+export const VOICE_FREQ_LOW = 300;
+export const VOICE_FREQ_HIGH = 3000;
+export const VOICE_WEIGHT_EXPONENT = 0.5;
+
 export const STORAGE_KEYS = {
   config: "hushMeetConfig",
   state: "hushMeetState",
@@ -71,4 +75,4 @@ export const THEME_LIST: { id: ThemeId; label: string }[] = [
 
 export const DEFAULT_SHORTCUT = "Ctrl+Shift+M";
 
-export const APP_VERSION = "1.0.10";
+export const APP_VERSION = "1.0.11";
