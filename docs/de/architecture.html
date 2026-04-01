@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Technische Dokumentation - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+        --code-bg: #0d1b2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="./" class="back">&larr; Zurück zur Startseite</a>
+      <h1>Technische Dokumentation</h1>
+      <p class="subtitle">Architektur und Design von Hush Meet</p>
+
+      <h2>Architekturübersicht</h2>
+      <div class="card">
+        <pre><code>┌─────────────────────────────────────────────────────┐
+│  Chrome-Erweiterung (Manifest V3)                     │
+│                                                     │
+│  ┌──────────────┐     ┌───────────────────────────┐ │
+│  │   Popup-UI   │     │     Content Script         │ │
+│  │  (React)     │     │   (meet.google.com)        │ │
+│  │              │     │                            │ │
+│  │  - Umschalten    │     │  ┌────────────────────┐   │ │
+│  │  - Messer     │◄───►│  │  Audio-Analysator    │   │ │
+│  │  - Einstellg.  │     │  │  (Web Audio API)   │   │ │
+│  │              │     │  └────────┬───────────┘   │ │
+│  └──────────────┘     │           │               │ │
+│         ▲             │  ┌────────▼───────────┐   │ │
+│         │             │  │  Zustandsautomat     │   │ │
+│         │             │  │  IDLE → MUTED →    │   │ │
+│         │             │  │  SPEAKING → GRACE  │   │ │
+│         │             │  └────────┬───────────┘   │ │
+│         │             │           │               │ │
+│         │             │  ┌────────▼───────────┐   │ │
+│         │             │  │  Stumm-Controller   │   │ │
+│         │             │  │  (DOM-Manipulation)│   │ │
+│         │             │  └────────────────────┘   │ │
+│         │             └───────────────────────────┘ │
+│         │                                           │
+│         └─── Chrome Storage API (Konfig/Status-Sync)─┘
+│                                                     │
+└─────────────────────────────────────────────────────┘</code></pre>
+      </div>
+
+      <h2>Projektstruktur</h2>
+      <div class="card">
+        <pre><code>src/
+├── constants.ts          # Konstanten, Modi, Schwellenwerte, Storage-Schlüssel
+├── messages.ts           # i18n-Nachrichten (EN/JA)
+├── i18n.ts               # Sprachverwaltung
+├── manifest.ts           # Chrome-Erweiterung Manifest-Definition
+├── background/
+│   └── service-worker.ts # Service Worker (Spiel-Launcher, etc.)
+├── content/
+│   └── index.ts          # Content Script (Zustandsautomat, Modussteuerung, Tastenkürzel)
+└── popup/
+    ├── index.html        # Popup-Einstiegs-HTML
+    ├── main.tsx          # React-Einbindung
+    ├── Popup.tsx         # Popup-UI-Komponente
+    ├── popup.css         # Styles
+    ├── Equalizer.tsx     # Spektrumanalysator
+    ├── ThemeSwitcher.tsx # Theme-Umschalter
+    ├── LocaleSwitcher.tsx# Sprachumschalter
+    └── GameLauncher.tsx  # Minispiel-Launcher</code></pre>
+      </div>
+
+      <h2>Komponentendetails</h2>
+
+      <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
+      <p>Dieses Skript wird in die Google Meet-Seite injiziert. Seine Hauptaufgaben sind:</p>
+
+      <h3>1.1 Audio-Analyse-Engine</h3>
+      <div class="card">
+        <p>
+          Verwendet die Web Audio API <code>AnalyserNode</code> zur Echtzeitmessung der Mikrofon-Eingangslautstärke.
+        </p>
+        <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
+                                                          │
+                                                    getFloatTimeDomainData()
+                                                          │
+                                                    RMS-Berechnung (Root Mean Square)</code></pre>
+        <p>Konfigurationsparameter:</p>
+        <table>
+          <tr>
+            <th>Parameter</th>
+            <th>Wert</th>
+            <th>Beschreibung</th>
+          </tr>
+          <tr>
+            <td><code>fftSize</code></td>
+            <td>512</td>
+            <td>FFT-Fenstergröße</td>
+          </tr>
+          <tr>
+            <td><code>smoothingTimeConstant</code></td>
+            <td>0.3</td>
+            <td>Zeitliche Glättungskonstante</td>
+          </tr>
+          <tr>
+            <td><code>echoCancellation</code></td>
+            <td>true</td>
+            <td>Echounterdrückung aktivieren</td>
+          </tr>
+          <tr>
+            <td><code>noiseSuppression</code></td>
+            <td>false</td>
+            <td>Rauschunterdrückung aus (für VAD-Genauigkeit)</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.2 Zustandsautomat</h3>
+      <div class="card">
+        <p>Ein endlicher Zustandsautomat mit 5 Zuständen verwaltet den Sprechzustand.</p>
+        <pre><code>IDLE ──(Modus außer Aus gewählt)──► MUTED ──(Lautstärke > Sprachschwelle)──► UNMUTING ──► SPEAKING
+                     ▲                                                │
+                     │                              (Lautstärke < Stilleschwelle)
+                     │                                                │
+                     └──(Nachklingtimer abgelaufen)── GRACE ◄────────────────┘
+                                                │
+                                         (Lautstärke > Stilleschwelle)
+                                                │
+                                                ▼
+                                            SPEAKING
+
+* Wenn der Benutzer das Meet-Mikrofon manuell umschaltet, bleibt der Modus gleich und nur der Zustand folgt.</code></pre>
+        <table>
+          <tr>
+            <th>Zustand</th>
+            <th>Beschreibung</th>
+            <th>Meet-Aktion</th>
+          </tr>
+          <tr>
+            <td>IDLE</td>
+            <td>Aus-Modus oder nicht initialisiert</td>
+            <td>Keine</td>
+          </tr>
+          <tr>
+            <td>MUTED</td>
+            <td>Stille erkannt &rarr; stummgeschaltet</td>
+            <td>Stummschalten</td>
+          </tr>
+          <tr>
+            <td>UNMUTING</td>
+            <td>Sprache erkannt &rarr; Freischaltung</td>
+            <td>Freischalten</td>
+          </tr>
+          <tr>
+            <td>SPEAKING</td>
+            <td>Spricht gerade</td>
+            <td>Keine</td>
+          </tr>
+          <tr>
+            <td>GRACE</td>
+            <td>Sprache beendet &rarr; Nachklingzeit</td>
+            <td>Keine</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.3 Betriebsmodi</h3>
+      <div class="card">
+        <p>Vier Modi steuern das Verhalten der Zustandsübergänge. Aus ist der deaktivierte Modus.</p>
+        <table>
+          <tr>
+            <th>Modus</th>
+            <th>Freischalten</th>
+            <th>Stummschalten</th>
+            <th>Tastenkürzel</th>
+          </tr>
+          <tr>
+            <td>Aus</td>
+            <td>Keine</td>
+            <td>Keine</td>
+            <td>Deaktiviert</td>
+          </tr>
+          <tr>
+            <td>Auto</td>
+            <td>Automatisch bei Spracherkennung</td>
+            <td>Automatisch bei Stille</td>
+            <td>Umschalten</td>
+          </tr>
+          <tr>
+            <td>Auto-Aus</td>
+            <td>Manuell / Tastenkürzel</td>
+            <td>Automatisch bei Stille</td>
+            <td>Umschalten</td>
+          </tr>
+          <tr>
+            <td>Push-to-Talk</td>
+            <td>Solange Taste gedrückt</td>
+            <td>Taste losgelassen &rarr; Nachklingzeit &rarr; Stumm</td>
+            <td>Halten</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.4 Tastenkürzel</h3>
+      <div class="card">
+        <p>
+          Bietet ein anpassbares Tastenkürzel (Standard: <code>Strg+Umschalt+M</code>).
+        </p>
+        <ul>
+          <li>Aus: Deaktiviert</li>
+          <li>Auto: Stummschaltung umschalten</li>
+          <li>Auto-Aus: Stummschaltung umschalten</li>
+          <li>Push-to-Talk: Freischalten nur solange die Taste gedrückt wird (Halte-Bedienung)</li>
+        </ul>
+        <p>Das Tastenkürzel kann in den Popup-Einstellungen frei geändert werden.</p>
+      </div>
+
+      <h3>1.5 Asymmetrisches Schwellenwert-Design</h3>
+      <div class="card">
+        <p>
+          Unterschiedliche Schwellenwerte für Freischalten und Stummschalten verhindern Flattern (häufiges Umschalten).
+        </p>
+        <pre><code>Sprachschwelle (Sprachbeginn)    = 0,025  (Standard)
+Stilleschwelle (Stilleerkennung) = Sprachschwelle × 0,5 = 0,0125
+
+  Lautstärke
+   ▲
+   │  ┄┄┄┄┄┄┄┄┄ Sprachschwelle (0,025) ┄┄┄┄  ← Freischalten bei Überschreitung
+   │
+   │  ┄┄┄┄┄┄┄┄┄ Stilleschwelle (0,0125) ┄┄  ← Nachklingzeit beginnt bei Unterschreitung
+   │
+   └──────────────────────────────────────────► Zeit</code></pre>
+      </div>
+
+      <h3>1.6 Stummschaltungstasten-Erkennung</h3>
+      <div class="card">
+        <p>Erkennt die Google Meet-Stummschaltungstaste mit mehreren Strategien:</p>
+        <ol>
+          <li>Suche nach <code>aria-label</code>-Attribut (unterstützt Japanisch/Englisch)</li>
+          <li>Suche nach <code>data-tooltip</code>-Attribut</li>
+          <li>Fallback: Simulation des <code>Strg+D</code>-Tastenkürzels</li>
+        </ol>
+        <p>
+          Der Stummschaltungszustand wird aus dem <code>data-is-muted</code>-Attribut oder dem <code>aria-label</code>-Textinhalt ermittelt.
+        </p>
+      </div>
+
+      <h3>2. Popup UI (<code>src/popup/</code>)</h3>
+      <div class="card">
+        <p>
+          Eine mit React 19 erstellte Einstellungs-UI. Synchronisiert den Zustand mit dem Content Script in Echtzeit über die Chrome Storage API.
+        </p>
+        <ul>
+          <li><strong>Modus-Auswahl</strong>: Umschalten zwischen Aus / Auto / Auto-Aus / Push-to-Talk</li>
+          <li>
+            <strong>Statusanzeige</strong>:
+            Zeigt den aktuellen Zustand (stummgeschaltet/sprechend/Nachklingzeit) mit einer Punkt-Anzeige
+          </li>
+          <li>
+            <strong>Pegelmesser</strong>:
+            Zeigt den Mikrofon-Eingangspegel in Echtzeit an (mit Schwellenwert-Markierungen)
+          </li>
+          <li>
+            <strong>Empfindlichkeitsregler</strong>: Anpassung von <code>speechThreshold</code> (0,005&ndash;0,25)
+          </li>
+          <li>
+            <strong>Nachklingzeit-Regler</strong>: Anpassung von <code>gracePeriod</code> (500ms&ndash;4000ms)
+          </li>
+          <li><strong>Tastenkürzel-Einstellungen</strong>: Anpassung über Tastenaufnahme-UI</li>
+          <li><strong>Mikrofongeräte-Auswahl</strong>: Manuelle Auswahl des zu verwendenden Mikrofons</li>
+        </ul>
+      </div>
+
+      <h2>Datenfluss</h2>
+      <div class="card">
+        <pre><code>Popup → Chrome Storage → Content Script
+  │                            │
+  │  hushMeetConfig: object    │  (Empfindlichkeit/Nachklingzeit-Einstellungen)
+  │  hushMeetMode: string      │  (Betriebsmodus)
+  │  hushMeetShortcutKey: str  │  (Tastenkürzel)
+  │                            │
+  │                            ▼
+  │                      Content Script → Chrome Storage → Popup
+  │                            │
+  │                            │  hushMeetState: string  (aktueller Zustand)
+  │                            │  hushMeetLevel: number  (Lautstärkepegel)
+  │                            │  hushMeetSpectrum: array (Spektrum)
+  └────────────────────────────┘</code></pre>
+        <p>
+          Popup und Content Script kommunizieren nicht direkt; sie kommunizieren bidirektional über Chrome Storage API-Änderungsereignisse.
+        </p>
+      </div>
+
+      <h2>Build-System</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>Werkzeug</th>
+            <th>Version</th>
+            <th>Zweck</th>
+          </tr>
+          <tr>
+            <td>Vite+</td>
+            <td>toolchain</td>
+            <td>Abhängigkeitsverwaltung, Build, Test, Validierung</td>
+          </tr>
+          <tr>
+            <td>Vite</td>
+            <td>8.x</td>
+            <td>Interne Build-Infrastruktur</td>
+          </tr>
+          <tr>
+            <td>CRXJS Vite Plugin</td>
+            <td>2.x</td>
+            <td>Chrome-Erweiterung HMR &amp; Manifest-Generierung</td>
+          </tr>
+          <tr>
+            <td>React</td>
+            <td>19.x</td>
+            <td>Popup UI</td>
+          </tr>
+          <tr>
+            <td>TypeScript</td>
+            <td>5.9.x</td>
+            <td>Typsicherheit</td>
+          </tr>
+        </table>
+        <h3>Befehle</h3>
+        <table>
+          <tr>
+            <th>Befehl</th>
+            <th>Beschreibung</th>
+          </tr>
+          <tr>
+            <td><code>vp install</code></td>
+            <td>Abhängigkeiten installieren</td>
+          </tr>
+          <tr>
+            <td><code>vp build</code></td>
+            <td>Produktions-Build</td>
+          </tr>
+          <tr>
+            <td><code>vp test</code></td>
+            <td>Tests ausführen</td>
+          </tr>
+          <tr>
+            <td><code>vp check</code></td>
+            <td>Formatierung / Lint / Typprüfung</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Bekannte Einschränkungen</h2>
+      <div class="card">
+        <ul>
+          <li>
+            Die Spracherkennung basiert auf RMS (Lautstärke) und kann bei lauten Umgebungsgeräuschen fehlauslösen (wird durch Auto-Aus-Modus abgemildert)
+          </li>
+          <li>Änderungen an der Google Meet-UI können die Stummschaltungstasten-Erkennung beeinträchtigen</li>
+          <li>Der Anfang einer Äußerung kann abgeschnitten werden (einstellbar über Schwellenwert-Einstellungen)</li>
+          <li>Das Tastenkürzel funktioniert nur, wenn der Google Meet-Tab fokussiert ist</li>
+        </ul>
+      </div>
+
+      <h2>Zukünftige Verbesserungen</h2>
+      <div class="card">
+        <ul>
+          <li>Sprachgewichtetes Noise-Gate für verbesserte Erkennungsgenauigkeit</li>
+          <li>Vor-Sprach-Pufferung zur Reduzierung des Abschneidens am Äußerungsbeginn</li>
+          <li>Auto-Erkennungslogik zur Anpassung an Google Meet-UI-Änderungen</li>
+          <li>Silero VAD (ML-basiert) Ersatz für höhere Erkennungsgenauigkeit</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

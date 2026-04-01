@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>隐私政策 - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 28px 0 12px;
+        color: var(--primary);
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      .updated {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="./" class="back">&larr; 返回首页</a>
+      <h1>隐私政策</h1>
+      <p class="updated">最后更新：2026年3月21日</p>
+
+      <h2>概述</h2>
+      <p>
+        Hush Meet（以下简称"本扩展"）是一款 Chrome 扩展程序，可在 Google Meet 通话期间检测语音并自动切换静音。本扩展最大限度地尊重用户隐私，仅使用最少的必要数据。
+      </p>
+
+      <h2>数据收集</h2>
+      <p><strong>本扩展不会收集或传输任何个人数据。</strong></p>
+
+      <h2>麦克风访问</h2>
+      <p>
+        本扩展需要麦克风权限用于语音检测。关于从麦克风获取的音频数据：
+      </p>
+      <ul>
+        <li>音频数据<strong>仅在您的设备上进行实时处理</strong></li>
+        <li>音频数据<strong>绝不会被录制或存储</strong></li>
+        <li>音频数据<strong>绝不会发送到外部服务器</strong></li>
+        <li>仅使用音频音量级别（RMS 值）进行计算，绝不会分析音频内容</li>
+      </ul>
+
+      <h2>本地存储</h2>
+      <p>本扩展使用 Chrome Storage API 在本地存储以下设置：</p>
+      <ul>
+        <li>运行模式（关闭 / 自动 / 自动关闭 / 按键通话）</li>
+        <li>语音检测灵敏度设置</li>
+        <li>宽限期设置</li>
+        <li>快捷键设置</li>
+        <li>已选择的麦克风设备</li>
+        <li>主题和语言设置</li>
+      </ul>
+      <p>这些数据仅存储在您的浏览器中，绝不会传输到外部。</p>
+
+      <h2>网站访问</h2>
+      <p>
+        本扩展仅在 <code>https://meet.google.com</code> 上运行。内容脚本不会在任何其他网站上执行。
+      </p>
+
+      <h2>第三方披露</h2>
+      <p>
+        本扩展不会向第三方提供任何数据。它不包含任何分析工具、跟踪代码或广告。
+      </p>
+
+      <h2>开源</h2>
+      <p>
+        本扩展的源代码可在 <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a> 上获取。如果您对数据处理方式有任何疑问，可以直接查看源代码。
+      </p>
+
+      <h2>联系方式</h2>
+      <p>
+        如果您对本隐私政策有任何疑问，请通过 <a href="https://github.com/s-hiraoku/hush-meet/issues">GitHub Issues</a> 与我们联系。
+      </p>
+
+      <h2>变更</h2>
+      <p>
+        本隐私政策可能会根据需要进行更新。如有重大变更，我们将在此页面上通知您。
+      </p>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Documentation - Hush Meet</title>
+    <title>Documentation Technique - Hush Meet</title>
     <style>
       :root {
         --bg: #0f0f1a;
@@ -128,306 +128,306 @@
   </head>
   <body>
     <div class="container">
-      <a href="./" class="back">&larr; Back to top</a>
-      <h1>Technical Documentation</h1>
-      <p class="subtitle">Architecture and design of Hush Meet</p>
+      <a href="./" class="back">&larr; Retour à l'accueil</a>
+      <h1>Documentation Technique</h1>
+      <p class="subtitle">Architecture et conception de Hush Meet</p>
 
-      <h2>Architecture Overview</h2>
+      <h2>Vue d'ensemble de l'architecture</h2>
       <div class="card">
         <pre><code>┌─────────────────────────────────────────────────────┐
-│  Chrome Extension (Manifest V3)                     │
+│  Extension Chrome (Manifest V3)                     │
 │                                                     │
 │  ┌──────────────┐     ┌───────────────────────────┐ │
-│  │   Popup UI   │     │     Content Script         │ │
+│  │   Interface Popup   │     │     Content Script         │ │
 │  │  (React)     │     │   (meet.google.com)        │ │
 │  │              │     │                            │ │
-│  │  - Toggle    │     │  ┌────────────────────┐   │ │
-│  │  - Meter     │◄───►│  │  Audio Analyser    │   │ │
-│  │  - Settings  │     │  │  (Web Audio API)   │   │ │
+│  │  - Bascule    │     │  ┌────────────────────┐   │ │
+│  │  - Niveau     │◄───►│  │  Analyseur Audio    │   │ │
+│  │  - Réglages  │     │  │  (Web Audio API)   │   │ │
 │  │              │     │  └────────┬───────────┘   │ │
 │  └──────────────┘     │           │               │ │
 │         ▲             │  ┌────────▼───────────┐   │ │
-│         │             │  │  State Machine     │   │ │
+│         │             │  │  Machine à états     │   │ │
 │         │             │  │  IDLE → MUTED →    │   │ │
 │         │             │  │  SPEAKING → GRACE  │   │ │
 │         │             │  └────────┬───────────┘   │ │
 │         │             │           │               │ │
 │         │             │  ┌────────▼───────────┐   │ │
-│         │             │  │  Mute Controller   │   │ │
-│         │             │  │  (DOM manipulation)│   │ │
+│         │             │  │  Contrôleur Mute   │   │ │
+│         │             │  │  (manipulation DOM)│   │ │
 │         │             │  └────────────────────┘   │ │
 │         │             └───────────────────────────┘ │
 │         │                                           │
-│         └─── Chrome Storage API (config/state sync)─┘
+│         └─── Chrome Storage API (sync config/état)─┘
 │                                                     │
 └─────────────────────────────────────────────────────┘</code></pre>
       </div>
 
-      <h2>Project Structure</h2>
+      <h2>Structure du projet</h2>
       <div class="card">
         <pre><code>src/
-├── constants.ts          # Constants, modes, thresholds, storage keys
-├── messages.ts           # i18n messages (EN/JA)
-├── i18n.ts               # Locale management
-├── manifest.ts           # Chrome extension manifest definition
+├── constants.ts          # Constantes, modes, seuils, clés de stockage
+├── messages.ts           # Messages i18n (EN/JA)
+├── i18n.ts               # Gestion des locales
+├── manifest.ts           # Définition du manifeste de l'extension Chrome
 ├── background/
-│   └── service-worker.ts # Service Worker (game launcher, etc.)
+│   └── service-worker.ts # Service Worker (lanceur de jeux, etc.)
 ├── content/
-│   └── index.ts          # Content Script (state machine, mode control, shortcuts)
+│   └── index.ts          # Content Script (machine à états, contrôle des modes, raccourcis)
 └── popup/
-    ├── index.html        # Popup entry HTML
-    ├── main.tsx          # React mount
-    ├── Popup.tsx         # Popup UI component
+    ├── index.html        # HTML d'entrée du popup
+    ├── main.tsx          # Point de montage React
+    ├── Popup.tsx         # Composant UI du popup
     ├── popup.css         # Styles
-    ├── Equalizer.tsx     # Spectrum analyser
-    ├── ThemeSwitcher.tsx # Theme switcher
-    ├── LocaleSwitcher.tsx# Language switcher
-    └── GameLauncher.tsx  # Mini-game launcher</code></pre>
+    ├── Equalizer.tsx     # Analyseur de spectre
+    ├── ThemeSwitcher.tsx # Sélecteur de thème
+    ├── LocaleSwitcher.tsx# Sélecteur de langue
+    └── GameLauncher.tsx  # Lanceur de mini-jeux</code></pre>
       </div>
 
-      <h2>Component Details</h2>
+      <h2>Détails des composants</h2>
 
       <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
-      <p>This script is injected into the Google Meet page. Its main responsibilities are:</p>
+      <p>Ce script est injecté dans la page Google Meet. Ses principales responsabilités sont :</p>
 
-      <h3>1.1 Audio Analysis Engine</h3>
+      <h3>1.1 Moteur d'analyse audio</h3>
       <div class="card">
         <p>
-          Uses the Web Audio API <code>AnalyserNode</code> to measure microphone input volume in real time.
+          Utilise l'API Web Audio <code>AnalyserNode</code> pour mesurer le volume d'entrée du microphone en temps réel.
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
                                                     getFloatTimeDomainData()
                                                           │
-                                                    RMS (Root Mean Square) calculation</code></pre>
-        <p>Configuration parameters:</p>
+                                                    Calcul RMS (Root Mean Square)</code></pre>
+        <p>Paramètres de configuration :</p>
         <table>
           <tr>
-            <th>Parameter</th>
-            <th>Value</th>
+            <th>Paramètre</th>
+            <th>Valeur</th>
             <th>Description</th>
           </tr>
           <tr>
             <td><code>fftSize</code></td>
             <td>512</td>
-            <td>FFT window size</td>
+            <td>Taille de la fenêtre FFT</td>
           </tr>
           <tr>
             <td><code>smoothingTimeConstant</code></td>
             <td>0.3</td>
-            <td>Temporal smoothing coefficient</td>
+            <td>Coefficient de lissage temporel</td>
           </tr>
           <tr>
             <td><code>echoCancellation</code></td>
             <td>true</td>
-            <td>Enable echo cancellation</td>
+            <td>Activer l'annulation d'écho</td>
           </tr>
           <tr>
             <td><code>noiseSuppression</code></td>
             <td>false</td>
-            <td>Noise suppression off (for VAD accuracy)</td>
+            <td>Suppression du bruit désactivée (pour la précision du VAD)</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.2 State Machine</h3>
+      <h3>1.2 Machine à états</h3>
       <div class="card">
-        <p>A finite state machine with 5 states manages the speech state.</p>
-        <pre><code>IDLE ──(mode other than Off selected)──► MUTED ──(volume > speechThreshold)──► UNMUTING ──► SPEAKING
+        <p>Une machine à états finis à 5 états gère l'état de la parole.</p>
+        <pre><code>IDLE ──(mode autre que Off sélectionné)──► MUTED ──(volume > speechThreshold)──► UNMUTING ──► SPEAKING
                      ▲                                                │
                      │                              (volume < silenceThreshold)
                      │                                                │
-                     └──(graceTimer expired)── GRACE ◄────────────────┘
+                     └──(graceTimer expiré)── GRACE ◄─────────────────┘
                                                 │
                                          (volume > silenceThreshold)
                                                 │
                                                 ▼
                                             SPEAKING
 
-* If the user manually toggles the Meet microphone, the mode stays the same and only the state follows.</code></pre>
+* Si l'utilisateur bascule manuellement le microphone Meet, le mode reste le même et seul l'état suit.</code></pre>
         <table>
           <tr>
-            <th>State</th>
+            <th>État</th>
             <th>Description</th>
-            <th>Meet Action</th>
+            <th>Action Meet</th>
           </tr>
           <tr>
             <td>IDLE</td>
-            <td>Off mode or uninitialized</td>
-            <td>None</td>
+            <td>Mode Off ou non initialisé</td>
+            <td>Aucune</td>
           </tr>
           <tr>
             <td>MUTED</td>
-            <td>Silence detected &rarr; muted</td>
-            <td>Mute</td>
+            <td>Silence détecté &rarr; micro coupé</td>
+            <td>Couper le micro</td>
           </tr>
           <tr>
             <td>UNMUTING</td>
-            <td>Speech detected &rarr; unmuting</td>
-            <td>Unmute</td>
+            <td>Parole détectée &rarr; réactivation</td>
+            <td>Réactiver le micro</td>
           </tr>
           <tr>
             <td>SPEAKING</td>
-            <td>Currently speaking</td>
-            <td>None</td>
+            <td>En train de parler</td>
+            <td>Aucune</td>
           </tr>
           <tr>
             <td>GRACE</td>
-            <td>Speech ended &rarr; grace period</td>
-            <td>None</td>
+            <td>Fin de parole &rarr; période de grâce</td>
+            <td>Aucune</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.3 Operating Modes</h3>
+      <h3>1.3 Modes de fonctionnement</h3>
       <div class="card">
-        <p>Four modes control how state transitions behave. Off is the control-disabled mode.</p>
+        <p>Quatre modes contrôlent le comportement des transitions d'état. Off est le mode de contrôle désactivé.</p>
         <table>
           <tr>
             <th>Mode</th>
-            <th>Unmute</th>
-            <th>Mute</th>
-            <th>Shortcut</th>
+            <th>Réactivation</th>
+            <th>Coupure</th>
+            <th>Raccourci</th>
           </tr>
           <tr>
             <td>Off</td>
-            <td>None</td>
-            <td>None</td>
-            <td>Disabled</td>
+            <td>Aucune</td>
+            <td>Aucune</td>
+            <td>Désactivé</td>
           </tr>
           <tr>
             <td>Auto</td>
-            <td>Automatic on voice detection</td>
-            <td>Automatic on silence</td>
-            <td>Toggle</td>
+            <td>Automatique à la détection vocale</td>
+            <td>Automatique au silence</td>
+            <td>Bascule</td>
           </tr>
           <tr>
             <td>Auto-Off</td>
-            <td>Manual / shortcut</td>
-            <td>Automatic on silence</td>
-            <td>Toggle</td>
+            <td>Manuel / raccourci</td>
+            <td>Automatique au silence</td>
+            <td>Bascule</td>
           </tr>
           <tr>
             <td>Push-to-Talk</td>
-            <td>While key is held down</td>
-            <td>Key released &rarr; Grace &rarr; Mute</td>
-            <td>Hold</td>
+            <td>Tant que la touche est enfoncée</td>
+            <td>Touche relâchée &rarr; Grâce &rarr; Coupure</td>
+            <td>Maintenir</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.4 Shortcut Key</h3>
+      <h3>1.4 Touche de raccourci</h3>
       <div class="card">
         <p>
-          Provides a customizable keyboard shortcut (default: <code>Ctrl+Shift+M</code>).
+          Fournit un raccourci clavier personnalisable (par défaut : <code>Ctrl+Shift+M</code>).
         </p>
         <ul>
-          <li>Off: Disabled</li>
-          <li>Auto: Toggle mute</li>
-          <li>Auto-Off: Toggle mute</li>
-          <li>Push-to-Talk: Unmute only while key is held (hold operation)</li>
+          <li>Off : Désactivé</li>
+          <li>Auto : Basculer le micro</li>
+          <li>Auto-Off : Basculer le micro</li>
+          <li>Push-to-Talk : Réactiver uniquement tant que la touche est enfoncée (maintenir)</li>
         </ul>
-        <p>The shortcut key can be freely changed from the popup settings.</p>
+        <p>La touche de raccourci peut être librement modifiée depuis les réglages du popup.</p>
       </div>
 
-      <h3>1.5 Asymmetric Threshold Design</h3>
+      <h3>1.5 Conception à seuils asymétriques</h3>
       <div class="card">
         <p>
-          Different thresholds for unmuting and muting prevent chattering (frequent toggling).
+          Des seuils différents pour la réactivation et la coupure empêchent le chattering (basculement fréquent).
         </p>
-        <pre><code>speechThreshold (speech start)  = 0.025  (default)
-silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
+        <pre><code>speechThreshold (début de parole)    = 0.025  (par défaut)
+silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
 
   Volume
    ▲
-   │  ┄┄┄┄┄┄┄┄┄ speechThreshold (0.025) ┄┄┄┄  ← Unmute when exceeded
+   │  ┄┄┄┄┄┄┄┄┄ speechThreshold (0.025) ┄┄┄┄  ← Réactivation si dépassé
    │
-   │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← Grace period starts when below
+   │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← Période de grâce si en dessous
    │
-   └──────────────────────────────────────────► Time</code></pre>
+   └──────────────────────────────────────────► Temps</code></pre>
       </div>
 
-      <h3>1.6 Mute Button Detection</h3>
+      <h3>1.6 Détection du bouton Mute</h3>
       <div class="card">
-        <p>Detects the Google Meet mute button using multiple strategies:</p>
+        <p>Détecte le bouton mute de Google Meet à l'aide de plusieurs stratégies :</p>
         <ol>
-          <li>Search by <code>aria-label</code> attribute (supports Japanese/English)</li>
-          <li>Search by <code>data-tooltip</code> attribute</li>
-          <li>Fallback: simulate <code>Ctrl+D</code> keyboard shortcut</li>
+          <li>Recherche par attribut <code>aria-label</code> (prend en charge le japonais et l'anglais)</li>
+          <li>Recherche par attribut <code>data-tooltip</code></li>
+          <li>Solution de repli : simulation du raccourci clavier <code>Ctrl+D</code></li>
         </ol>
         <p>
-          Mute state is determined from the <code>data-is-muted</code> attribute or the <code>aria-label</code> text content.
+          L'état mute est déterminé à partir de l'attribut <code>data-is-muted</code> ou du contenu textuel de l'<code>aria-label</code>.
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          A settings UI built with React 19. Synchronizes state with the Content Script in real time via the Chrome Storage API.
+          Une interface de réglages construite avec React 19. Synchronise l'état avec le Content Script en temps réel via l'API Chrome Storage.
         </p>
         <ul>
-          <li><strong>Mode selector</strong>: Switch between Off / Auto / Auto-Off / Push-to-Talk</li>
+          <li><strong>Sélecteur de mode</strong>: Basculer entre Off / Auto / Auto-Off / Push-to-Talk</li>
           <li>
-            <strong>Status display</strong>:
-            Shows the current state (muted/speaking/grace) with a dot indicator
+            <strong>Affichage de l'état</strong>:
+            Affiche l'état actuel (coupé/en train de parler/grâce) avec un indicateur à pastille
           </li>
           <li>
-            <strong>Level meter</strong>:
-            Displays microphone input level in real time (with threshold markers)
+            <strong>Indicateur de niveau</strong>:
+            Affiche le niveau d'entrée du microphone en temps réel (avec marqueurs de seuil)
           </li>
           <li>
-            <strong>Sensitivity slider</strong>: Adjust <code>speechThreshold</code> (0.005&ndash;0.25)
+            <strong>Curseur de sensibilité</strong>: Régler le <code>speechThreshold</code> (0.005&ndash;0.25)
           </li>
           <li>
-            <strong>Grace period slider</strong>: Adjust <code>gracePeriod</code> (500ms&ndash;4000ms)
+            <strong>Curseur de période de grâce</strong>: Régler le <code>gracePeriod</code> (500ms&ndash;4000ms)
           </li>
-          <li><strong>Shortcut key settings</strong>: Customization via key recording UI</li>
-          <li><strong>Microphone device selection</strong>: Manual selection of the microphone to use</li>
+          <li><strong>Réglages du raccourci clavier</strong>: Personnalisation via l'interface d'enregistrement de touches</li>
+          <li><strong>Sélection du microphone</strong>: Sélection manuelle du microphone à utiliser</li>
         </ul>
       </div>
 
-      <h2>Data Flow</h2>
+      <h2>Flux de données</h2>
       <div class="card">
         <pre><code>Popup → Chrome Storage → Content Script
   │                            │
-  │  hushMeetConfig: object    │  (sensitivity/grace period settings)
-  │  hushMeetMode: string      │  (operating mode)
-  │  hushMeetShortcutKey: str  │  (shortcut key)
+  │  hushMeetConfig: object    │  (réglages sensibilité/période de grâce)
+  │  hushMeetMode: string      │  (mode de fonctionnement)
+  │  hushMeetShortcutKey: str  │  (touche de raccourci)
   │                            │
   │                            ▼
   │                      Content Script → Chrome Storage → Popup
   │                            │
-  │                            │  hushMeetState: string  (current state)
-  │                            │  hushMeetLevel: number  (volume level)
-  │                            │  hushMeetSpectrum: array (spectrum)
+  │                            │  hushMeetState: string  (état actuel)
+  │                            │  hushMeetLevel: number  (niveau de volume)
+  │                            │  hushMeetSpectrum: array (spectre)
   └────────────────────────────┘</code></pre>
         <p>
-          The Popup and Content Script do not communicate directly; they communicate bidirectionally via Chrome Storage API change events.
+          Le Popup et le Content Script ne communiquent pas directement ; ils communiquent de manière bidirectionnelle via les événements de changement de l'API Chrome Storage.
         </p>
       </div>
 
-      <h2>Build System</h2>
+      <h2>Système de build</h2>
       <div class="card">
         <table>
           <tr>
-            <th>Tool</th>
+            <th>Outil</th>
             <th>Version</th>
-            <th>Purpose</th>
+            <th>Objectif</th>
           </tr>
           <tr>
             <td>Vite+</td>
             <td>toolchain</td>
-            <td>Dependency management, build, test, validation</td>
+            <td>Gestion des dépendances, build, tests, validation</td>
           </tr>
           <tr>
             <td>Vite</td>
             <td>8.x</td>
-            <td>Internal build infrastructure</td>
+            <td>Infrastructure de build interne</td>
           </tr>
           <tr>
             <td>CRXJS Vite Plugin</td>
             <td>2.x</td>
-            <td>Chrome extension HMR &amp; manifest generation</td>
+            <td>HMR pour extension Chrome et génération de manifeste</td>
           </tr>
           <tr>
             <td>React</td>
@@ -437,53 +437,53 @@ silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
           <tr>
             <td>TypeScript</td>
             <td>5.9.x</td>
-            <td>Type safety</td>
+            <td>Sécurité des types</td>
           </tr>
         </table>
-        <h3>Commands</h3>
+        <h3>Commandes</h3>
         <table>
           <tr>
-            <th>Command</th>
+            <th>Commande</th>
             <th>Description</th>
           </tr>
           <tr>
             <td><code>vp install</code></td>
-            <td>Install dependencies</td>
+            <td>Installer les dépendances</td>
           </tr>
           <tr>
             <td><code>vp build</code></td>
-            <td>Production build</td>
+            <td>Build de production</td>
           </tr>
           <tr>
             <td><code>vp test</code></td>
-            <td>Run tests</td>
+            <td>Exécuter les tests</td>
           </tr>
           <tr>
             <td><code>vp check</code></td>
-            <td>format / lint / typecheck</td>
+            <td>formatage / lint / vérification de types</td>
           </tr>
         </table>
       </div>
 
-      <h2>Known Limitations</h2>
+      <h2>Limitations connues</h2>
       <div class="card">
         <ul>
           <li>
-            Voice detection is RMS (volume) based, so it may false-trigger on loud ambient noise (mitigated by using Auto-Off mode)
+            La détection vocale est basée sur le RMS (volume), elle peut donc se déclencher par erreur en cas de bruit ambiant fort (atténué par l'utilisation du mode Auto-Off)
           </li>
-          <li>Google Meet UI changes may break mute button detection</li>
-          <li>The very beginning of speech may be cut off (adjustable via threshold settings)</li>
-          <li>The shortcut key only works when the Google Meet tab is focused</li>
+          <li>Les modifications de l'interface Google Meet peuvent casser la détection du bouton mute</li>
+          <li>Le tout début de la parole peut être coupé (ajustable via les réglages de seuil)</li>
+          <li>La touche de raccourci ne fonctionne que lorsque l'onglet Google Meet est au premier plan</li>
         </ul>
       </div>
 
-      <h2>Future Improvements</h2>
+      <h2>Améliorations futures</h2>
       <div class="card">
         <ul>
-          <li>Voice-weighted noise gate for improved detection accuracy</li>
-          <li>Pre-speech buffering to reduce beginning-of-utterance clipping</li>
-          <li>Auto-detection logic to follow Google Meet UI changes</li>
-          <li>Silero VAD (ML-based) replacement for higher detection accuracy</li>
+          <li>Porte de bruit pondérée par la voix pour une meilleure précision de détection</li>
+          <li>Mise en mémoire tampon pré-parole pour réduire la coupure en début d'énoncé</li>
+          <li>Logique de détection automatique pour suivre les changements d'interface de Google Meet</li>
+          <li>Remplacement par Silero VAD (basé sur le ML) pour une précision de détection accrue</li>
         </ul>
       </div>
 

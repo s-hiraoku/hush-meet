@@ -54,6 +54,9 @@ let selectedMode: ModeId = MODES.off;
 let shortcutKey = DEFAULT_SHORTCUT;
 let pttKeyHeld = false;
 let listeningRunId = 0;
+/** Timestamp until which the audio analysis loop should not auto-mute (shortcut grace) */
+let shortcutUnmuteUntil = 0;
+let muteObserverDebounceId: ReturnType<typeof setTimeout> | null = null;
 
 let dataArray: Float32Array<ArrayBuffer> | null = null;
 let freqData: Uint8Array<ArrayBuffer> | null = null;
@@ -147,10 +150,13 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
 
   if (shouldUsePushToTalkHold(selectedMode)) {
     pttKeyHeld = true;
+    shortcutUnmuteUntil = Date.now() + config.gracePeriod;
     transition(State.UNMUTING);
   } else {
     const muted = isMeetMuted();
     if (muted === true || currentState === State.MUTED) {
+      // Give the user time to start speaking before auto-mute kicks in
+      shortcutUnmuteUntil = Date.now() + config.gracePeriod;
       transition(State.UNMUTING);
     } else if (muted === false || currentState === State.SPEAKING || currentState === State.GRACE) {
       transition(State.MUTED);
@@ -234,9 +240,18 @@ function startMuteObserver() {
     }
   };
 
+  // Debounce: Meet may fire multiple attribute mutations for a single mute toggle.
+  const debouncedCheck = () => {
+    if (muteObserverDebounceId) clearTimeout(muteObserverDebounceId);
+    muteObserverDebounceId = setTimeout(() => {
+      muteObserverDebounceId = null;
+      checkForUserMute();
+    }, 80);
+  };
+
   const btn = findMuteButton(warn);
   if (btn) {
-    muteObserver = new MutationObserver(checkForUserMute);
+    muteObserver = new MutationObserver(debouncedCheck);
     muteObserver.observe(btn, {
       attributes: true,
       attributeFilter: [...MUTE_BUTTON_ATTRS],
@@ -250,7 +265,7 @@ function startMuteObserver() {
         if (muteObserverRetryId) {
           muteObserverRetryId = clearIntervalTimer(muteObserverRetryId);
         }
-        muteObserver = new MutationObserver(checkForUserMute);
+        muteObserver = new MutationObserver(debouncedCheck);
         muteObserver.observe(b, {
           attributes: true,
           attributeFilter: [...MUTE_BUTTON_ATTRS],
@@ -272,6 +287,10 @@ function stopMuteObserver() {
   }
   if (muteObserverRetryId) {
     muteObserverRetryId = clearIntervalTimer(muteObserverRetryId);
+  }
+  if (muteObserverDebounceId) {
+    clearTimeout(muteObserverDebounceId);
+    muteObserverDebounceId = null;
   }
 }
 
@@ -314,7 +333,20 @@ function analyseLoop() {
     silenceThreshold: config.silenceThreshold,
   });
   if (nextState) {
-    transition(nextState);
+    // After a shortcut unmute, suppress silence-triggered muting until the grace window expires.
+    // This gives the user time to start speaking before auto-mute kicks in.
+    if (
+      shortcutUnmuteUntil > 0 &&
+      Date.now() < shortcutUnmuteUntil &&
+      (nextState === State.GRACE || nextState === State.MUTED)
+    ) {
+      // Still within shortcut grace — skip auto-mute
+    } else {
+      if (nextState !== State.GRACE && nextState !== State.MUTED) {
+        shortcutUnmuteUntil = 0; // Speech detected, clear the window
+      }
+      transition(nextState);
+    }
   }
 
   // Spectrum data for equalizer (16 bands)
@@ -498,6 +530,7 @@ function stopListening() {
   stopMuteObserver();
   stopShortcutListener();
   pttKeyHeld = false;
+  shortcutUnmuteUntil = 0;
 
   if (analyseTimerId) {
     analyseTimerId = clearIntervalTimer(analyseTimerId);

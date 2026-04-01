@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hush Meet - Google Meet 自动静音 Chrome 扩展</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+      }
+      .tagline {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p,
+      li {
+        color: var(--text-muted);
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .flow {
+        font-family: monospace;
+        color: var(--text);
+        margin: 12px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      .nav {
+        margin-bottom: 32px;
+      }
+      .nav a {
+        margin-right: 16px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hush Meet</h1>
+      <p class="tagline">
+        一款 Chrome 扩展程序，在您不说话时自动将 Google Meet 中的麦克风静音，防止背景噪音传达给其他参与者。
+      </p>
+
+      <nav class="nav">
+        <a href="privacy-policy.html">隐私政策</a>
+        <a href="architecture.html">技术文档</a>
+        <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
+        <a href="../de/">Deutsch</a>
+        <a href="../en/">English</a>
+        <a href="../es/">Español</a>
+        <a href="../fr/">Français</a>
+        <a href="../">日本語</a>
+        <a href="../ko/">한국어</a>
+      </nav>
+
+      <h2>功能特性</h2>
+      <div class="card">
+        <ul>
+          <li>检测到语音时自动取消静音，停止说话后自动静音</li>
+          <li>
+            4 种运行模式：
+            <ul>
+              <li><strong>关闭</strong> &mdash; 扩展禁用，Meet 默认行为</li>
+              <li>
+                <strong>自动</strong> &mdash; 语音触发取消静音 &amp; 自动静音（适用于安静环境）
+              </li>
+              <li>
+                <strong>自动关闭</strong> &mdash; 仅通过 Meet 手动控制或快捷键取消静音，语音结束后自动静音（适用于嘈杂环境）
+              </li>
+              <li><strong>按键通话</strong> &mdash; 按住快捷键说话</li>
+            </ul>
+          </li>
+          <li>
+            可自定义快捷键（默认：Ctrl+Shift+M）&mdash; 除关闭模式外所有模式均可用
+          </li>
+          <li>独立音频监控（与 Google Meet 分离的麦克风流）</li>
+          <li>语音加权噪声门 &mdash; 强调人声频率（300Hz&ndash;3kHz），减少键盘、风扇和环境噪音的误触发</li>
+          <li>非对称阈值设计防止抖动</li>
+          <li>实时音频电平表 &amp; 频谱分析器</li>
+          <li>可调灵敏度和宽限期</li>
+          <li>
+            手动静音检测 &mdash; 跟随 Meet 侧的静音/取消静音操作而不改变所选模式
+          </li>
+          <li>麦克风设备选择器 &mdash; 选择要使用的麦克风</li>
+          <li>4 种视觉主题（默认 / 模拟收音机 / 音箱 / 复古未来）</li>
+          <li>模式感知工具栏图标 &mdash; 图标颜色和徽章根据活动模式变化</li>
+          <li>英语 &amp; 日语语言支持，可手动切换</li>
+          <li>
+            会议无聊？内含复古未来迷你游戏（打砖块 / 太空侵略者 / 2048 / Flappy Bird）。友情提示：游戏音效可能触发自动取消静音。请调整好灵敏度，享受不被发现的刺激。
+          </li>
+        </ul>
+      </div>
+
+      <h2>工作原理</h2>
+      <div class="card">
+        <div class="flow">
+          [麦克风输入] &rarr; [Web Audio API (RMS)] &rarr; [语音检测] &rarr; [Meet 静音按钮控制]
+        </div>
+        <p>
+          一个独立的麦克风流监控音频电平。当检测到语音时，扩展会自动点击 Meet 静音按钮来取消静音。当恢复安静后，会在可配置的宽限期后重新静音。
+        </p>
+      </div>
+
+      <h2>设置</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>设置项</th>
+            <th>说明</th>
+            <th>默认值</th>
+          </tr>
+          <tr>
+            <td>模式</td>
+            <td>关闭 / 自动 / 自动关闭 / 按键通话</td>
+            <td>自动</td>
+          </tr>
+          <tr>
+            <td>快捷键</td>
+            <td>静音控制的键盘快捷键（除关闭外所有模式）</td>
+            <td>Ctrl+Shift+M</td>
+          </tr>
+          <tr>
+            <td>语音灵敏度</td>
+            <td>触发取消静音的音量阈值</td>
+            <td>0.025</td>
+          </tr>
+          <tr>
+            <td>宽限期</td>
+            <td>语音结束后重新静音前的延迟</td>
+            <td>1.5秒</td>
+          </tr>
+          <tr>
+            <td>麦克风</td>
+            <td>要使用的音频输入设备</td>
+            <td>系统默认</td>
+          </tr>
+          <tr>
+            <td>主题</td>
+            <td>弹出窗口视觉主题（4 个选项）</td>
+            <td>默认</td>
+          </tr>
+          <tr>
+            <td>语言</td>
+            <td>界面语言（自动 / 英语 / 日语）</td>
+            <td>自动（浏览器语言）</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>手动静音检测</h2>
+      <div class="card">
+        <p>
+          当您在 Google Meet 中手动静音或取消静音时，扩展会保持所选模式，仅更新其内部的说话状态。
+        </p>
+        <ul>
+          <li>通过 MutationObserver 监控 Meet 静音按钮</li>
+          <li>区分扩展发起的和用户发起的静音更改</li>
+          <li>将手动静音跟踪为 `MUTED`，手动取消静音跟踪为 `SPEAKING`</li>
+          <li>不改变所选模式</li>
+        </ul>
+      </div>
+
+      <h2>快速入门</h2>
+      <div class="card">
+        <ol style="padding-left: 24px; color: var(--text-muted)">
+          <li>从 Chrome 网上应用店安装</li>
+          <li>加入 Google Meet 通话</li>
+          <li>点击工具栏中的 Hush Meet 图标</li>
+          <li>选择除关闭外的任意模式</li>
+          <li>在提示时允许麦克风访问</li>
+        </ol>
+      </div>
+
+      <h2>技术栈</h2>
+      <div class="card">
+        <ul>
+          <li>Chrome Extension Manifest V3</li>
+          <li>React 19 + TypeScript</li>
+          <li>Vite + CRXJS Vite Plugin</li>
+          <li>Web Audio API (AnalyserNode)</li>
+          <li>Chrome Storage API</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>
