@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Technical Documentation - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+        --code-bg: #0d1b2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="../en/" class="back">&larr; Back to top</a>
+      <h1>Technical Documentation</h1>
+      <p class="subtitle">Architecture and design of Hush Meet</p>
+
+      <h2>Architecture Overview</h2>
+      <div class="card">
+        <pre><code>┌─────────────────────────────────────────────────────┐
+│  Chrome Extension (Manifest V3)                     │
+│                                                     │
+│  ┌──────────────┐     ┌───────────────────────────┐ │
+│  │   Popup UI   │     │     Content Script         │ │
+│  │  (React)     │     │   (meet.google.com)        │ │
+│  │              │     │                            │ │
+│  │  - Toggle    │     │  ┌────────────────────┐   │ │
+│  │  - Meter     │◄───►│  │  Audio Analyser    │   │ │
+│  │  - Settings  │     │  │  (Web Audio API)   │   │ │
+│  │              │     │  └────────┬───────────┘   │ │
+│  └──────────────┘     │           │               │ │
+│         ▲             │  ┌────────▼───────────┐   │ │
+│         │             │  │  State Machine     │   │ │
+│         │             │  │  IDLE → MUTED →    │   │ │
+│         │             │  │  SPEAKING → GRACE  │   │ │
+│         │             │  └────────┬───────────┘   │ │
+│         │             │           │               │ │
+│         │             │  ┌────────▼───────────┐   │ │
+│         │             │  │  Mute Controller   │   │ │
+│         │             │  │  (DOM manipulation)│   │ │
+│         │             │  └────────────────────┘   │ │
+│         │             └───────────────────────────┘ │
+│         │                                           │
+│         └─── Chrome Storage API (config/state sync)─┘
+│                                                     │
+└─────────────────────────────────────────────────────┘</code></pre>
+      </div>
+
+      <h2>Project Structure</h2>
+      <div class="card">
+        <pre><code>src/
+├── constants.ts          # Constants, modes, thresholds, storage keys
+├── messages.ts           # i18n messages (EN/JA)
+├── i18n.ts               # Locale management
+├── manifest.ts           # Chrome extension manifest definition
+├── background/
+│   └── service-worker.ts # Service Worker (game launcher, etc.)
+├── content/
+│   └── index.ts          # Content Script (state machine, mode control, shortcuts)
+└── popup/
+    ├── index.html        # Popup entry HTML
+    ├── main.tsx          # React mount
+    ├── Popup.tsx         # Popup UI component
+    ├── popup.css         # Styles
+    ├── Equalizer.tsx     # Spectrum analyser
+    ├── ThemeSwitcher.tsx # Theme switcher
+    ├── LocaleSwitcher.tsx# Language switcher
+    └── GameLauncher.tsx  # Mini-game launcher</code></pre>
+      </div>
+
+      <h2>Component Details</h2>
+
+      <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
+      <p>This script is injected into the Google Meet page. Its main responsibilities are:</p>
+
+      <h3>1.1 Audio Analysis Engine</h3>
+      <div class="card">
+        <p>
+          Uses the Web Audio API
+          <code>AnalyserNode</code> to measure microphone input volume in real time.
+        </p>
+        <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
+                                                          │
+                                                    getFloatTimeDomainData()
+                                                          │
+                                                    RMS (Root Mean Square) calculation</code></pre>
+        <p>Configuration parameters:</p>
+        <table>
+          <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><code>fftSize</code></td>
+            <td>512</td>
+            <td>FFT window size</td>
+          </tr>
+          <tr>
+            <td><code>smoothingTimeConstant</code></td>
+            <td>0.3</td>
+            <td>Temporal smoothing coefficient</td>
+          </tr>
+          <tr>
+            <td><code>echoCancellation</code></td>
+            <td>true</td>
+            <td>Enable echo cancellation</td>
+          </tr>
+          <tr>
+            <td><code>noiseSuppression</code></td>
+            <td>false</td>
+            <td>Noise suppression off (for VAD accuracy)</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.2 State Machine</h3>
+      <div class="card">
+        <p>A finite state machine with 5 states manages the speech state.</p>
+        <pre><code>IDLE ──(mode other than Off selected)──► MUTED ──(volume > speechThreshold)──► UNMUTING ──► SPEAKING
+                     ▲                                                │
+                     │                              (volume < silenceThreshold)
+                     │                                                │
+                     └──(graceTimer expired)── GRACE ◄────────────────┘
+                                                │
+                                         (volume > silenceThreshold)
+                                                │
+                                                ▼
+                                            SPEAKING
+
+* If the user manually toggles the Meet microphone, the mode stays the same and only the state follows.</code></pre>
+        <table>
+          <tr>
+            <th>State</th>
+            <th>Description</th>
+            <th>Meet Action</th>
+          </tr>
+          <tr>
+            <td>IDLE</td>
+            <td>Off mode or uninitialized</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>MUTED</td>
+            <td>Silence detected &rarr; muted</td>
+            <td>Mute</td>
+          </tr>
+          <tr>
+            <td>UNMUTING</td>
+            <td>Speech detected &rarr; unmuting</td>
+            <td>Unmute</td>
+          </tr>
+          <tr>
+            <td>SPEAKING</td>
+            <td>Currently speaking</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>GRACE</td>
+            <td>Speech ended &rarr; grace period</td>
+            <td>None</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.3 Operating Modes</h3>
+      <div class="card">
+        <p>Four modes control how state transitions behave. Off is the control-disabled mode.</p>
+        <table>
+          <tr>
+            <th>Mode</th>
+            <th>Unmute</th>
+            <th>Mute</th>
+            <th>Shortcut</th>
+          </tr>
+          <tr>
+            <td>Off</td>
+            <td>None</td>
+            <td>None</td>
+            <td>Disabled</td>
+          </tr>
+          <tr>
+            <td>Auto</td>
+            <td>Automatic on voice detection</td>
+            <td>Automatic on silence</td>
+            <td>Toggle</td>
+          </tr>
+          <tr>
+            <td>Auto-Off</td>
+            <td>Manual / shortcut</td>
+            <td>Automatic on silence</td>
+            <td>Toggle</td>
+          </tr>
+          <tr>
+            <td>Push-to-Talk</td>
+            <td>While key is held down</td>
+            <td>Key released &rarr; Grace &rarr; Mute</td>
+            <td>Hold</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.4 Shortcut Key</h3>
+      <div class="card">
+        <p>
+          Provides a customizable keyboard shortcut (default:
+          <code>Ctrl+Shift+M</code>).
+        </p>
+        <ul>
+          <li>Off: Disabled</li>
+          <li>Auto: Toggle mute</li>
+          <li>Auto-Off: Toggle mute</li>
+          <li>Push-to-Talk: Unmute only while key is held (hold operation)</li>
+        </ul>
+        <p>The shortcut key can be freely changed from the popup settings.</p>
+      </div>
+
+      <h3>1.5 Asymmetric Threshold Design</h3>
+      <div class="card">
+        <p>
+          Different thresholds for unmuting and muting prevent chattering (frequent toggling).
+        </p>
+        <pre><code>speechThreshold (speech start)  = 0.025  (default)
+silenceThreshold (silence判定)  = speechThreshold × 0.5 = 0.0125
+
+  Volume
+   ▲
+   │  ┄┄┄┄┄┄┄┄┄ speechThreshold (0.025) ┄┄┄┄  ← Unmute when exceeded
+   │
+   │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← Grace period starts when below
+   │
+   └──────────────────────────────────────────► Time</code></pre>
+      </div>
+
+      <h3>1.6 Mute Button Detection</h3>
+      <div class="card">
+        <p>Detects the Google Meet mute button using multiple strategies:</p>
+        <ol>
+          <li>Search by <code>aria-label</code> attribute (supports Japanese/English)</li>
+          <li>Search by <code>data-tooltip</code> attribute</li>
+          <li>Fallback: simulate <code>Ctrl+D</code> keyboard shortcut</li>
+        </ol>
+        <p>
+          Mute state is determined from the <code>data-is-muted</code> attribute or the
+          <code>aria-label</code> text content.
+        </p>
+      </div>
+
+      <h3>2. Popup UI (<code>src/popup/</code>)</h3>
+      <div class="card">
+        <p>
+          A settings UI built with React 19. Synchronizes state with the Content Script
+          in real time via the Chrome Storage API.
+        </p>
+        <ul>
+          <li><strong>Mode selector</strong>: Switch between Off / Auto / Auto-Off / Push-to-Talk</li>
+          <li>
+            <strong>Status display</strong>:
+            Shows the current state (muted/speaking/grace) with a dot indicator
+          </li>
+          <li>
+            <strong>Level meter</strong>:
+            Displays microphone input level in real time (with threshold markers)
+          </li>
+          <li>
+            <strong>Sensitivity slider</strong>: Adjust <code>speechThreshold</code> (0.005&ndash;0.25)
+          </li>
+          <li>
+            <strong>Grace period slider</strong>: Adjust <code>gracePeriod</code> (500ms&ndash;4000ms)
+          </li>
+          <li><strong>Shortcut key settings</strong>: Customization via key recording UI</li>
+          <li><strong>Microphone device selection</strong>: Manual selection of the microphone to use</li>
+        </ul>
+      </div>
+
+      <h2>Data Flow</h2>
+      <div class="card">
+        <pre><code>Popup → Chrome Storage → Content Script
+  │                            │
+  │  hushMeetConfig: object    │  (sensitivity/grace period settings)
+  │  hushMeetMode: string      │  (operating mode)
+  │  hushMeetShortcutKey: str  │  (shortcut key)
+  │                            │
+  │                            ▼
+  │                      Content Script → Chrome Storage → Popup
+  │                            │
+  │                            │  hushMeetState: string  (current state)
+  │                            │  hushMeetLevel: number  (volume level)
+  │                            │  hushMeetSpectrum: array (spectrum)
+  └────────────────────────────┘</code></pre>
+        <p>
+          The Popup and Content Script do not communicate directly; they communicate
+          bidirectionally via Chrome Storage API change events.
+        </p>
+      </div>
+
+      <h2>Build System</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>Tool</th>
+            <th>Version</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td>Vite+</td>
+            <td>toolchain</td>
+            <td>Dependency management, build, test, validation</td>
+          </tr>
+          <tr>
+            <td>Vite</td>
+            <td>8.x</td>
+            <td>Internal build infrastructure</td>
+          </tr>
+          <tr>
+            <td>CRXJS Vite Plugin</td>
+            <td>2.x</td>
+            <td>Chrome extension HMR &amp; manifest generation</td>
+          </tr>
+          <tr>
+            <td>React</td>
+            <td>19.x</td>
+            <td>Popup UI</td>
+          </tr>
+          <tr>
+            <td>TypeScript</td>
+            <td>5.9.x</td>
+            <td>Type safety</td>
+          </tr>
+        </table>
+        <h3>Commands</h3>
+        <table>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><code>vp install</code></td>
+            <td>Install dependencies</td>
+          </tr>
+          <tr>
+            <td><code>vp build</code></td>
+            <td>Production build</td>
+          </tr>
+          <tr>
+            <td><code>vp test</code></td>
+            <td>Run tests</td>
+          </tr>
+          <tr>
+            <td><code>vp check</code></td>
+            <td>format / lint / typecheck</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Known Limitations</h2>
+      <div class="card">
+        <ul>
+          <li>
+            Voice detection is RMS (volume) based, so it may false-trigger on loud ambient noise
+            (mitigated by using Auto-Off mode)
+          </li>
+          <li>Google Meet UI changes may break mute button detection</li>
+          <li>The very beginning of speech may be cut off (adjustable via threshold settings)</li>
+          <li>The shortcut key only works when the Google Meet tab is focused</li>
+        </ul>
+      </div>
+
+      <h2>Future Improvements</h2>
+      <div class="card">
+        <ul>
+          <li>Voice-weighted noise gate for improved detection accuracy</li>
+          <li>Pre-speech buffering to reduce beginning-of-utterance clipping</li>
+          <li>Auto-detection logic to follow Google Meet UI changes</li>
+          <li>Silero VAD (ML-based) replacement for higher detection accuracy</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

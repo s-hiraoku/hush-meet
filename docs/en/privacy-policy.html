@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 28px 0 12px;
+        color: var(--primary);
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      .updated {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="./" class="back">&larr; Back to top</a>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: March 21, 2026</p>
+
+      <h2>Overview</h2>
+      <p>
+        Hush Meet (hereinafter "this extension") is a Chrome extension that detects speech during
+        Google Meet calls and automatically toggles mute. This extension respects user privacy to the
+        fullest extent and uses only the minimum amount of data necessary.
+      </p>
+
+      <h2>Data Collection</h2>
+      <p><strong>This extension does not collect or transmit any personal data.</strong></p>
+
+      <h2>Microphone Access</h2>
+      <p>
+        This extension requires microphone access for speech detection. Regarding the audio data
+        obtained from the microphone:
+      </p>
+      <ul>
+        <li>Audio data is <strong>processed in real time only on your device</strong></li>
+        <li>Audio data is <strong>never recorded or stored</strong></li>
+        <li>Audio data is <strong>never sent to external servers</strong></li>
+        <li>Only the audio volume level (RMS value) is used for computation; the content of the audio is never analyzed</li>
+      </ul>
+
+      <h2>Local Storage</h2>
+      <p>This extension uses the Chrome Storage API to store the following settings locally:</p>
+      <ul>
+        <li>Operating mode (Off / Auto / Auto-Off / Push-to-Talk)</li>
+        <li>Speech detection sensitivity settings</li>
+        <li>Grace period settings</li>
+        <li>Shortcut key settings</li>
+        <li>Selected microphone device</li>
+        <li>Theme and language settings</li>
+      </ul>
+      <p>This data is stored only within your browser and is never transmitted externally.</p>
+
+      <h2>Website Access</h2>
+      <p>
+        This extension operates only on
+        <code>https://meet.google.com</code>.
+        Content scripts are not executed on any other websites.
+      </p>
+
+      <h2>Third-Party Disclosure</h2>
+      <p>
+        This extension does not provide any data to third parties. It contains no analytics tools,
+        tracking code, or advertisements.
+      </p>
+
+      <h2>Open Source</h2>
+      <p>
+        The source code of this extension is available on
+        <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>.
+        If you have any questions about how data is handled, you can review the source code directly.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        If you have questions about this privacy policy, please contact us via
+        <a
+          href="https://github.com/s-hiraoku/hush-meet/issues"
+          >GitHub Issues</a
+        >.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        This privacy policy may be updated as needed. If there are significant changes, we will
+        notify you on this page.
+      </p>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>
