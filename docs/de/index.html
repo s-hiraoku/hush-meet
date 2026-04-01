@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hush Meet - Auto-Mute Chrome-Erweiterung für Google Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+      }
+      .tagline {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p,
+      li {
+        color: var(--text-muted);
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .flow {
+        font-family: monospace;
+        color: var(--text);
+        margin: 12px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      .nav {
+        margin-bottom: 32px;
+      }
+      .nav a {
+        margin-right: 16px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hush Meet</h1>
+      <p class="tagline">
+        Eine Chrome-Erweiterung, die Ihr Mikrofon bei Google Meet automatisch stummschaltet, wenn Sie nicht sprechen, und verhindert, dass Hintergrundgeräusche andere Teilnehmer erreichen.
+      </p>
+
+      <nav class="nav">
+        <a href="privacy-policy.html">Datenschutzrichtlinie</a>
+        <a href="architecture.html">Technische Dokumentation</a>
+        <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
+        <a href="../en/">English</a>
+        <a href="../es/">Español</a>
+        <a href="../fr/">Français</a>
+        <a href="../">日本語</a>
+        <a href="../ko/">한국어</a>
+        <a href="../zh/">中文</a>
+      </nav>
+
+      <h2>Funktionen</h2>
+      <div class="card">
+        <ul>
+          <li>Automatische Stummschaltung aufheben bei Spracherkennung, automatische Stummschaltung nach dem Sprechen</li>
+          <li>
+            4 Betriebsmodi:
+            <ul>
+              <li><strong>Aus</strong> &mdash; Erweiterung deaktiviert, Meet-Standardverhalten</li>
+              <li>
+                <strong>Auto</strong> &mdash; Sprachgesteuerte Stummschaltungsaufhebung &amp; automatische Stummschaltung (für ruhige Umgebungen)
+              </li>
+              <li>
+                <strong>Auto-Aus</strong> &mdash; Stummschaltung nur durch manuelle Meet-Steuerung oder Tastenkürzel aufheben, automatische Stummschaltung nach dem Sprechen (für laute Umgebungen)
+              </li>
+              <li><strong>Push-to-Talk</strong> &mdash; Tastenkürzel gedrückt halten zum Sprechen</li>
+            </ul>
+          </li>
+          <li>
+            Anpassbares Tastenkürzel (Standard: Strg+Umschalt+M) &mdash; in allen Modi außer Aus verfügbar
+          </li>
+          <li>Unabhängige Audio-Überwachung (separater Mikrofonstream von Google Meet)</li>
+          <li>Sprachgewichtetes Noise-Gate &mdash; betont menschliche Sprachfrequenzen (300Hz&ndash;3kHz) und reduziert Fehlauslösungen durch Tastatur-, Lüfter- und Umgebungsgeräusche</li>
+          <li>Asymmetrisches Schwellenwertdesign verhindert Flattern</li>
+          <li>Echtzeit-Audiopegelmesser &amp; Spektrumanalysator</li>
+          <li>Einstellbare Empfindlichkeit und Nachklingzeit</li>
+          <li>
+            Manuelle Stummschaltungserkennung &mdash; folgt der Meet-seitigen Stummschaltung/Aufhebung ohne den gewählten Modus zu ändern
+          </li>
+          <li>Mikrofongeräte-Auswahl &mdash; wählen Sie das gewünschte Mikrofon</li>
+          <li>4 visuelle Themes (Standard / Analogradio / Boombox / Retro Future)</li>
+          <li>Modusbewusstes Toolbar-Symbol &mdash; Symbolfarbe und Badge ändern sich je nach aktivem Modus</li>
+          <li>Englische &amp; japanische Sprachunterstützung mit manueller Umschaltung</li>
+          <li>
+            Gelangweilt im Meeting? Retro-Future-Minispiele enthalten (Breakout / Space Invaders / 2048 / Flappy Bird). Achtung: Spielsoundeffekte können die automatische Stummschaltungsaufhebung auslösen. Stellen Sie die Empfindlichkeit richtig ein und genießen Sie den Nervenkitzel, nicht erwischt zu werden.
+          </li>
+        </ul>
+      </div>
+
+      <h2>Funktionsweise</h2>
+      <div class="card">
+        <div class="flow">
+          [Mikrofon-Eingang] &rarr; [Web Audio API (RMS)] &rarr; [Spracherkennung] &rarr; [Meet Stummschaltungstasten-Steuerung]
+        </div>
+        <p>
+          Ein separater Mikrofonstream überwacht die Audiopegel. Wenn Sprache erkannt wird, klickt die Erweiterung automatisch auf die Meet-Stummschaltungstaste, um die Stummschaltung aufzuheben. Wenn wieder Stille eintritt, wird nach einer konfigurierbaren Nachklingzeit erneut stummgeschaltet.
+        </p>
+      </div>
+
+      <h2>Einstellungen</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>Einstellung</th>
+            <th>Beschreibung</th>
+            <th>Standard</th>
+          </tr>
+          <tr>
+            <td>Modus</td>
+            <td>Aus / Auto / Auto-Aus / Push-to-Talk</td>
+            <td>Auto</td>
+          </tr>
+          <tr>
+            <td>Tastenkürzel</td>
+            <td>Tastenkombination für Stummschaltungssteuerung (alle Modi außer Aus)</td>
+            <td>Strg+Umschalt+M</td>
+          </tr>
+          <tr>
+            <td>Sprachempfindlichkeit</td>
+            <td>Lautstärkeschwelle zum Auslösen der Stummschaltungsaufhebung</td>
+            <td>0.025</td>
+          </tr>
+          <tr>
+            <td>Nachklingzeit</td>
+            <td>Verzögerung vor erneuter Stummschaltung nach dem Sprechen</td>
+            <td>1,5s</td>
+          </tr>
+          <tr>
+            <td>Mikrofon</td>
+            <td>Zu verwendendes Audio-Eingabegerät</td>
+            <td>Systemstandard</td>
+          </tr>
+          <tr>
+            <td>Theme</td>
+            <td>Visuelles Popup-Theme (4 Optionen)</td>
+            <td>Standard</td>
+          </tr>
+          <tr>
+            <td>Sprache</td>
+            <td>UI-Sprache (Auto / Englisch / Japanisch)</td>
+            <td>Auto (Browsersprache)</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Manuelle Stummschaltungserkennung</h2>
+      <div class="card">
+        <p>
+          Wenn Sie in Google Meet manuell stumm- oder freischalten, behält die Erweiterung den gewählten Modus bei und aktualisiert nur ihren internen Sprechstatus.
+        </p>
+        <ul>
+          <li>Überwacht die Meet-Stummschaltungstaste über MutationObserver</li>
+          <li>Unterscheidet zwischen erweiterungsinitiierten und benutzerinitiierten Stummschaltungsänderungen</li>
+          <li>Erfasst manuelle Stummschaltung als `MUTED` und manuelle Freischaltung als `SPEAKING`</li>
+          <li>Ändert nicht den gewählten Modus</li>
+        </ul>
+      </div>
+
+      <h2>Erste Schritte</h2>
+      <div class="card">
+        <ol style="padding-left: 24px; color: var(--text-muted)">
+          <li>Aus dem Chrome Web Store installieren</li>
+          <li>Einem Google Meet-Anruf beitreten</li>
+          <li>Auf das Hush Meet-Symbol in der Symbolleiste klicken</li>
+          <li>Einen beliebigen Modus außer Aus wählen</li>
+          <li>Mikrofonzugriff erlauben, wenn Sie dazu aufgefordert werden</li>
+        </ol>
+      </div>
+
+      <h2>Technologie-Stack</h2>
+      <div class="card">
+        <ul>
+          <li>Chrome Extension Manifest V3</li>
+          <li>React 19 + TypeScript</li>
+          <li>Vite + CRXJS Vite Plugin</li>
+          <li>Web Audio API (AnalyserNode)</li>
+          <li>Chrome Storage API</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

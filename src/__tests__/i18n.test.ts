@@ -58,8 +58,8 @@ describe("i18n helpers", () => {
 
   it("falls back for unsupported explicit locales and leaves placeholders untouched without values", async () => {
     const { setLocale, t } = await import("../i18n.ts");
-    setLocale("fr" as never);
-    expect(t("modeOff")).toBe("Off");
+    setLocale("fr");
+    expect(t("modeOff")).toBe("Désactivé");
     expect(t("secondsUnit")).toBe("$VALUE$s");
   });
 });

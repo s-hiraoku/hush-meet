@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Documentation - Hush Meet</title>
+    <title>技术文档 - Hush Meet</title>
     <style>
       :root {
         --bg: #0f0f1a;
@@ -128,306 +128,306 @@
   </head>
   <body>
     <div class="container">
-      <a href="./" class="back">&larr; Back to top</a>
-      <h1>Technical Documentation</h1>
-      <p class="subtitle">Architecture and design of Hush Meet</p>
+      <a href="./" class="back">&larr; 返回首页</a>
+      <h1>技术文档</h1>
+      <p class="subtitle">Hush Meet 的架构与设计</p>
 
-      <h2>Architecture Overview</h2>
+      <h2>架构概览</h2>
       <div class="card">
         <pre><code>┌─────────────────────────────────────────────────────┐
-│  Chrome Extension (Manifest V3)                     │
+│  Chrome 扩展程序 (Manifest V3)                     │
 │                                                     │
 │  ┌──────────────┐     ┌───────────────────────────┐ │
-│  │   Popup UI   │     │     Content Script         │ │
+│  │   弹出界面   │     │     Content Script         │ │
 │  │  (React)     │     │   (meet.google.com)        │ │
 │  │              │     │                            │ │
-│  │  - Toggle    │     │  ┌────────────────────┐   │ │
-│  │  - Meter     │◄───►│  │  Audio Analyser    │   │ │
-│  │  - Settings  │     │  │  (Web Audio API)   │   │ │
+│  │  - 切换    │     │  ┌────────────────────┐   │ │
+│  │  - 音量表     │◄───►│  │  音频分析器    │   │ │
+│  │  - 设置  │     │  │  (Web Audio API)   │   │ │
 │  │              │     │  └────────┬───────────┘   │ │
 │  └──────────────┘     │           │               │ │
 │         ▲             │  ┌────────▼───────────┐   │ │
-│         │             │  │  State Machine     │   │ │
+│         │             │  │  状态机     │   │ │
 │         │             │  │  IDLE → MUTED →    │   │ │
 │         │             │  │  SPEAKING → GRACE  │   │ │
 │         │             │  └────────┬───────────┘   │ │
 │         │             │           │               │ │
 │         │             │  ┌────────▼───────────┐   │ │
-│         │             │  │  Mute Controller   │   │ │
-│         │             │  │  (DOM manipulation)│   │ │
+│         │             │  │  静音控制器   │   │ │
+│         │             │  │  (DOM 操作)│   │ │
 │         │             │  └────────────────────┘   │ │
 │         │             └───────────────────────────┘ │
 │         │                                           │
-│         └─── Chrome Storage API (config/state sync)─┘
+│         └─── Chrome Storage API (配置/状态同步)─┘
 │                                                     │
 └─────────────────────────────────────────────────────┘</code></pre>
       </div>
 
-      <h2>Project Structure</h2>
+      <h2>项目结构</h2>
       <div class="card">
         <pre><code>src/
-├── constants.ts          # Constants, modes, thresholds, storage keys
-├── messages.ts           # i18n messages (EN/JA)
-├── i18n.ts               # Locale management
-├── manifest.ts           # Chrome extension manifest definition
+├── constants.ts          # 常量、模式、阈值、存储键
+├── messages.ts           # i18n 消息 (EN/JA)
+├── i18n.ts               # 语言管理
+├── manifest.ts           # Chrome 扩展程序清单定义
 ├── background/
-│   └── service-worker.ts # Service Worker (game launcher, etc.)
+│   └── service-worker.ts # Service Worker（游戏启动器等）
 ├── content/
-│   └── index.ts          # Content Script (state machine, mode control, shortcuts)
+│   └── index.ts          # Content Script（状态机、模式控制、快捷键）
 └── popup/
-    ├── index.html        # Popup entry HTML
-    ├── main.tsx          # React mount
-    ├── Popup.tsx         # Popup UI component
-    ├── popup.css         # Styles
-    ├── Equalizer.tsx     # Spectrum analyser
-    ├── ThemeSwitcher.tsx # Theme switcher
-    ├── LocaleSwitcher.tsx# Language switcher
-    └── GameLauncher.tsx  # Mini-game launcher</code></pre>
+    ├── index.html        # 弹出页面入口 HTML
+    ├── main.tsx          # React 挂载
+    ├── Popup.tsx         # 弹出界面组件
+    ├── popup.css         # 样式
+    ├── Equalizer.tsx     # 频谱分析器
+    ├── ThemeSwitcher.tsx # 主题切换器
+    ├── LocaleSwitcher.tsx# 语言切换器
+    └── GameLauncher.tsx  # 小游戏启动器</code></pre>
       </div>
 
-      <h2>Component Details</h2>
+      <h2>组件详情</h2>
 
       <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
-      <p>This script is injected into the Google Meet page. Its main responsibilities are:</p>
+      <p>此脚本被注入到 Google Meet 页面中。其主要职责包括：</p>
 
-      <h3>1.1 Audio Analysis Engine</h3>
+      <h3>1.1 音频分析引擎</h3>
       <div class="card">
         <p>
-          Uses the Web Audio API <code>AnalyserNode</code> to measure microphone input volume in real time.
+          使用 Web Audio API 的 <code>AnalyserNode</code> 实时测量麦克风输入音量。
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
                                                     getFloatTimeDomainData()
                                                           │
-                                                    RMS (Root Mean Square) calculation</code></pre>
-        <p>Configuration parameters:</p>
+                                                    RMS（均方根）计算</code></pre>
+        <p>配置参数：</p>
         <table>
           <tr>
-            <th>Parameter</th>
-            <th>Value</th>
-            <th>Description</th>
+            <th>参数</th>
+            <th>值</th>
+            <th>说明</th>
           </tr>
           <tr>
             <td><code>fftSize</code></td>
             <td>512</td>
-            <td>FFT window size</td>
+            <td>FFT 窗口大小</td>
           </tr>
           <tr>
             <td><code>smoothingTimeConstant</code></td>
             <td>0.3</td>
-            <td>Temporal smoothing coefficient</td>
+            <td>时间平滑系数</td>
           </tr>
           <tr>
             <td><code>echoCancellation</code></td>
             <td>true</td>
-            <td>Enable echo cancellation</td>
+            <td>启用回声消除</td>
           </tr>
           <tr>
             <td><code>noiseSuppression</code></td>
             <td>false</td>
-            <td>Noise suppression off (for VAD accuracy)</td>
+            <td>关闭噪声抑制（为保证 VAD 准确性）</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.2 State Machine</h3>
+      <h3>1.2 状态机</h3>
       <div class="card">
-        <p>A finite state machine with 5 states manages the speech state.</p>
-        <pre><code>IDLE ──(mode other than Off selected)──► MUTED ──(volume > speechThreshold)──► UNMUTING ──► SPEAKING
+        <p>一个包含 5 个状态的有限状态机管理语音状态。</p>
+        <pre><code>IDLE ──(选择了非关闭模式)──► MUTED ──(音量 > 语音阈值)──► UNMUTING ──► SPEAKING
                      ▲                                                │
-                     │                              (volume < silenceThreshold)
+                     │                              (音量 < 静音阈值)
                      │                                                │
-                     └──(graceTimer expired)── GRACE ◄────────────────┘
+                     └──(宽限定时器到期)── GRACE ◄────────────────────┘
                                                 │
-                                         (volume > silenceThreshold)
+                                         (音量 > 静音阈值)
                                                 │
                                                 ▼
                                             SPEAKING
 
-* If the user manually toggles the Meet microphone, the mode stays the same and only the state follows.</code></pre>
+* 如果用户手动切换 Meet 麦克风，模式保持不变，仅状态跟随变化。</code></pre>
         <table>
           <tr>
-            <th>State</th>
-            <th>Description</th>
-            <th>Meet Action</th>
+            <th>状态</th>
+            <th>说明</th>
+            <th>Meet 操作</th>
           </tr>
           <tr>
             <td>IDLE</td>
-            <td>Off mode or uninitialized</td>
-            <td>None</td>
+            <td>关闭模式或未初始化</td>
+            <td>无</td>
           </tr>
           <tr>
             <td>MUTED</td>
-            <td>Silence detected &rarr; muted</td>
-            <td>Mute</td>
+            <td>检测到静音 &rarr; 已静音</td>
+            <td>静音</td>
           </tr>
           <tr>
             <td>UNMUTING</td>
-            <td>Speech detected &rarr; unmuting</td>
-            <td>Unmute</td>
+            <td>检测到语音 &rarr; 正在取消静音</td>
+            <td>取消静音</td>
           </tr>
           <tr>
             <td>SPEAKING</td>
-            <td>Currently speaking</td>
-            <td>None</td>
+            <td>正在讲话</td>
+            <td>无</td>
           </tr>
           <tr>
             <td>GRACE</td>
-            <td>Speech ended &rarr; grace period</td>
-            <td>None</td>
+            <td>讲话结束 &rarr; 宽限期</td>
+            <td>无</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.3 Operating Modes</h3>
+      <h3>1.3 运行模式</h3>
       <div class="card">
-        <p>Four modes control how state transitions behave. Off is the control-disabled mode.</p>
+        <p>四种模式控制状态转换的行为。关闭模式为禁用控制模式。</p>
         <table>
           <tr>
-            <th>Mode</th>
-            <th>Unmute</th>
-            <th>Mute</th>
-            <th>Shortcut</th>
+            <th>模式</th>
+            <th>取消静音</th>
+            <th>静音</th>
+            <th>快捷键</th>
           </tr>
           <tr>
-            <td>Off</td>
-            <td>None</td>
-            <td>None</td>
-            <td>Disabled</td>
+            <td>关闭</td>
+            <td>无</td>
+            <td>无</td>
+            <td>禁用</td>
           </tr>
           <tr>
-            <td>Auto</td>
-            <td>Automatic on voice detection</td>
-            <td>Automatic on silence</td>
-            <td>Toggle</td>
+            <td>自动</td>
+            <td>检测到语音时自动取消静音</td>
+            <td>检测到静音时自动静音</td>
+            <td>切换</td>
           </tr>
           <tr>
-            <td>Auto-Off</td>
-            <td>Manual / shortcut</td>
-            <td>Automatic on silence</td>
-            <td>Toggle</td>
+            <td>自动关闭</td>
+            <td>手动 / 快捷键</td>
+            <td>检测到静音时自动静音</td>
+            <td>切换</td>
           </tr>
           <tr>
             <td>Push-to-Talk</td>
-            <td>While key is held down</td>
-            <td>Key released &rarr; Grace &rarr; Mute</td>
-            <td>Hold</td>
+            <td>按住键时取消静音</td>
+            <td>松开键 &rarr; 宽限期 &rarr; 静音</td>
+            <td>按住</td>
           </tr>
         </table>
       </div>
 
-      <h3>1.4 Shortcut Key</h3>
+      <h3>1.4 快捷键</h3>
       <div class="card">
         <p>
-          Provides a customizable keyboard shortcut (default: <code>Ctrl+Shift+M</code>).
+          提供可自定义的键盘快捷键（默认：<code>Ctrl+Shift+M</code>）。
         </p>
         <ul>
-          <li>Off: Disabled</li>
-          <li>Auto: Toggle mute</li>
-          <li>Auto-Off: Toggle mute</li>
-          <li>Push-to-Talk: Unmute only while key is held (hold operation)</li>
+          <li>关闭：禁用</li>
+          <li>自动：切换静音</li>
+          <li>自动关闭：切换静音</li>
+          <li>Push-to-Talk：仅在按住键时取消静音（按住操作）</li>
         </ul>
-        <p>The shortcut key can be freely changed from the popup settings.</p>
+        <p>快捷键可以在弹出窗口的设置中自由更改。</p>
       </div>
 
-      <h3>1.5 Asymmetric Threshold Design</h3>
+      <h3>1.5 非对称阈值设计</h3>
       <div class="card">
         <p>
-          Different thresholds for unmuting and muting prevent chattering (frequent toggling).
+          取消静音和静音使用不同的阈值，以防止抖动（频繁切换）。
         </p>
-        <pre><code>speechThreshold (speech start)  = 0.025  (default)
-silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
+        <pre><code>语音阈值（语音开始）    = 0.025（默认）
+静音阈值（静音判定）    = 语音阈值 × 0.5 = 0.0125
 
-  Volume
+  音量
    ▲
-   │  ┄┄┄┄┄┄┄┄┄ speechThreshold (0.025) ┄┄┄┄  ← Unmute when exceeded
+   │  ┄┄┄┄┄┄┄┄┄ 语音阈值 (0.025) ┄┄┄┄  ← 超过时取消静音
    │
-   │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← Grace period starts when below
+   │  ┄┄┄┄┄┄┄┄┄ 静音阈值 (0.0125) ┄┄  ← 低于时开始宽限期
    │
-   └──────────────────────────────────────────► Time</code></pre>
+   └──────────────────────────────────────────► 时间</code></pre>
       </div>
 
-      <h3>1.6 Mute Button Detection</h3>
+      <h3>1.6 静音按钮检测</h3>
       <div class="card">
-        <p>Detects the Google Meet mute button using multiple strategies:</p>
+        <p>使用多种策略检测 Google Meet 的静音按钮：</p>
         <ol>
-          <li>Search by <code>aria-label</code> attribute (supports Japanese/English)</li>
-          <li>Search by <code>data-tooltip</code> attribute</li>
-          <li>Fallback: simulate <code>Ctrl+D</code> keyboard shortcut</li>
+          <li>通过 <code>aria-label</code> 属性搜索（支持日语/英语）</li>
+          <li>通过 <code>data-tooltip</code> 属性搜索</li>
+          <li>回退方案：模拟 <code>Ctrl+D</code> 键盘快捷键</li>
         </ol>
         <p>
-          Mute state is determined from the <code>data-is-muted</code> attribute or the <code>aria-label</code> text content.
+          静音状态通过 <code>data-is-muted</code> 属性或 <code>aria-label</code> 文本内容来判定。
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          A settings UI built with React 19. Synchronizes state with the Content Script in real time via the Chrome Storage API.
+          使用 React 19 构建的设置界面。通过 Chrome Storage API 与 Content Script 实时同步状态。
         </p>
         <ul>
-          <li><strong>Mode selector</strong>: Switch between Off / Auto / Auto-Off / Push-to-Talk</li>
+          <li><strong>模式选择器</strong>: 在关闭 / 自动 / 自动关闭 / Push-to-Talk 之间切换</li>
           <li>
-            <strong>Status display</strong>:
-            Shows the current state (muted/speaking/grace) with a dot indicator
+            <strong>状态显示</strong>:
+            通过圆点指示器显示当前状态（静音/讲话中/宽限期）
           </li>
           <li>
-            <strong>Level meter</strong>:
-            Displays microphone input level in real time (with threshold markers)
+            <strong>电平表</strong>:
+            实时显示麦克风输入电平（带阈值标记）
           </li>
           <li>
-            <strong>Sensitivity slider</strong>: Adjust <code>speechThreshold</code> (0.005&ndash;0.25)
+            <strong>灵敏度滑块</strong>: 调整 <code>speechThreshold</code>（0.005&ndash;0.25）
           </li>
           <li>
-            <strong>Grace period slider</strong>: Adjust <code>gracePeriod</code> (500ms&ndash;4000ms)
+            <strong>宽限期滑块</strong>: 调整 <code>gracePeriod</code>（500ms&ndash;4000ms）
           </li>
-          <li><strong>Shortcut key settings</strong>: Customization via key recording UI</li>
-          <li><strong>Microphone device selection</strong>: Manual selection of the microphone to use</li>
+          <li><strong>快捷键设置</strong>: 通过按键录制界面进行自定义</li>
+          <li><strong>麦克风设备选择</strong>: 手动选择要使用的麦克风</li>
         </ul>
       </div>
 
-      <h2>Data Flow</h2>
+      <h2>数据流</h2>
       <div class="card">
         <pre><code>Popup → Chrome Storage → Content Script
   │                            │
-  │  hushMeetConfig: object    │  (sensitivity/grace period settings)
-  │  hushMeetMode: string      │  (operating mode)
-  │  hushMeetShortcutKey: str  │  (shortcut key)
+  │  hushMeetConfig: object    │  （灵敏度/宽限期设置）
+  │  hushMeetMode: string      │  （运行模式）
+  │  hushMeetShortcutKey: str  │  （快捷键）
   │                            │
   │                            ▼
   │                      Content Script → Chrome Storage → Popup
   │                            │
-  │                            │  hushMeetState: string  (current state)
-  │                            │  hushMeetLevel: number  (volume level)
-  │                            │  hushMeetSpectrum: array (spectrum)
+  │                            │  hushMeetState: string  （当前状态）
+  │                            │  hushMeetLevel: number  （音量电平）
+  │                            │  hushMeetSpectrum: array （频谱）
   └────────────────────────────┘</code></pre>
         <p>
-          The Popup and Content Script do not communicate directly; they communicate bidirectionally via Chrome Storage API change events.
+          Popup 和 Content Script 之间不直接通信；它们通过 Chrome Storage API 的变更事件进行双向通信。
         </p>
       </div>
 
-      <h2>Build System</h2>
+      <h2>构建系统</h2>
       <div class="card">
         <table>
           <tr>
-            <th>Tool</th>
-            <th>Version</th>
-            <th>Purpose</th>
+            <th>工具</th>
+            <th>版本</th>
+            <th>用途</th>
           </tr>
           <tr>
             <td>Vite+</td>
             <td>toolchain</td>
-            <td>Dependency management, build, test, validation</td>
+            <td>依赖管理、构建、测试、验证</td>
           </tr>
           <tr>
             <td>Vite</td>
             <td>8.x</td>
-            <td>Internal build infrastructure</td>
+            <td>内部构建基础设施</td>
           </tr>
           <tr>
             <td>CRXJS Vite Plugin</td>
             <td>2.x</td>
-            <td>Chrome extension HMR &amp; manifest generation</td>
+            <td>Chrome 扩展程序 HMR 和清单生成</td>
           </tr>
           <tr>
             <td>React</td>
@@ -437,53 +437,53 @@ silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
           <tr>
             <td>TypeScript</td>
             <td>5.9.x</td>
-            <td>Type safety</td>
+            <td>类型安全</td>
           </tr>
         </table>
-        <h3>Commands</h3>
+        <h3>命令</h3>
         <table>
           <tr>
-            <th>Command</th>
-            <th>Description</th>
+            <th>命令</th>
+            <th>说明</th>
           </tr>
           <tr>
             <td><code>vp install</code></td>
-            <td>Install dependencies</td>
+            <td>安装依赖</td>
           </tr>
           <tr>
             <td><code>vp build</code></td>
-            <td>Production build</td>
+            <td>生产环境构建</td>
           </tr>
           <tr>
             <td><code>vp test</code></td>
-            <td>Run tests</td>
+            <td>运行测试</td>
           </tr>
           <tr>
             <td><code>vp check</code></td>
-            <td>format / lint / typecheck</td>
+            <td>格式化 / 代码检查 / 类型检查</td>
           </tr>
         </table>
       </div>
 
-      <h2>Known Limitations</h2>
+      <h2>已知限制</h2>
       <div class="card">
         <ul>
           <li>
-            Voice detection is RMS (volume) based, so it may false-trigger on loud ambient noise (mitigated by using Auto-Off mode)
+            语音检测基于 RMS（音量），因此可能会被较大的环境噪声误触发（可通过使用自动关闭模式来缓解）
           </li>
-          <li>Google Meet UI changes may break mute button detection</li>
-          <li>The very beginning of speech may be cut off (adjustable via threshold settings)</li>
-          <li>The shortcut key only works when the Google Meet tab is focused</li>
+          <li>Google Meet 界面变更可能导致静音按钮检测失效</li>
+          <li>语音的最开始部分可能会被截断（可通过阈值设置进行调整）</li>
+          <li>快捷键仅在 Google Meet 标签页处于焦点时有效</li>
         </ul>
       </div>
 
-      <h2>Future Improvements</h2>
+      <h2>未来改进</h2>
       <div class="card">
         <ul>
-          <li>Voice-weighted noise gate for improved detection accuracy</li>
-          <li>Pre-speech buffering to reduce beginning-of-utterance clipping</li>
-          <li>Auto-detection logic to follow Google Meet UI changes</li>
-          <li>Silero VAD (ML-based) replacement for higher detection accuracy</li>
+          <li>语音加权噪声门限，提高检测准确性</li>
+          <li>语音前缓冲，减少语音开头被截断的问题</li>
+          <li>自动检测逻辑，适应 Google Meet 界面变更</li>
+          <li>Silero VAD（基于机器学习）替代方案，实现更高的检测准确率</li>
         </ul>
       </div>
 

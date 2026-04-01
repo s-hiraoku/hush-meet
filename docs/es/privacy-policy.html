@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Política de Privacidad - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 28px 0 12px;
+        color: var(--primary);
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      .updated {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="./" class="back">&larr; Volver al inicio</a>
+      <h1>Política de Privacidad</h1>
+      <p class="updated">Última actualización: 21 de marzo de 2026</p>
+
+      <h2>Descripción general</h2>
+      <p>
+        Hush Meet (en adelante "esta extensión") es una extensión de Chrome que detecta la voz durante las llamadas de Google Meet y activa o desactiva el silencio automáticamente. Esta extensión respeta la privacidad del usuario en la mayor medida posible y utiliza solo la cantidad mínima de datos necesaria.
+      </p>
+
+      <h2>Recopilación de datos</h2>
+      <p><strong>Esta extensión no recopila ni transmite ningún dato personal.</strong></p>
+
+      <h2>Acceso al micrófono</h2>
+      <p>
+        Esta extensión requiere acceso al micrófono para la detección de voz. Con respecto a los datos de audio obtenidos del micrófono:
+      </p>
+      <ul>
+        <li>Los datos de audio se <strong>procesan en tiempo real únicamente en su dispositivo</strong></li>
+        <li>Los datos de audio <strong>nunca se graban ni se almacenan</strong></li>
+        <li>Los datos de audio <strong>nunca se envían a servidores externos</strong></li>
+        <li>Solo se utiliza el nivel de volumen del audio (valor RMS) para el cálculo; el contenido del audio nunca se analiza</li>
+      </ul>
+
+      <h2>Almacenamiento local</h2>
+      <p>Esta extensión utiliza la API de Chrome Storage para almacenar las siguientes configuraciones de forma local:</p>
+      <ul>
+        <li>Modo de operación (Desactivado / Automático / Auto-Desactivado / Pulsar para hablar)</li>
+        <li>Configuración de sensibilidad de detección de voz</li>
+        <li>Configuración del período de gracia</li>
+        <li>Configuración de teclas de acceso rápido</li>
+        <li>Dispositivo de micrófono seleccionado</li>
+        <li>Configuración de tema e idioma</li>
+      </ul>
+      <p>Estos datos se almacenan únicamente en su navegador y nunca se transmiten externamente.</p>
+
+      <h2>Acceso a sitios web</h2>
+      <p>
+        Esta extensión opera únicamente en <code>https://meet.google.com</code>. Los scripts de contenido no se ejecutan en ningún otro sitio web.
+      </p>
+
+      <h2>Divulgación a terceros</h2>
+      <p>
+        Esta extensión no proporciona ningún dato a terceros. No contiene herramientas de análisis, código de seguimiento ni publicidad.
+      </p>
+
+      <h2>Código abierto</h2>
+      <p>
+        El código fuente de esta extensión está disponible en <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>. Si tiene alguna pregunta sobre cómo se manejan los datos, puede revisar el código fuente directamente.
+      </p>
+
+      <h2>Contacto</h2>
+      <p>
+        Si tiene preguntas sobre esta política de privacidad, contáctenos a través de <a href="https://github.com/s-hiraoku/hush-meet/issues">GitHub Issues</a>.
+      </p>
+
+      <h2>Cambios</h2>
+      <p>
+        Esta política de privacidad puede actualizarse según sea necesario. Si hay cambios significativos, se lo notificaremos en esta página.
+      </p>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

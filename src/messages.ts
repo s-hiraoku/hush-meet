@@ -53,6 +53,11 @@ export const en: Messages = {
   localeAuto: { message: "Auto" },
   localeEn: { message: "English" },
   localeJa: { message: "Japanese" },
+  localeDe: { message: "German" },
+  localeZh: { message: "Chinese" },
+  localeKo: { message: "Korean" },
+  localeEs: { message: "Spanish" },
+  localeFr: { message: "French" },
 };
 
 export const ja: Messages = {
@@ -106,4 +111,9 @@ export const ja: Messages = {
   localeAuto: { message: "自動" },
   localeEn: { message: "English" },
   localeJa: { message: "日本語" },
+  localeDe: { message: "Deutsch" },
+  localeZh: { message: "中文" },
+  localeKo: { message: "한국어" },
+  localeEs: { message: "Español" },
+  localeFr: { message: "Français" },
 };

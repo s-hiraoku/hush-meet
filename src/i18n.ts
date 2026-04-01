@@ -1,11 +1,12 @@
 import { en, ja, type Messages } from "./messages.ts";
+import { de, zh, ko, es, fr } from "./messages-extra.ts";
 
-const bundles: Record<string, Messages> = { en, ja };
+const bundles: Record<string, Messages> = { en, ja, de, zh, ko, es, fr };
 
 let current: Messages = en;
 let listeners: Array<() => void> = [];
 
-export type LocaleId = "auto" | "en" | "ja";
+export type LocaleId = "auto" | "en" | "ja" | "de" | "zh" | "ko" | "es" | "fr";
 
 export function getLocale(): Messages {
   return current;

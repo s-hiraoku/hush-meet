@@ -6,6 +6,11 @@ const LOCALES: { id: LocaleId; key: string }[] = [
   { id: "auto", key: "localeAuto" },
   { id: "en", key: "localeEn" },
   { id: "ja", key: "localeJa" },
+  { id: "de", key: "localeDe" },
+  { id: "zh", key: "localeZh" },
+  { id: "ko", key: "localeKo" },
+  { id: "es", key: "localeEs" },
+  { id: "fr", key: "localeFr" },
 ];
 
 interface Props {

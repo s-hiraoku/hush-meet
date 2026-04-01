@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hush Meet - Extensión de Chrome para silenciar automáticamente en Google Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+      }
+      .tagline {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p,
+      li {
+        color: var(--text-muted);
+      }
+      ul {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .flow {
+        font-family: monospace;
+        color: var(--text);
+        margin: 12px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      .nav {
+        margin-bottom: 32px;
+      }
+      .nav a {
+        margin-right: 16px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hush Meet</h1>
+      <p class="tagline">
+        Una extensión de Chrome que silencia automáticamente tu micrófono en Google Meet cuando no estás hablando, evitando que el ruido de fondo llegue a los demás participantes.
+      </p>
+
+      <nav class="nav">
+        <a href="privacy-policy.html">Política de Privacidad</a>
+        <a href="architecture.html">Documentación Técnica</a>
+        <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a>
+        <a href="../de/">Deutsch</a>
+        <a href="../en/">English</a>
+        <a href="../fr/">Français</a>
+        <a href="../">日本語</a>
+        <a href="../ko/">한국어</a>
+        <a href="../zh/">中文</a>
+      </nav>
+
+      <h2>Características</h2>
+      <div class="card">
+        <ul>
+          <li>Se activa automáticamente al detectar voz y se silencia cuando dejas de hablar</li>
+          <li>
+            4 modos de operación:
+            <ul>
+              <li><strong>Desactivado</strong> &mdash; Extensión desactivada, comportamiento predeterminado de Meet</li>
+              <li>
+                <strong>Auto</strong> &mdash; Activación por voz y silenciado automático (para entornos silenciosos)
+              </li>
+              <li>
+                <strong>Auto-Off</strong> &mdash; Activación solo mediante control manual de Meet o atajo, silenciado automático tras hablar (para entornos ruidosos)
+              </li>
+              <li><strong>Pulsar para hablar</strong> &mdash; Mantén presionada la tecla de atajo para hablar</li>
+            </ul>
+          </li>
+          <li>
+            Tecla de atajo personalizable (predeterminada: Ctrl+Shift+M) &mdash; disponible en todos los modos excepto Desactivado
+          </li>
+          <li>Monitoreo de audio independiente (flujo de micrófono separado de Google Meet)</li>
+          <li>Puerta de ruido ponderada por voz &mdash; enfatiza las frecuencias de la voz humana (300Hz&ndash;3kHz), reduciendo falsas activaciones por teclado, ventilador y ruido ambiental</li>
+          <li>Diseño de umbral asimétrico que previene el parpadeo</li>
+          <li>Medidor de nivel de audio en tiempo real y analizador de espectro</li>
+          <li>Sensibilidad y período de gracia ajustables</li>
+          <li>
+            Detección de silenciado manual &mdash; sigue el silenciado/activación del lado de Meet sin cambiar el modo seleccionado
+          </li>
+          <li>Selector de dispositivo de micrófono &mdash; elige qué micrófono usar</li>
+          <li>4 temas visuales (Predeterminado / Radio Analógica / Boombox / Retro Futuro)</li>
+          <li>Icono de barra de herramientas según el modo &mdash; el color del icono y la insignia cambian según el modo activo</li>
+          <li>Soporte de idiomas inglés y japonés con cambio manual</li>
+          <li>
+            ¿Aburrido en una reunión? Minijuegos retro-futuristas incluidos (Breakout / Space Invaders / 2048 / Flappy Bird). Advertencia: los efectos de sonido del juego pueden activar el micrófono automáticamente. Ajusta tu sensibilidad correctamente y disfruta la emoción de no ser descubierto.
+          </li>
+        </ul>
+      </div>
+
+      <h2>Cómo funciona</h2>
+      <div class="card">
+        <div class="flow">
+          [Entrada de micrófono] &rarr; [Web Audio API (RMS)] &rarr; [Detección de voz] &rarr; [Control del botón de silencio de Meet]
+        </div>
+        <p>
+          Un flujo de micrófono separado monitorea los niveles de audio. Cuando se detecta voz, la extensión hace clic automáticamente en el botón de silencio de Meet para activar el micrófono. Cuando vuelve el silencio, se vuelve a silenciar después de un período de gracia configurable.
+        </p>
+      </div>
+
+      <h2>Configuración</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>Ajuste</th>
+            <th>Descripción</th>
+            <th>Predeterminado</th>
+          </tr>
+          <tr>
+            <td>Modo</td>
+            <td>Desactivado / Auto / Auto-Off / Pulsar para hablar</td>
+            <td>Auto</td>
+          </tr>
+          <tr>
+            <td>Tecla de atajo</td>
+            <td>Atajo de teclado para control de silencio (todos los modos excepto Desactivado)</td>
+            <td>Ctrl+Shift+M</td>
+          </tr>
+          <tr>
+            <td>Sensibilidad de voz</td>
+            <td>Umbral de volumen para activar el micrófono</td>
+            <td>0.025</td>
+          </tr>
+          <tr>
+            <td>Período de gracia</td>
+            <td>Retraso antes de volver a silenciar tras hablar</td>
+            <td>1.5s</td>
+          </tr>
+          <tr>
+            <td>Micrófono</td>
+            <td>Dispositivo de entrada de audio a utilizar</td>
+            <td>Predeterminado del sistema</td>
+          </tr>
+          <tr>
+            <td>Tema</td>
+            <td>Tema visual del popup (4 opciones)</td>
+            <td>Predeterminado</td>
+          </tr>
+          <tr>
+            <td>Idioma</td>
+            <td>Idioma de la interfaz (Automático / Inglés / Japonés)</td>
+            <td>Automático (idioma del navegador)</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Detección de silenciado manual</h2>
+      <div class="card">
+        <p>
+          Cuando silencias o activas manualmente el micrófono en Google Meet, la extensión mantiene el modo seleccionado y solo actualiza su estado interno de habla.
+        </p>
+        <ul>
+          <li>Monitorea el botón de silencio de Meet mediante MutationObserver</li>
+          <li>Distingue entre cambios de silencio iniciados por la extensión y por el usuario</li>
+          <li>Registra el silenciado manual como `MUTED` y la activación manual como `SPEAKING`</li>
+          <li>No cambia el modo seleccionado</li>
+        </ul>
+      </div>
+
+      <h2>Primeros pasos</h2>
+      <div class="card">
+        <ol style="padding-left: 24px; color: var(--text-muted)">
+          <li>Instalar desde la Chrome Web Store</li>
+          <li>Unirse a una llamada de Google Meet</li>
+          <li>Hacer clic en el icono de Hush Meet en la barra de herramientas</li>
+          <li>Elegir cualquier modo excepto Desactivado</li>
+          <li>Permitir el acceso al micrófono cuando se solicite</li>
+        </ol>
+      </div>
+
+      <h2>Stack tecnológico</h2>
+      <div class="card">
+        <ul>
+          <li>Chrome Extension Manifest V3</li>
+          <li>React 19 + TypeScript</li>
+          <li>Vite + CRXJS Vite Plugin</li>
+          <li>Web Audio API (AnalyserNode)</li>
+          <li>Chrome Storage API</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

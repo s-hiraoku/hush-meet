@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="{{lang}}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{architecture.title}} - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+        --code-bg: #0d1b2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="{{architecture.back_link}}" class="back">&larr; {{architecture.back}}</a>
+      <h1>{{architecture.title}}</h1>
+      <p class="subtitle">{{architecture.subtitle}}</p>
+
+      <h2>{{architecture.overview_title}}</h2>
+      <div class="card">
+        <pre><code>┌─────────────────────────────────────────────────────┐
+│  {{architecture.arch_chrome_ext}}                     │
+│                                                     │
+│  ┌──────────────┐     ┌───────────────────────────┐ │
+│  │   {{architecture.arch_popup_ui}}   │     │     Content Script         │ │
+│  │  (React)     │     │   (meet.google.com)        │ │
+│  │              │     │                            │ │
+│  │  - {{architecture.arch_toggle}}    │     │  ┌────────────────────┐   │ │
+│  │  - {{architecture.arch_meter}}     │◄───►│  │  {{architecture.arch_audio_analyser}}    │   │ │
+│  │  - {{architecture.arch_settings}}  │     │  │  (Web Audio API)   │   │ │
+│  │              │     │  └────────┬───────────┘   │ │
+│  └──────────────┘     │           │               │ │
+│         ▲             │  ┌────────▼───────────┐   │ │
+│         │             │  │  {{architecture.arch_state_machine}}     │   │ │
+│         │             │  │  IDLE → MUTED →    │   │ │
+│         │             │  │  SPEAKING → GRACE  │   │ │
+│         │             │  └────────┬───────────┘   │ │
+│         │             │           │               │ │
+│         │             │  ┌────────▼───────────┐   │ │
+│         │             │  │  {{architecture.arch_mute_controller}}   │   │ │
+│         │             │  │  {{architecture.arch_dom_manipulation}}│   │ │
+│         │             │  └────────────────────┘   │ │
+│         │             └───────────────────────────┘ │
+│         │                                           │
+│         └─── Chrome Storage API {{architecture.arch_config_sync}}─┘
+│                                                     │
+└─────────────────────────────────────────────────────┘</code></pre>
+      </div>
+
+      <h2>{{architecture.project_structure_title}}</h2>
+      <div class="card">
+        <pre><code>src/
+├── constants.ts          # {{architecture.file_constants}}
+├── messages.ts           # {{architecture.file_messages}}
+├── i18n.ts               # {{architecture.file_i18n}}
+├── manifest.ts           # {{architecture.file_manifest}}
+├── background/
+│   └── service-worker.ts # {{architecture.file_service_worker}}
+├── content/
+│   └── index.ts          # {{architecture.file_content_script}}
+└── popup/
+    ├── index.html        # {{architecture.file_popup_html}}
+    ├── main.tsx          # {{architecture.file_react_mount}}
+    ├── Popup.tsx         # {{architecture.file_popup_component}}
+    ├── popup.css         # {{architecture.file_styles}}
+    ├── Equalizer.tsx     # {{architecture.file_equalizer}}
+    ├── ThemeSwitcher.tsx # {{architecture.file_theme_switcher}}
+    ├── LocaleSwitcher.tsx# {{architecture.file_locale_switcher}}
+    └── GameLauncher.tsx  # {{architecture.file_game_launcher}}</code></pre>
+      </div>
+
+      <h2>{{architecture.component_details_title}}</h2>
+
+      <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
+      <p>{{architecture.content_script_desc}}</p>
+
+      <h3>{{architecture.audio_engine_title}}</h3>
+      <div class="card">
+        <p>
+          {{architecture.audio_engine_desc}}
+        </p>
+        <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
+                                                          │
+                                                    getFloatTimeDomainData()
+                                                          │
+                                                    {{architecture.rms_calculation}}</code></pre>
+        <p>{{architecture.config_params_label}}</p>
+        <table>
+          <tr>
+            <th>{{architecture.param_col_param}}</th>
+            <th>{{architecture.param_col_value}}</th>
+            <th>{{architecture.param_col_desc}}</th>
+          </tr>
+          <tr>
+            <td><code>fftSize</code></td>
+            <td>512</td>
+            <td>{{architecture.param_fft}}</td>
+          </tr>
+          <tr>
+            <td><code>smoothingTimeConstant</code></td>
+            <td>0.3</td>
+            <td>{{architecture.param_smoothing}}</td>
+          </tr>
+          <tr>
+            <td><code>echoCancellation</code></td>
+            <td>true</td>
+            <td>{{architecture.param_echo}}</td>
+          </tr>
+          <tr>
+            <td><code>noiseSuppression</code></td>
+            <td>false</td>
+            <td>{{architecture.param_noise}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>{{architecture.state_machine_title}}</h3>
+      <div class="card">
+        <p>{{architecture.state_machine_desc}}</p>
+        <pre><code>{{architecture.state_diagram}}</code></pre>
+        <table>
+          <tr>
+            <th>{{architecture.state_col_state}}</th>
+            <th>{{architecture.state_col_desc}}</th>
+            <th>{{architecture.state_col_action}}</th>
+          </tr>
+          <tr>
+            <td>IDLE</td>
+            <td>{{architecture.state_idle}}</td>
+            <td>{{architecture.state_action_none}}</td>
+          </tr>
+          <tr>
+            <td>MUTED</td>
+            <td>{{architecture.state_muted}}</td>
+            <td>{{architecture.state_action_mute}}</td>
+          </tr>
+          <tr>
+            <td>UNMUTING</td>
+            <td>{{architecture.state_unmuting}}</td>
+            <td>{{architecture.state_action_unmute}}</td>
+          </tr>
+          <tr>
+            <td>SPEAKING</td>
+            <td>{{architecture.state_speaking}}</td>
+            <td>{{architecture.state_action_none}}</td>
+          </tr>
+          <tr>
+            <td>GRACE</td>
+            <td>{{architecture.state_grace}}</td>
+            <td>{{architecture.state_action_none}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>{{architecture.operating_modes_title}}</h3>
+      <div class="card">
+        <p>{{architecture.operating_modes_desc}}</p>
+        <table>
+          <tr>
+            <th>{{architecture.modes_col_mode}}</th>
+            <th>{{architecture.modes_col_unmute}}</th>
+            <th>{{architecture.modes_col_mute}}</th>
+            <th>{{architecture.modes_col_shortcut}}</th>
+          </tr>
+          <tr>
+            <td>{{architecture.modes_off}}</td>
+            <td>{{architecture.modes_none}}</td>
+            <td>{{architecture.modes_none}}</td>
+            <td>{{architecture.modes_disabled}}</td>
+          </tr>
+          <tr>
+            <td>{{architecture.modes_auto}}</td>
+            <td>{{architecture.modes_auto_unmute}}</td>
+            <td>{{architecture.modes_auto_mute}}</td>
+            <td>{{architecture.modes_toggle}}</td>
+          </tr>
+          <tr>
+            <td>{{architecture.modes_auto_off}}</td>
+            <td>{{architecture.modes_auto_off_unmute}}</td>
+            <td>{{architecture.modes_auto_mute}}</td>
+            <td>{{architecture.modes_toggle}}</td>
+          </tr>
+          <tr>
+            <td>Push-to-Talk</td>
+            <td>{{architecture.modes_ptt_unmute}}</td>
+            <td>{{architecture.modes_ptt_mute}}</td>
+            <td>{{architecture.modes_hold}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>{{architecture.shortcut_title}}</h3>
+      <div class="card">
+        <p>
+          {{architecture.shortcut_desc}}
+        </p>
+        <ul>
+          <li>{{architecture.shortcut_off}}</li>
+          <li>{{architecture.shortcut_auto}}</li>
+          <li>{{architecture.shortcut_auto_off}}</li>
+          <li>{{architecture.shortcut_ptt}}</li>
+        </ul>
+        <p>{{architecture.shortcut_customize}}</p>
+      </div>
+
+      <h3>{{architecture.asymmetric_title}}</h3>
+      <div class="card">
+        <p>
+          {{architecture.asymmetric_desc}}
+        </p>
+        <pre><code>{{architecture.asymmetric_diagram}}</code></pre>
+      </div>
+
+      <h3>{{architecture.mute_button_title}}</h3>
+      <div class="card">
+        <p>{{architecture.mute_button_desc}}</p>
+        <ol>
+          <li>{{architecture.mute_button_aria}}</li>
+          <li>{{architecture.mute_button_tooltip}}</li>
+          <li>{{architecture.mute_button_fallback}}</li>
+        </ol>
+        <p>
+          {{architecture.mute_button_state}}
+        </p>
+      </div>
+
+      <h3>2. Popup UI (<code>src/popup/</code>)</h3>
+      <div class="card">
+        <p>
+          {{architecture.popup_desc}}
+        </p>
+        <ul>
+          <li><strong>{{architecture.popup_mode_selector}}</strong>: {{architecture.popup_mode_selector_desc}}</li>
+          <li>
+            <strong>{{architecture.popup_status}}</strong>:
+            {{architecture.popup_status_desc}}
+          </li>
+          <li>
+            <strong>{{architecture.popup_level_meter}}</strong>:
+            {{architecture.popup_level_meter_desc}}
+          </li>
+          <li>
+            <strong>{{architecture.popup_sensitivity}}</strong>: {{architecture.popup_sensitivity_desc}}
+          </li>
+          <li>
+            <strong>{{architecture.popup_grace}}</strong>: {{architecture.popup_grace_desc}}
+          </li>
+          <li><strong>{{architecture.popup_shortcut}}</strong>: {{architecture.popup_shortcut_desc}}</li>
+          <li><strong>{{architecture.popup_mic}}</strong>: {{architecture.popup_mic_desc}}</li>
+        </ul>
+      </div>
+
+      <h2>{{architecture.data_flow_title}}</h2>
+      <div class="card">
+        <pre><code>Popup → Chrome Storage → Content Script
+  │                            │
+  │  hushMeetConfig: object    │  {{architecture.data_flow_config}}
+  │  hushMeetMode: string      │  {{architecture.data_flow_mode}}
+  │  hushMeetShortcutKey: str  │  {{architecture.data_flow_shortcut}}
+  │                            │
+  │                            ▼
+  │                      Content Script → Chrome Storage → Popup
+  │                            │
+  │                            │  hushMeetState: string  {{architecture.data_flow_state}}
+  │                            │  hushMeetLevel: number  {{architecture.data_flow_level}}
+  │                            │  hushMeetSpectrum: array {{architecture.data_flow_spectrum}}
+  └────────────────────────────┘</code></pre>
+        <p>
+          {{architecture.data_flow_desc}}
+        </p>
+      </div>
+
+      <h2>{{architecture.build_system_title}}</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>{{architecture.build_col_tool}}</th>
+            <th>{{architecture.build_col_version}}</th>
+            <th>{{architecture.build_col_purpose}}</th>
+          </tr>
+          <tr>
+            <td>Vite+</td>
+            <td>toolchain</td>
+            <td>{{architecture.build_viteplus}}</td>
+          </tr>
+          <tr>
+            <td>Vite</td>
+            <td>8.x</td>
+            <td>{{architecture.build_vite}}</td>
+          </tr>
+          <tr>
+            <td>CRXJS Vite Plugin</td>
+            <td>2.x</td>
+            <td>{{architecture.build_crxjs}}</td>
+          </tr>
+          <tr>
+            <td>React</td>
+            <td>19.x</td>
+            <td>Popup UI</td>
+          </tr>
+          <tr>
+            <td>TypeScript</td>
+            <td>5.9.x</td>
+            <td>{{architecture.build_typescript}}</td>
+          </tr>
+        </table>
+        <h3>{{architecture.commands_title}}</h3>
+        <table>
+          <tr>
+            <th>{{architecture.commands_col_command}}</th>
+            <th>{{architecture.commands_col_desc}}</th>
+          </tr>
+          <tr>
+            <td><code>vp install</code></td>
+            <td>{{architecture.cmd_install}}</td>
+          </tr>
+          <tr>
+            <td><code>vp build</code></td>
+            <td>{{architecture.cmd_build}}</td>
+          </tr>
+          <tr>
+            <td><code>vp test</code></td>
+            <td>{{architecture.cmd_test}}</td>
+          </tr>
+          <tr>
+            <td><code>vp check</code></td>
+            <td>{{architecture.cmd_check}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>{{architecture.limitations_title}}</h2>
+      <div class="card">
+        <ul>
+          <li>
+            {{architecture.limitation_rms}}
+          </li>
+          <li>{{architecture.limitation_ui_change}}</li>
+          <li>{{architecture.limitation_clipping}}</li>
+          <li>{{architecture.limitation_focus}}</li>
+        </ul>
+      </div>
+
+      <h2>{{architecture.future_title}}</h2>
+      <div class="card">
+        <ul>
+          <li>{{architecture.future_noise_gate}}</li>
+          <li>{{architecture.future_buffering}}</li>
+          <li>{{architecture.future_auto_detect}}</li>
+          <li>{{architecture.future_silero}}</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>기술 문서 - Hush Meet</title>
+    <style>
+      :root {
+        --bg: #0f0f1a;
+        --surface: #1a1a2e;
+        --border: #0f3460;
+        --primary: #e94560;
+        --text: #eee;
+        --text-muted: #8892a4;
+        --code-bg: #0d1b2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 32px 0 12px;
+        color: var(--primary);
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px;
+      }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      ul,
+      ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+      li {
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .back {
+        margin-bottom: 24px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      td {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="./" class="back">&larr; 홈으로 돌아가기</a>
+      <h1>기술 문서</h1>
+      <p class="subtitle">Hush Meet의 아키텍처 및 설계</p>
+
+      <h2>아키텍처 개요</h2>
+      <div class="card">
+        <pre><code>┌─────────────────────────────────────────────────────┐
+│  Chrome 확장 프로그램 (Manifest V3)                     │
+│                                                     │
+│  ┌──────────────┐     ┌───────────────────────────┐ │
+│  │   팝업 UI   │     │     Content Script         │ │
+│  │  (React)     │     │   (meet.google.com)        │ │
+│  │              │     │                            │ │
+│  │  - 토글    │     │  ┌────────────────────┐   │ │
+│  │  - 미터     │◄───►│  │  오디오 분석기    │   │ │
+│  │  - 설정  │     │  │  (Web Audio API)   │   │ │
+│  │              │     │  └────────┬───────────┘   │ │
+│  └──────────────┘     │           │               │ │
+│         ▲             │  ┌────────▼───────────┐   │ │
+│         │             │  │  상태 머신     │   │ │
+│         │             │  │  IDLE → MUTED →    │   │ │
+│         │             │  │  SPEAKING → GRACE  │   │ │
+│         │             │  └────────┬───────────┘   │ │
+│         │             │           │               │ │
+│         │             │  ┌────────▼───────────┐   │ │
+│         │             │  │  음소거 컨트롤러   │   │ │
+│         │             │  │  (DOM 조작)│   │ │
+│         │             │  └────────────────────┘   │ │
+│         │             └───────────────────────────┘ │
+│         │                                           │
+│         └─── Chrome Storage API (설정/상태 동기화)─┘
+│                                                     │
+└─────────────────────────────────────────────────────┘</code></pre>
+      </div>
+
+      <h2>프로젝트 구조</h2>
+      <div class="card">
+        <pre><code>src/
+├── constants.ts          # 상수, 모드, 임계값, 스토리지 키
+├── messages.ts           # i18n 메시지 (EN/JA)
+├── i18n.ts               # 로케일 관리
+├── manifest.ts           # Chrome 확장 프로그램 매니페스트 정의
+├── background/
+│   └── service-worker.ts # Service Worker (게임 런처 등)
+├── content/
+│   └── index.ts          # 콘텐츠 스크립트 (상태 머신, 모드 제어, 단축키)
+└── popup/
+    ├── index.html        # 팝업 엔트리 HTML
+    ├── main.tsx          # React 마운트
+    ├── Popup.tsx         # 팝업 UI 컴포넌트
+    ├── popup.css         # 스타일
+    ├── Equalizer.tsx     # 스펙트럼 분석기
+    ├── ThemeSwitcher.tsx # 테마 전환기
+    ├── LocaleSwitcher.tsx# 언어 전환기
+    └── GameLauncher.tsx  # 미니 게임 런처</code></pre>
+      </div>
+
+      <h2>컴포넌트 상세</h2>
+
+      <h3>1. Content Script (<code>src/content/index.ts</code>)</h3>
+      <p>이 스크립트는 Google Meet 페이지에 주입됩니다. 주요 역할은 다음과 같습니다:</p>
+
+      <h3>1.1 오디오 분석 엔진</h3>
+      <div class="card">
+        <p>
+          Web Audio API의 <code>AnalyserNode</code>를 사용하여 마이크 입력 볼륨을 실시간으로 측정합니다.
+        </p>
+        <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
+                                                          │
+                                                    getFloatTimeDomainData()
+                                                          │
+                                                    RMS (제곱 평균 제곱근) 계산</code></pre>
+        <p>설정 매개변수:</p>
+        <table>
+          <tr>
+            <th>매개변수</th>
+            <th>값</th>
+            <th>설명</th>
+          </tr>
+          <tr>
+            <td><code>fftSize</code></td>
+            <td>512</td>
+            <td>FFT 윈도우 크기</td>
+          </tr>
+          <tr>
+            <td><code>smoothingTimeConstant</code></td>
+            <td>0.3</td>
+            <td>시간 평활화 계수</td>
+          </tr>
+          <tr>
+            <td><code>echoCancellation</code></td>
+            <td>true</td>
+            <td>에코 제거 활성화</td>
+          </tr>
+          <tr>
+            <td><code>noiseSuppression</code></td>
+            <td>false</td>
+            <td>노이즈 억제 비활성화 (VAD 정확도를 위해)</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.2 상태 머신</h3>
+      <div class="card">
+        <p>5가지 상태를 가진 유한 상태 머신이 음성 상태를 관리합니다.</p>
+        <pre><code>IDLE ──(Off 이외의 모드 선택)──► MUTED ──(볼륨 > speechThreshold)──► UNMUTING ──► SPEAKING
+                     ▲                                                │
+                     │                              (볼륨 < silenceThreshold)
+                     │                                                │
+                     └──(graceTimer 만료)── GRACE ◄────────────────────┘
+                                                │
+                                         (볼륨 > silenceThreshold)
+                                                │
+                                                ▼
+                                            SPEAKING
+
+* 사용자가 수동으로 Meet 마이크를 전환하면 모드는 유지되고 상태만 따라갑니다.</code></pre>
+        <table>
+          <tr>
+            <th>상태</th>
+            <th>설명</th>
+            <th>Meet 동작</th>
+          </tr>
+          <tr>
+            <td>IDLE</td>
+            <td>Off 모드 또는 미초기화</td>
+            <td>없음</td>
+          </tr>
+          <tr>
+            <td>MUTED</td>
+            <td>무음 감지 &rarr; 음소거</td>
+            <td>음소거</td>
+          </tr>
+          <tr>
+            <td>UNMUTING</td>
+            <td>음성 감지 &rarr; 음소거 해제 중</td>
+            <td>음소거 해제</td>
+          </tr>
+          <tr>
+            <td>SPEAKING</td>
+            <td>현재 발화 중</td>
+            <td>없음</td>
+          </tr>
+          <tr>
+            <td>GRACE</td>
+            <td>발화 종료 &rarr; 유예 기간</td>
+            <td>없음</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.3 동작 모드</h3>
+      <div class="card">
+        <p>4가지 모드가 상태 전환 동작을 제어합니다. Off는 제어 비활성화 모드입니다.</p>
+        <table>
+          <tr>
+            <th>모드</th>
+            <th>음소거 해제</th>
+            <th>음소거</th>
+            <th>단축키</th>
+          </tr>
+          <tr>
+            <td>Off</td>
+            <td>없음</td>
+            <td>없음</td>
+            <td>비활성화</td>
+          </tr>
+          <tr>
+            <td>Auto</td>
+            <td>음성 감지 시 자동</td>
+            <td>무음 시 자동</td>
+            <td>토글</td>
+          </tr>
+          <tr>
+            <td>Auto-Off</td>
+            <td>수동 / 단축키</td>
+            <td>무음 시 자동</td>
+            <td>토글</td>
+          </tr>
+          <tr>
+            <td>Push-to-Talk</td>
+            <td>키를 누르고 있는 동안</td>
+            <td>키 놓기 &rarr; 유예 &rarr; 음소거</td>
+            <td>홀드</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>1.4 단축키</h3>
+      <div class="card">
+        <p>
+          사용자 지정 가능한 키보드 단축키를 제공합니다 (기본값: <code>Ctrl+Shift+M</code>).
+        </p>
+        <ul>
+          <li>Off: 비활성화</li>
+          <li>Auto: 음소거 토글</li>
+          <li>Auto-Off: 음소거 토글</li>
+          <li>Push-to-Talk: 키를 누르고 있는 동안만 음소거 해제 (홀드 동작)</li>
+        </ul>
+        <p>단축키는 팝업 설정에서 자유롭게 변경할 수 있습니다.</p>
+      </div>
+
+      <h3>1.5 비대칭 임계값 설계</h3>
+      <div class="card">
+        <p>
+          음소거 해제와 음소거에 서로 다른 임계값을 사용하여 채터링(빈번한 전환)을 방지합니다.
+        </p>
+        <pre><code>speechThreshold (발화 시작)     = 0.025  (기본값)
+silenceThreshold (무음 판정)   = speechThreshold × 0.5 = 0.0125
+
+  볼륨
+   ▲
+   │  ┄┄┄┄┄┄┄┄┄ speechThreshold (0.025) ┄┄┄┄  ← 초과 시 음소거 해제
+   │
+   │  ┄┄┄┄┄┄┄┄┄ silenceThreshold (0.0125) ┄┄  ← 미만 시 유예 기간 시작
+   │
+   └──────────────────────────────────────────► 시간</code></pre>
+      </div>
+
+      <h3>1.6 음소거 버튼 감지</h3>
+      <div class="card">
+        <p>여러 전략을 사용하여 Google Meet 음소거 버튼을 감지합니다:</p>
+        <ol>
+          <li><code>aria-label</code> 속성으로 검색 (일본어/영어 지원)</li>
+          <li><code>data-tooltip</code> 속성으로 검색</li>
+          <li>폴백: <code>Ctrl+D</code> 키보드 단축키 시뮬레이션</li>
+        </ol>
+        <p>
+          음소거 상태는 <code>data-is-muted</code> 속성 또는 <code>aria-label</code> 텍스트 내용으로 판별합니다.
+        </p>
+      </div>
+
+      <h3>2. Popup UI (<code>src/popup/</code>)</h3>
+      <div class="card">
+        <p>
+          React 19로 구축된 설정 UI입니다. Chrome Storage API를 통해 콘텐츠 스크립트와 실시간으로 상태를 동기화합니다.
+        </p>
+        <ul>
+          <li><strong>모드 선택기</strong>: Off / Auto / Auto-Off / Push-to-Talk 전환</li>
+          <li>
+            <strong>상태 표시</strong>:
+            현재 상태 (음소거/발화 중/유예)를 점 표시기로 표시
+          </li>
+          <li>
+            <strong>레벨 미터</strong>:
+            마이크 입력 레벨을 실시간으로 표시 (임계값 마커 포함)
+          </li>
+          <li>
+            <strong>감도 슬라이더</strong>: <code>speechThreshold</code> 조정 (0.005&ndash;0.25)
+          </li>
+          <li>
+            <strong>유예 기간 슬라이더</strong>: <code>gracePeriod</code> 조정 (500ms&ndash;4000ms)
+          </li>
+          <li><strong>단축키 설정</strong>: 키 녹음 UI를 통한 사용자 지정</li>
+          <li><strong>마이크 장치 선택</strong>: 사용할 마이크의 수동 선택</li>
+        </ul>
+      </div>
+
+      <h2>데이터 흐름</h2>
+      <div class="card">
+        <pre><code>Popup → Chrome Storage → Content Script
+  │                            │
+  │  hushMeetConfig: object    │  (감도/유예 기간 설정)
+  │  hushMeetMode: string      │  (동작 모드)
+  │  hushMeetShortcutKey: str  │  (단축키)
+  │                            │
+  │                            ▼
+  │                      Content Script → Chrome Storage → Popup
+  │                            │
+  │                            │  hushMeetState: string  (현재 상태)
+  │                            │  hushMeetLevel: number  (볼륨 레벨)
+  │                            │  hushMeetSpectrum: array (스펙트럼)
+  └────────────────────────────┘</code></pre>
+        <p>
+          팝업과 콘텐츠 스크립트는 직접 통신하지 않으며, Chrome Storage API 변경 이벤트를 통해 양방향으로 통신합니다.
+        </p>
+      </div>
+
+      <h2>빌드 시스템</h2>
+      <div class="card">
+        <table>
+          <tr>
+            <th>도구</th>
+            <th>버전</th>
+            <th>용도</th>
+          </tr>
+          <tr>
+            <td>Vite+</td>
+            <td>toolchain</td>
+            <td>의존성 관리, 빌드, 테스트, 검증</td>
+          </tr>
+          <tr>
+            <td>Vite</td>
+            <td>8.x</td>
+            <td>내부 빌드 인프라</td>
+          </tr>
+          <tr>
+            <td>CRXJS Vite Plugin</td>
+            <td>2.x</td>
+            <td>Chrome 확장 프로그램 HMR 및 매니페스트 생성</td>
+          </tr>
+          <tr>
+            <td>React</td>
+            <td>19.x</td>
+            <td>Popup UI</td>
+          </tr>
+          <tr>
+            <td>TypeScript</td>
+            <td>5.9.x</td>
+            <td>타입 안전성</td>
+          </tr>
+        </table>
+        <h3>명령어</h3>
+        <table>
+          <tr>
+            <th>명령어</th>
+            <th>설명</th>
+          </tr>
+          <tr>
+            <td><code>vp install</code></td>
+            <td>의존성 설치</td>
+          </tr>
+          <tr>
+            <td><code>vp build</code></td>
+            <td>프로덕션 빌드</td>
+          </tr>
+          <tr>
+            <td><code>vp test</code></td>
+            <td>테스트 실행</td>
+          </tr>
+          <tr>
+            <td><code>vp check</code></td>
+            <td>포맷 / 린트 / 타입 체크</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>알려진 제한 사항</h2>
+      <div class="card">
+        <ul>
+          <li>
+            음성 감지가 RMS(볼륨) 기반이므로 주변 소음이 큰 경우 오작동할 수 있습니다 (Auto-Off 모드 사용으로 완화 가능)
+          </li>
+          <li>Google Meet UI 변경으로 음소거 버튼 감지가 중단될 수 있습니다</li>
+          <li>발화 시작 부분이 잘릴 수 있습니다 (임계값 설정으로 조정 가능)</li>
+          <li>단축키는 Google Meet 탭에 포커스가 있을 때만 작동합니다</li>
+        </ul>
+      </div>
+
+      <h2>향후 개선 사항</h2>
+      <div class="card">
+        <ul>
+          <li>음성 가중 노이즈 게이트를 통한 감지 정확도 향상</li>
+          <li>발화 시작 부분 잘림을 줄이기 위한 사전 음성 버퍼링</li>
+          <li>Google Meet UI 변경에 대응하는 자동 감지 로직</li>
+          <li>더 높은 감지 정확도를 위한 Silero VAD (ML 기반) 대체</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <p>&copy; 2026 Hush Meet. <a href="https://github.com/s-hiraoku/hush-meet">GitHub</a></p>
+      </div>
+    </div>
+  </body>
+</html>
