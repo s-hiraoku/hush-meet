@@ -18,22 +18,24 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 
 ### Operating Modes
 
-| Mode | Behavior |
-|------|----------|
-| Off | Extension disabled — Meet default behavior |
-| Auto | Speech-triggered unmute, auto-mute on silence |
-| Auto-Off | Manual or shortcut unmute only, auto-mute on silence |
-| Push-to-Talk | Hold shortcut key to speak, instant mute on release |
+| Mode         | Behavior                                             |
+| ------------ | ---------------------------------------------------- |
+| Off          | Extension disabled — Meet default behavior           |
+| Auto         | Speech-triggered unmute, auto-mute on silence        |
+| Auto-Off     | Manual or shortcut unmute only, auto-mute on silence |
+| Push-to-Talk | Hold shortcut key to speak, instant mute on release  |
 
 ### Settings
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| Mode | Off / Auto / Auto-Off / Push-to-Talk | Auto |
-| Shortcut Key | Keyboard shortcut for mute control | Ctrl+Shift+M |
-| Speech Sensitivity | Volume threshold to trigger unmute | 0.025 |
-| Grace Period | Delay before re-muting after speech | 1.5s |
-| Microphone | Audio input device | System Default |
+| Setting            | Description                          | Default                |
+| ------------------ | ------------------------------------ | ---------------------- |
+| Mode               | Off / Auto / Auto-Off / Push-to-Talk | Auto                   |
+| Shortcut Key       | Keyboard shortcut for mute control   | Ctrl+Shift+M           |
+| Speech Sensitivity | Volume threshold to trigger unmute   | 0.025                  |
+| Grace Period       | Delay before re-muting after speech  | 1.5s                   |
+| Microphone         | Audio input device                   | System Default         |
+| Theme              | Popup visual theme (4 options)       | Default                |
+| Language           | UI language (7 languages + Auto)     | Auto (browser language)|
 
 ## How It Works
 
@@ -61,11 +63,11 @@ pnpm install
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start dev server |
-| `pnpm build` | Production build |
-| `pnpm test` | Run tests |
+| Command          | Description               |
+| ---------------- | ------------------------- |
+| `pnpm dev`       | Start dev server          |
+| `pnpm build`     | Production build          |
+| `pnpm test`      | Run tests                 |
 | `pnpm run check` | Format / lint / typecheck |
 
 ### Load in Chrome
@@ -92,9 +94,9 @@ pnpm install
 
 ## Documentation
 
-- [Website](https://s-hiraoku.github.io/hush-meet/en/)
-- [Technical Docs](https://s-hiraoku.github.io/hush-meet/architecture.html)
-- [Privacy Policy](https://s-hiraoku.github.io/hush-meet/privacy-policy.html)
+- [Website](https://s-hiraoku.github.io/hush-meet/en/) ([日本語](https://s-hiraoku.github.io/hush-meet/) / [Deutsch](https://s-hiraoku.github.io/hush-meet/de/) / [中文](https://s-hiraoku.github.io/hush-meet/zh/) / [한국어](https://s-hiraoku.github.io/hush-meet/ko/) / [Español](https://s-hiraoku.github.io/hush-meet/es/) / [Français](https://s-hiraoku.github.io/hush-meet/fr/))
+- [Technical Docs](https://s-hiraoku.github.io/hush-meet/en/architecture.html)
+- [Privacy Policy](https://s-hiraoku.github.io/hush-meet/en/privacy-policy.html)
 
 ## License
 
