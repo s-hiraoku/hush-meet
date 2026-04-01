@@ -10,7 +10,7 @@ import {
 } from "../constants";
 import { isModeActive } from "../mode-control.ts";
 import { matchesShortcut } from "../shortcut.ts";
-import { t, onLocaleChange, type LocaleId } from "../i18n.ts";
+import { t, onLocaleChange, getActiveLang, type LocaleId } from "../i18n.ts";
 import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
@@ -271,7 +271,7 @@ export function Popup() {
         <div>{t("footer")}</div>
         <a
           className="footer-link"
-          href="https://s-hiraoku.github.io/hush-meet/"
+          href={`https://s-hiraoku.github.io/hush-meet/${getActiveLang() === "ja" ? "" : getActiveLang() + "/"}`}
           target="_blank"
           rel="noopener noreferrer"
         >
