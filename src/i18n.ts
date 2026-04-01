@@ -4,6 +4,7 @@ import { de, zh, ko, es, fr } from "./messages-extra.ts";
 const bundles: Record<string, Messages> = { en, ja, de, zh, ko, es, fr };
 
 let current: Messages = en;
+let currentLangId = "en";
 let listeners: Array<() => void> = [];
 
 export type LocaleId = "auto" | "en" | "ja" | "de" | "zh" | "ko" | "es" | "fr";
@@ -15,11 +16,18 @@ export function getLocale(): Messages {
 export function setLocale(locale: LocaleId) {
   if (locale === "auto") {
     const browserLang = chrome.i18n.getUILanguage().split("-")[0];
-    current = bundles[browserLang] ?? en;
+    currentLangId = browserLang in bundles ? browserLang : "en";
+    current = bundles[currentLangId];
   } else {
-    current = bundles[locale] ?? en;
+    currentLangId = locale in bundles ? locale : "en";
+    current = bundles[currentLangId];
   }
   for (const fn of listeners) fn();
+}
+
+/** Returns the resolved language code (never "auto"). */
+export function getActiveLang(): string {
+  return currentLangId;
 }
 
 export function onLocaleChange(fn: () => void) {
