@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DEFAULT_CONFIG,
   DEFAULT_SHORTCUT,
@@ -9,16 +9,17 @@ import {
 } from "../constants";
 import { normalizeMode } from "../constants.ts";
 import { setLocale, type LocaleId } from "../i18n.ts";
-
-interface HushMeetConfig {
-  speechThreshold?: number;
-  silenceThreshold?: number;
-  gracePeriod?: number;
-}
+import {
+  DEFAULT_PER_MODE_CONFIG,
+  getConfigForMode,
+  isPerModeConfig,
+  migrateConfig,
+  type PerModeConfig,
+} from "../content/config.ts";
 
 interface HushMeetStorage {
-  [key: string]: boolean | HushMeetConfig | string | number | undefined;
-  hushMeetConfig?: HushMeetConfig;
+  [key: string]: unknown;
+  hushMeetConfig?: unknown;
   hushMeetState?: string;
   hushMeetLevel?: number;
 }
@@ -28,10 +29,12 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
   const [level, setLevel] = useState(0);
   const [threshold, setThreshold] = useState<number>(DEFAULT_CONFIG.speechThreshold);
   const [gracePeriod, setGracePeriod] = useState<number>(DEFAULT_CONFIG.gracePeriod);
+  const perModeRef = useRef<PerModeConfig>({ ...DEFAULT_PER_MODE_CONFIG });
   const [theme, setTheme] = useState<ThemeId>(THEMES.default);
   const [locale, setLocaleState] = useState<LocaleId>("auto");
   const [micError, setMicError] = useState<string | null>(null);
   const [mode, setMode] = useState<ModeId | null>(null);
+  const modeRef = useRef<ModeId | null>(null);
   const [shortcutKey, setShortcutKey] = useState(DEFAULT_SHORTCUT);
   const [micDevices, setMicDevices] = useState<{ deviceId: string; label: string }[]>([]);
   const [selectedMicId, setSelectedMicId] = useState("");
@@ -63,6 +66,7 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
 
         const normalizedMode = normalizeMode(result[STORAGE_KEYS.mode]);
         setMode(normalizedMode);
+        modeRef.current = normalizedMode;
         if (
           result[STORAGE_KEYS.mode] === undefined ||
           result[STORAGE_KEYS.mode] !== normalizedMode
@@ -74,18 +78,14 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
         setTheme(savedTheme);
         applyTheme(savedTheme);
 
-        if (result.hushMeetConfig) {
-          setThreshold(result.hushMeetConfig.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
-          setGracePeriod(result.hushMeetConfig.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
-        } else {
-          chrome.storage.local.set({
-            [STORAGE_KEYS.config]: {
-              speechThreshold: DEFAULT_CONFIG.speechThreshold,
-              silenceThreshold: DEFAULT_CONFIG.silenceThreshold,
-              gracePeriod: DEFAULT_CONFIG.gracePeriod,
-            },
-          });
+        const perMode = migrateConfig(result.hushMeetConfig);
+        perModeRef.current = perMode;
+        if (!isPerModeConfig(result.hushMeetConfig)) {
+          chrome.storage.local.set({ [STORAGE_KEYS.config]: perMode });
         }
+        const modeConfig = getConfigForMode(perMode, normalizedMode);
+        setThreshold(modeConfig.speechThreshold);
+        setGracePeriod(modeConfig.gracePeriod);
 
         const loadedState = result.hushMeetState ?? "IDLE";
         setState(loadedState);
@@ -129,11 +129,12 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
         setLevel((changes[STORAGE_KEYS.level].newValue as number) ?? 0);
       }
       if (changes[STORAGE_KEYS.config]) {
-        const cfg = changes[STORAGE_KEYS.config].newValue as HushMeetConfig;
-        if (cfg) {
-          setThreshold(cfg.speechThreshold ?? DEFAULT_CONFIG.speechThreshold);
-          setGracePeriod(cfg.gracePeriod ?? DEFAULT_CONFIG.gracePeriod);
-        }
+        const perMode = migrateConfig(changes[STORAGE_KEYS.config].newValue);
+        perModeRef.current = perMode;
+        const currentMode = modeRef.current ?? normalizeMode(undefined);
+        const modeConfig = getConfigForMode(perMode, currentMode);
+        setThreshold(modeConfig.speechThreshold);
+        setGracePeriod(modeConfig.gracePeriod);
       }
       if (changes[STORAGE_KEYS.theme]) {
         const themeId = changes[STORAGE_KEYS.theme].newValue as ThemeId;
@@ -146,7 +147,12 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
         setLocale(loc);
       }
       if (changes[STORAGE_KEYS.mode]) {
-        setMode(normalizeMode(changes[STORAGE_KEYS.mode].newValue));
+        const newMode = normalizeMode(changes[STORAGE_KEYS.mode].newValue);
+        setMode(newMode);
+        modeRef.current = newMode;
+        const modeConfig = getConfigForMode(perModeRef.current, newMode);
+        setThreshold(modeConfig.speechThreshold);
+        setGracePeriod(modeConfig.gracePeriod);
       }
       if (changes[STORAGE_KEYS.shortcutKey]) {
         setShortcutKey((changes[STORAGE_KEYS.shortcutKey].newValue as string) || DEFAULT_SHORTCUT);
@@ -160,6 +166,14 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
     return () => chrome.storage.onChanged.removeListener(listener);
   }, [applyTheme]);
 
+  const switchMode = (newMode: ModeId) => {
+    setMode(newMode);
+    modeRef.current = newMode;
+    const modeConfig = getConfigForMode(perModeRef.current, newMode);
+    setThreshold(modeConfig.speechThreshold);
+    setGracePeriod(modeConfig.gracePeriod);
+  };
+
   return {
     gracePeriod,
     isLoaded,
@@ -171,13 +185,13 @@ export function usePopupStorage({ applyTheme }: { applyTheme: (themeId: ThemeId)
     selectedMicId,
     setGracePeriod,
     setLocaleState,
-    setMode,
     setSelectedMicId,
     setShortcutKey,
     setTheme,
     setThreshold,
     shortcutKey,
     state,
+    switchMode,
     theme,
     threshold,
   };

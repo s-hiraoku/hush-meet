@@ -193,8 +193,7 @@
       <h3>1.1 音声解析エンジン</h3>
       <div class="card">
         <p>
-          Web Audio API の
-          <code>AnalyserNode</code> を使用して、マイク入力の音量をリアルタイムに測定します。
+          Web Audio API の <code>AnalyserNode</code> を使用して、マイク入力の音量をリアルタイムに測定します。
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
@@ -320,8 +319,7 @@
       <h3>1.4 ショートカットキー</h3>
       <div class="card">
         <p>
-          カスタマイズ可能なキーボードショートカット（デフォルト:
-          <code>Ctrl+Shift+M</code>）を提供します。
+          カスタマイズ可能なキーボードショートカット（デフォルト: <code>Ctrl+Shift+M</code>）を提供します。
         </p>
         <ul>
           <li>Off: 無効</li>
@@ -358,16 +356,14 @@ silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
           <li>フォールバック: <code>Ctrl+D</code> キーボードショートカットのシミュレーション</li>
         </ol>
         <p>
-          ミュート状態の判定は <code>data-is-muted</code> 属性または
-          <code>aria-label</code> の文言から行います。
+          ミュート状態の判定は <code>data-is-muted</code> 属性または <code>aria-label</code> の文言から行います。
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          React 19 で構築された設定UIです。Chrome Storage API を介して Content Script
-          とリアルタイムに状態を同期します。
+          React 19 で構築された設定UIです。Chrome Storage API を介して Content Script とリアルタイムに状態を同期します。
         </p>
         <ul>
           <li><strong>モードセレクタ</strong>: Off / Auto / Auto-Off / Push-to-Talk の切り替え</li>
@@ -380,11 +376,10 @@ silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
             マイク入力レベルをリアルタイムに表示（閾値マーカー付き）
           </li>
           <li>
-            <strong>感度スライダー</strong>: <code>speechThreshold</code> の調整（0.005&ndash;0.1）
+            <strong>感度スライダー</strong>: <code>speechThreshold</code> の調整（0.005&ndash;0.25）&mdash; モード別に保存
           </li>
           <li>
-            <strong>猶予時間スライダー</strong>:
-            <code>gracePeriod</code> の調整（500ms&ndash;4000ms）
+            <strong>猶予時間スライダー</strong>: <code>gracePeriod</code> の調整（500ms&ndash;4000ms）&mdash; モード別に保存
           </li>
           <li><strong>ショートカットキー設定</strong>: キー記録UIによるカスタマイズ</li>
           <li><strong>マイクデバイス選択</strong>: 使用するマイクの手動選択</li>
@@ -407,8 +402,7 @@ silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
   │                            │  hushMeetSpectrum: array (スペクトラム)
   └────────────────────────────┘</code></pre>
         <p>
-          Popup と Content Script は直接通信せず、Chrome Storage API
-          の変更イベントを介して双方向に通信します。
+          Popup と Content Script は直接通信せず、Chrome Storage API の変更イベントを介して双方向に通信します。
         </p>
       </div>
 
@@ -475,8 +469,7 @@ silenceThreshold (無音判定) = speechThreshold × 0.5 = 0.0125
       <div class="card">
         <ul>
           <li>
-            音声検出は RMS（音量）ベースのため、大きな環境雑音で誤反応する可能性がある（Auto-Off
-            モードで軽減可能）
+            音声検出は RMS（音量）ベースのため、大きな環境雑音で誤反応する可能性がある（Auto-Off モードで軽減可能）
           </li>
           <li>Google Meet の UI 変更でミュートボタンの検出が壊れる可能性がある</li>
           <li>発話の最初の一瞬が切れる場合がある（閾値の調整で軽減可能）</li>

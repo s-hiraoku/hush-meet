@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0] - 2026-04-03
+
+### Added
+
+- Per-mode sensitivity and grace period settings: each mode (Auto, Auto-Off, Push-to-Talk) now stores its own speech threshold and grace period values
+- Switching modes automatically restores that mode's saved slider values
+- Existing settings are automatically migrated to per-mode format on first load
+
 ## [1.0.11] - 2026-04-01
 
 ### Added

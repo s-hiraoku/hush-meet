@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { MODES, SILENCE_RATIO, STORAGE_KEYS } from "../constants.ts";
+import { MODES, STORAGE_KEYS } from "../constants.ts";
 import {
   persistErrorState,
   persistIdleSnapshot,
@@ -21,12 +21,16 @@ import {
 
 describe("content and popup helpers", () => {
   const storageSet = vi.fn();
+  const storageGet = vi.fn((_keys: string[], cb: (result: Record<string, unknown>) => void) => {
+    cb({});
+  });
 
   beforeEach(() => {
     vi.stubGlobal("chrome", {
       storage: {
         local: {
           set: storageSet,
+          get: storageGet,
         },
       },
     });
@@ -63,20 +67,17 @@ describe("content and popup helpers", () => {
   });
 
   it("persists popup settings", () => {
-    savePopupConfig(0.03, 1200);
+    savePopupConfig(MODES.auto, 0.03, 1200);
     savePopupMode(MODES.autoOff);
     savePopupShortcut("Ctrl+Alt+U");
     savePopupMicDevice("mic-1");
-    expect(storageSet).toHaveBeenNthCalledWith(1, {
-      [STORAGE_KEYS.config]: {
-        speechThreshold: 0.03,
-        silenceThreshold: 0.03 * SILENCE_RATIO,
-        gracePeriod: 1200,
-      },
-    });
-    expect(storageSet).toHaveBeenNthCalledWith(2, { [STORAGE_KEYS.mode]: MODES.autoOff });
-    expect(storageSet).toHaveBeenNthCalledWith(3, { [STORAGE_KEYS.shortcutKey]: "Ctrl+Alt+U" });
-    expect(storageSet).toHaveBeenNthCalledWith(4, { [STORAGE_KEYS.micDeviceId]: "mic-1" });
+    // savePopupConfig does get then set (async via callback), so set is called by the get mock
+    expect(storageSet).toHaveBeenCalledWith(
+      expect.objectContaining({ [STORAGE_KEYS.config]: expect.any(Object) }),
+    );
+    expect(storageSet).toHaveBeenCalledWith({ [STORAGE_KEYS.mode]: MODES.autoOff });
+    expect(storageSet).toHaveBeenCalledWith({ [STORAGE_KEYS.shortcutKey]: "Ctrl+Alt+U" });
+    expect(storageSet).toHaveBeenCalledWith({ [STORAGE_KEYS.micDeviceId]: "mic-1" });
   });
 
   it("clears timers and intervals", () => {

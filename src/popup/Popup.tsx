@@ -74,13 +74,13 @@ export function Popup() {
     selectedMicId,
     setGracePeriod,
     setLocaleState,
-    setMode,
     setSelectedMicId,
     setShortcutKey,
     setTheme,
     setThreshold,
     shortcutKey,
     state,
+    switchMode,
     theme,
     threshold,
   } = usePopupStorage({ applyTheme });
@@ -102,8 +102,15 @@ export function Popup() {
     return () => window.removeEventListener("keydown", handler, true);
   }, [shortcutKey, recordingShortcut]);
 
+  const resolvedMode = mode ?? MODES.off;
+  const isOff = resolvedMode === MODES.off;
+  const showShortcutSetting = isModeActive(resolvedMode);
+  const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
+  const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
+  const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
+
   const saveConfig = (speech: number, grace: number) => {
-    savePopupConfig(speech, grace);
+    savePopupConfig(resolvedMode, speech, grace);
   };
 
   const handleThresholdChange = (val: number) => {
@@ -131,7 +138,7 @@ export function Popup() {
   };
 
   const handleModeChange = (newMode: ModeId) => {
-    setMode(newMode);
+    switchMode(newMode);
     savePopupMode(newMode);
   };
 
@@ -150,13 +157,6 @@ export function Popup() {
       savePopupShortcut(sc);
     }
   };
-
-  const stateInfo = stateLabels[state] ?? stateLabels.IDLE;
-  const levelPct = Math.min(100, (level / THRESHOLD_RANGE.max) * 100);
-  const thresholdPct = Math.min(100, (threshold / THRESHOLD_RANGE.max) * 100);
-  const resolvedMode = mode ?? MODES.off;
-  const isOff = resolvedMode === MODES.off;
-  const showShortcutSetting = isModeActive(resolvedMode);
 
   return (
     <div className="popup">

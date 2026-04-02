@@ -33,7 +33,15 @@ import {
   getNextAudioState,
   getNextManualMuteState,
 } from "./state-machine.ts";
-import { buildAudioConstraints, normalizeConfig, type HushMeetConfig } from "./config.ts";
+import {
+  buildAudioConstraints,
+  DEFAULT_PER_MODE_CONFIG,
+  getConfigForMode,
+  isPerModeConfig,
+  migrateConfig,
+  type HushMeetConfig,
+  type PerModeConfig,
+} from "./config.ts";
 const State = CONTENT_STATE;
 type StateType = ContentState;
 
@@ -69,6 +77,7 @@ let ensureMuteTimerId: ReturnType<typeof setInterval> | null = null;
 let ensureMuteTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 let config: HushMeetConfig = { ...DEFAULT_CONFIG };
+let perModeConfig: PerModeConfig = { ...DEFAULT_PER_MODE_CONFIG };
 
 const MUTE_BUTTON_ATTRS = ["aria-label", "aria-pressed", "data-tooltip", "data-is-muted"] as const;
 
@@ -574,7 +583,8 @@ function stopListening() {
 
 chrome.storage.onChanged.addListener((changes) => {
   if (changes[STORAGE_KEYS.config]) {
-    config = normalizeConfig(changes[STORAGE_KEYS.config].newValue as Partial<HushMeetConfig>);
+    perModeConfig = migrateConfig(changes[STORAGE_KEYS.config].newValue);
+    config = getConfigForMode(perModeConfig, selectedMode);
     log("設定を更新:", config);
   }
 
@@ -586,11 +596,12 @@ chrome.storage.onChanged.addListener((changes) => {
     }
     if (newMode !== selectedMode) {
       selectedMode = newMode;
+      config = getConfigForMode(perModeConfig, newMode);
       if (isModeActive(newMode)) {
         lastActiveMode = newMode;
       }
       pttKeyHeld = false;
-      log("モードを変更:", selectedMode);
+      log("モードを変更:", selectedMode, "config:", config);
       if (!isModeActive(newMode)) {
         stopListening();
       } else if (!isListening && !isStarting) {
@@ -662,9 +673,11 @@ chrome.storage.local.get(
       void chrome.storage.local.set({ [STORAGE_KEYS.mode]: selectedMode });
     }
     shortcutKey = (result[STORAGE_KEYS.shortcutKey] as string) || DEFAULT_SHORTCUT;
-    if (result[STORAGE_KEYS.config]) {
-      config = normalizeConfig(result[STORAGE_KEYS.config] as Partial<HushMeetConfig>);
+    perModeConfig = migrateConfig(result[STORAGE_KEYS.config]);
+    if (!isPerModeConfig(result[STORAGE_KEYS.config])) {
+      void chrome.storage.local.set({ [STORAGE_KEYS.config]: perModeConfig });
     }
+    config = getConfigForMode(perModeConfig, selectedMode);
     selectedMicDeviceId = (result[STORAGE_KEYS.micDeviceId] as string) || null;
     if (isModeActive(selectedMode)) {
       scheduleStartListening(2000);

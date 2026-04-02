@@ -193,8 +193,7 @@
       <h3>1.1 Audio-Analyse-Engine</h3>
       <div class="card">
         <p>
-          Verwendet die Web Audio API <code>AnalyserNode</code> zur Echtzeitmessung der
-          Mikrofon-Eingangslautstärke.
+          Verwendet die Web Audio API <code>AnalyserNode</code> zur Echtzeitmessung der Mikrofon-Eingangslautstärke.
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
@@ -282,9 +281,7 @@
 
       <h3>1.3 Betriebsmodi</h3>
       <div class="card">
-        <p>
-          Vier Modi steuern das Verhalten der Zustandsübergänge. Aus ist der deaktivierte Modus.
-        </p>
+        <p>Vier Modi steuern das Verhalten der Zustandsübergänge. Aus ist der deaktivierte Modus.</p>
         <table>
           <tr>
             <th>Modus</th>
@@ -321,7 +318,9 @@
 
       <h3>1.4 Tastenkürzel</h3>
       <div class="card">
-        <p>Bietet ein anpassbares Tastenkürzel (Standard: <code>Strg+Umschalt+M</code>).</p>
+        <p>
+          Bietet ein anpassbares Tastenkürzel (Standard: <code>Strg+Umschalt+M</code>).
+        </p>
         <ul>
           <li>Aus: Deaktiviert</li>
           <li>Auto: Stummschaltung umschalten</li>
@@ -334,8 +333,7 @@
       <h3>1.5 Asymmetrisches Schwellenwert-Design</h3>
       <div class="card">
         <p>
-          Unterschiedliche Schwellenwerte für Freischalten und Stummschalten verhindern Flattern
-          (häufiges Umschalten).
+          Unterschiedliche Schwellenwerte für Freischalten und Stummschalten verhindern Flattern (häufiges Umschalten).
         </p>
         <pre><code>Sprachschwelle (Sprachbeginn)    = 0,025  (Standard)
 Stilleschwelle (Stilleerkennung) = Sprachschwelle × 0,5 = 0,0125
@@ -358,41 +356,33 @@ Stilleschwelle (Stilleerkennung) = Sprachschwelle × 0,5 = 0,0125
           <li>Fallback: Simulation des <code>Strg+D</code>-Tastenkürzels</li>
         </ol>
         <p>
-          Der Stummschaltungszustand wird aus dem <code>data-is-muted</code>-Attribut oder dem
-          <code>aria-label</code>-Textinhalt ermittelt.
+          Der Stummschaltungszustand wird aus dem <code>data-is-muted</code>-Attribut oder dem <code>aria-label</code>-Textinhalt ermittelt.
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          Eine mit React 19 erstellte Einstellungs-UI. Synchronisiert den Zustand mit dem Content
-          Script in Echtzeit über die Chrome Storage API.
+          Eine mit React 19 erstellte Einstellungs-UI. Synchronisiert den Zustand mit dem Content Script in Echtzeit über die Chrome Storage API.
         </p>
         <ul>
+          <li><strong>Modus-Auswahl</strong>: Umschalten zwischen Aus / Auto / Auto-Aus / Push-to-Talk</li>
           <li>
-            <strong>Modus-Auswahl</strong>: Umschalten zwischen Aus / Auto / Auto-Aus / Push-to-Talk
+            <strong>Statusanzeige</strong>:
+            Zeigt den aktuellen Zustand (stummgeschaltet/sprechend/Nachklingzeit) mit einer Punkt-Anzeige
           </li>
           <li>
-            <strong>Statusanzeige</strong>: Zeigt den aktuellen Zustand
-            (stummgeschaltet/sprechend/Nachklingzeit) mit einer Punkt-Anzeige
+            <strong>Pegelmesser</strong>:
+            Zeigt den Mikrofon-Eingangspegel in Echtzeit an (mit Schwellenwert-Markierungen)
           </li>
           <li>
-            <strong>Pegelmesser</strong>: Zeigt den Mikrofon-Eingangspegel in Echtzeit an (mit
-            Schwellenwert-Markierungen)
+            <strong>Empfindlichkeitsregler</strong>: Anpassung von <code>speechThreshold</code> (0,005&ndash;0,25) &mdash; pro Modus gespeichert
           </li>
           <li>
-            <strong>Empfindlichkeitsregler</strong>: Anpassung von
-            <code>speechThreshold</code> (0,005&ndash;0,25)
-          </li>
-          <li>
-            <strong>Nachklingzeit-Regler</strong>: Anpassung von
-            <code>gracePeriod</code> (500ms&ndash;4000ms)
+            <strong>Nachklingzeit-Regler</strong>: Anpassung von <code>gracePeriod</code> (500ms&ndash;4000ms) &mdash; pro Modus gespeichert
           </li>
           <li><strong>Tastenkürzel-Einstellungen</strong>: Anpassung über Tastenaufnahme-UI</li>
-          <li>
-            <strong>Mikrofongeräte-Auswahl</strong>: Manuelle Auswahl des zu verwendenden Mikrofons
-          </li>
+          <li><strong>Mikrofongeräte-Auswahl</strong>: Manuelle Auswahl des zu verwendenden Mikrofons</li>
         </ul>
       </div>
 
@@ -412,8 +402,7 @@ Stilleschwelle (Stilleerkennung) = Sprachschwelle × 0,5 = 0,0125
   │                            │  hushMeetSpectrum: array (Spektrum)
   └────────────────────────────┘</code></pre>
         <p>
-          Popup und Content Script kommunizieren nicht direkt; sie kommunizieren bidirektional über
-          Chrome Storage API-Änderungsereignisse.
+          Popup und Content Script kommunizieren nicht direkt; sie kommunizieren bidirektional über Chrome Storage API-Änderungsereignisse.
         </p>
       </div>
 
@@ -480,17 +469,10 @@ Stilleschwelle (Stilleerkennung) = Sprachschwelle × 0,5 = 0,0125
       <div class="card">
         <ul>
           <li>
-            Die Spracherkennung basiert auf RMS (Lautstärke) und kann bei lauten Umgebungsgeräuschen
-            fehlauslösen (wird durch Auto-Aus-Modus abgemildert)
+            Die Spracherkennung basiert auf RMS (Lautstärke) und kann bei lauten Umgebungsgeräuschen fehlauslösen (wird durch Auto-Aus-Modus abgemildert)
           </li>
-          <li>
-            Änderungen an der Google Meet-UI können die Stummschaltungstasten-Erkennung
-            beeinträchtigen
-          </li>
-          <li>
-            Der Anfang einer Äußerung kann abgeschnitten werden (einstellbar über
-            Schwellenwert-Einstellungen)
-          </li>
+          <li>Änderungen an der Google Meet-UI können die Stummschaltungstasten-Erkennung beeinträchtigen</li>
+          <li>Der Anfang einer Äußerung kann abgeschnitten werden (einstellbar über Schwellenwert-Einstellungen)</li>
           <li>Das Tastenkürzel funktioniert nur, wenn der Google Meet-Tab fokussiert ist</li>
         </ul>
       </div>
