@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Activación solo mediante control manual de Meet o atajo, silenciado automático tras hablar (para entornos ruidosos)",
     "mode_ptt": "Pulsar para hablar",
     "mode_ptt_desc": "Mantén presionada la tecla de atajo para hablar",
+    "feature_mic_button": "Botón de micrófono en el popup &mdash; silencia/activa el micrófono directamente desde el popup sin cerrarlo. En modo Pulsar para hablar, el botón funciona como mantener para hablar (mantén presionado para activar, suelta para silenciar)",
     "feature_shortcut": "Tecla de atajo personalizable (predeterminada: Ctrl+Shift+M) &mdash; disponible en todos los modos excepto Desactivado",
     "feature_independent_audio": "Monitoreo de audio independiente (flujo de micrófono separado de Google Meet)",
     "feature_noise_gate": "Puerta de ruido ponderada por voz &mdash; enfatiza las frecuencias de la voz humana (300Hz&ndash;3kHz), reduciendo falsas activaciones por teclado, ventilador y ruido ambiental",
@@ -67,7 +68,8 @@
     "getting_started_4": "Elegir cualquier modo excepto Desactivado",
     "getting_started_5": "Permitir el acceso al micrófono cuando se solicite",
     "tech_stack_title": "Stack tecnológico",
-    "getting_started_6": "Usa la tecla de atajo (Ctrl+Shift+M) para silenciar &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado"
+    "getting_started_6": "Usa el botón de micrófono en el popup para silenciar/activar sin cerrarlo &mdash; en modo Pulsar para hablar, mantén presionado el botón para hablar",
+    "getting_started_7": "También puedes usar la tecla de atajo (Ctrl+Shift+M) en la pestaña de Meet &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado"
   },
   "privacy": {
     "title": "Política de Privacidad",

@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Meet 수동 조작 또는 단축키로만 음소거 해제, 발언 후 자동 음소거 (시끄러운 환경용)",
     "mode_ptt": "Push-to-Talk",
     "mode_ptt_desc": "단축키를 누르고 있는 동안만 발언 가능",
+    "feature_mic_button": "팝업 마이크 버튼 &mdash; 팝업을 닫지 않고 직접 음소거/음소거 해제 가능. Push-to-Talk 모드에서는 버튼을 길게 누르면 음소거 해제, 놓으면 음소거",
     "feature_shortcut": "사용자 지정 단축키 (기본값: Ctrl+Shift+M) &mdash; Off 모드를 제외한 모든 모드에서 사용 가능",
     "feature_independent_audio": "독립적인 오디오 모니터링 (Google Meet과 별도의 마이크 스트림)",
     "feature_noise_gate": "음성 가중 노이즈 게이트 &mdash; 사람의 음성 주파수(300Hz&ndash;3kHz)를 강조하여 키보드, 팬, 주변 소음으로 인한 오작동을 줄임",
@@ -67,7 +68,8 @@
     "getting_started_4": "Off 이외의 모드를 선택",
     "getting_started_5": "메시지가 표시되면 마이크 액세스 허용",
     "tech_stack_title": "기술 스택",
-    "getting_started_6": "단축키(Ctrl+Shift+M)로 음소거 조작 &mdash; Meet의 음소거 버튼을 직접 클릭하면 확장 프로그램이 끄기 모드로 전환됩니다"
+    "getting_started_6": "팝업의 마이크 버튼으로 팝업을 닫지 않고 음소거 조작 가능 &mdash; Push-to-Talk 모드에서는 버튼을 길게 눌러 통화",
+    "getting_started_7": "Meet 탭에서 단축키(Ctrl+Shift+M)로도 음소거 조작 가능 &mdash; Meet의 음소거 버튼을 직접 클릭하면 확장 프로그램이 끄기 모드로 전환됩니다"
   },
   "privacy": {
     "title": "개인정보 처리방침",

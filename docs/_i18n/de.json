@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Stummschaltung nur durch manuelle Meet-Steuerung oder Tastenkürzel aufheben, automatische Stummschaltung nach dem Sprechen (für laute Umgebungen)",
     "mode_ptt": "Push-to-Talk",
     "mode_ptt_desc": "Tastenkürzel gedrückt halten zum Sprechen",
+    "feature_mic_button": "Mikrofon-Taste im Popup &mdash; Stummschalten/Freischalten direkt im Popup, ohne es zu schließen. Im Push-to-Talk-Modus funktioniert die Taste als Halten-zum-Sprechen (gedrückt halten zum Freischalten, loslassen zum Stummschalten)",
     "feature_shortcut": "Anpassbares Tastenkürzel (Standard: Strg+Umschalt+M) &mdash; in allen Modi außer Aus verfügbar",
     "feature_independent_audio": "Unabhängige Audio-Überwachung (separater Mikrofonstream von Google Meet)",
     "feature_noise_gate": "Sprachgewichtetes Noise-Gate &mdash; betont menschliche Sprachfrequenzen (300Hz&ndash;3kHz) und reduziert Fehlauslösungen durch Tastatur-, Lüfter- und Umgebungsgeräusche",
@@ -67,7 +68,8 @@
     "getting_started_4": "Einen beliebigen Modus außer Aus wählen",
     "getting_started_5": "Mikrofonzugriff erlauben, wenn Sie dazu aufgefordert werden",
     "tech_stack_title": "Technologie-Stack",
-    "getting_started_6": "Verwenden Sie das Tastenkürzel (Strg+Umschalt+M) für die Stummschaltung &mdash; ein direkter Klick auf die Meet-Stummschaltungstaste schaltet die Erweiterung in den Aus-Modus"
+    "getting_started_6": "Verwenden Sie die Mikrofon-Taste im Popup zum Stummschalten/Freischalten, ohne es zu schließen &mdash; im Push-to-Talk-Modus die Taste gedrückt halten zum Sprechen",
+    "getting_started_7": "Auf dem Meet-Tab können Sie auch das Tastenkürzel (Strg+Umschalt+M) verwenden &mdash; ein direkter Klick auf die Meet-Stummschaltungstaste schaltet die Erweiterung in den Aus-Modus"
   },
   "privacy": {
     "title": "Datenschutzrichtlinie",

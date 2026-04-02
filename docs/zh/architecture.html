@@ -192,7 +192,9 @@
 
       <h3>1.1 音频分析引擎</h3>
       <div class="card">
-        <p>使用 Web Audio API 的 <code>AnalyserNode</code> 实时测量麦克风输入音量。</p>
+        <p>
+          使用 Web Audio API 的 <code>AnalyserNode</code> 实时测量麦克风输入音量。
+        </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
                                                     getFloatTimeDomainData()
@@ -316,7 +318,9 @@
 
       <h3>1.4 快捷键</h3>
       <div class="card">
-        <p>提供可自定义的键盘快捷键（默认：<code>Ctrl+Shift+M</code>）。</p>
+        <p>
+          提供可自定义的键盘快捷键（默认：<code>Ctrl+Shift+M</code>）。
+        </p>
         <ul>
           <li>关闭：禁用</li>
           <li>自动：切换静音</li>
@@ -328,7 +332,9 @@
 
       <h3>1.5 非对称阈值设计</h3>
       <div class="card">
-        <p>取消静音和静音使用不同的阈值，以防止抖动（频繁切换）。</p>
+        <p>
+          取消静音和静音使用不同的阈值，以防止抖动（频繁切换）。
+        </p>
         <pre><code>语音阈值（语音开始）    = 0.025（默认）
 静音阈值（静音判定）    = 语音阈值 × 0.5 = 0.0125
 
@@ -361,12 +367,20 @@
         </p>
         <ul>
           <li><strong>模式选择器</strong>: 在关闭 / 自动 / 自动关闭 / Push-to-Talk 之间切换</li>
-          <li><strong>状态显示</strong>: 通过圆点指示器显示当前状态（静音/讲话中/宽限期）</li>
-          <li><strong>电平表</strong>: 实时显示麦克风输入电平（带阈值标记）</li>
+          <li>
+            <strong>状态显示</strong>:
+            通过圆点指示器显示当前状态（静音/讲话中/宽限期）
+          </li>
+          <li>
+            <strong>电平表</strong>:
+            实时显示麦克风输入电平（带阈值标记）
+          </li>
           <li>
             <strong>灵敏度滑块</strong>: 调整 <code>speechThreshold</code>（0.005&ndash;0.25）
           </li>
-          <li><strong>宽限期滑块</strong>: 调整 <code>gracePeriod</code>（500ms&ndash;4000ms）</li>
+          <li>
+            <strong>宽限期滑块</strong>: 调整 <code>gracePeriod</code>（500ms&ndash;4000ms）
+          </li>
           <li><strong>快捷键设置</strong>: 通过按键录制界面进行自定义</li>
           <li><strong>麦克风设备选择</strong>: 手动选择要使用的麦克风</li>
         </ul>
@@ -388,8 +402,7 @@
   │                            │  hushMeetSpectrum: array （频谱）
   └────────────────────────────┘</code></pre>
         <p>
-          Popup 和 Content Script 之间不直接通信；它们通过 Chrome Storage API
-          的变更事件进行双向通信。
+          Popup 和 Content Script 之间不直接通信；它们通过 Chrome Storage API 的变更事件进行双向通信。
         </p>
       </div>
 
@@ -456,8 +469,7 @@
       <div class="card">
         <ul>
           <li>
-            语音检测基于
-            RMS（音量），因此可能会被较大的环境噪声误触发（可通过使用自动关闭模式来缓解）
+            语音检测基于 RMS（音量），因此可能会被较大的环境噪声误触发（可通过使用自动关闭模式来缓解）
           </li>
           <li>Google Meet 界面变更可能导致静音按钮检测失效</li>
           <li>语音的最开始部分可能会被截断（可通过阈值设置进行调整）</li>

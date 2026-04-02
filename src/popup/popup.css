@@ -19,14 +19,14 @@
 }
 
 body {
-  width: 300px;
+  width: 340px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 
 .popup {
-  padding: 16px;
+  padding: 12px;
   position: relative;
 }
 
@@ -34,13 +34,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   position: relative;
   z-index: 100;
 }
 
 .header h1 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -57,12 +57,12 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
 }
 
 .toggle-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -111,8 +111,8 @@ body {
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 5px;
+  margin-bottom: 8px;
 }
 
 .mode-card {
@@ -123,7 +123,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 4px;
+  padding: 6px 4px;
   cursor: pointer;
   transition:
     border-color 0.15s,
@@ -178,8 +178,8 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
 }
 
 .status-dot {
@@ -325,13 +325,13 @@ body {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 10px 16px;
-  margin-bottom: 12px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -407,8 +407,8 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
 }
 
 .meter-label {
@@ -451,11 +451,11 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 8px 12px;
 }
 
 .setting {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .setting:last-child {
@@ -501,9 +501,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .footer {
-  margin-top: 12px;
+  margin-top: 8px;
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 

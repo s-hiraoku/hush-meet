@@ -115,8 +115,7 @@
     <div class="container">
       <h1>Hush Meet</h1>
       <p class="tagline">
-        Une extension Chrome qui coupe automatiquement votre microphone sur Google Meet lorsque vous
-        ne parlez pas, empêchant les bruits de fond d'atteindre les autres participants.
+        Une extension Chrome qui coupe automatiquement votre microphone sur Google Meet lorsque vous ne parlez pas, empêchant les bruits de fond d'atteindre les autres participants.
       </p>
 
       <nav class="nav">
@@ -134,62 +133,40 @@
       <h2>Fonctionnalités</h2>
       <div class="card">
         <ul>
-          <li>
-            Réactivation automatique lorsque la parole est détectée, mise en sourdine automatique
-            après que vous cessez de parler
-          </li>
+          <li>Réactivation automatique lorsque la parole est détectée, mise en sourdine automatique après que vous cessez de parler</li>
           <li>
             4 modes de fonctionnement :
             <ul>
+              <li><strong>Désactivé</strong> &mdash; Extension désactivée, comportement par défaut de Meet</li>
               <li>
-                <strong>Désactivé</strong> &mdash; Extension désactivée, comportement par défaut de
-                Meet
+                <strong>Auto</strong> &mdash; Réactivation déclenchée par la parole et mise en sourdine automatique (pour les environnements calmes)
               </li>
               <li>
-                <strong>Auto</strong> &mdash; Réactivation déclenchée par la parole et mise en
-                sourdine automatique (pour les environnements calmes)
+                <strong>Auto-Off</strong> &mdash; Réactivation uniquement par le contrôle manuel de Meet ou le raccourci, mise en sourdine automatique après la parole (pour les environnements bruyants)
               </li>
-              <li>
-                <strong>Auto-Off</strong> &mdash; Réactivation uniquement par le contrôle manuel de
-                Meet ou le raccourci, mise en sourdine automatique après la parole (pour les
-                environnements bruyants)
-              </li>
-              <li>
-                <strong>Appuyer pour parler</strong> &mdash; Maintenez la touche de raccourci
-                enfoncée pour parler
-              </li>
+              <li><strong>Appuyer pour parler</strong> &mdash; Maintenez la touche de raccourci enfoncée pour parler</li>
             </ul>
           </li>
           <li>
-            Touche de raccourci personnalisable (par défaut : Ctrl+Shift+M) &mdash; disponible dans
-            tous les modes sauf Désactivé
+            Bouton micro dans le popup &mdash; couper/réactiver le micro directement depuis le popup sans le fermer. En mode Appuyer pour parler, le bouton fonctionne en maintien (maintenir pour réactiver, relâcher pour couper)
+          </li>
+          <li>
+            Touche de raccourci personnalisable (par défaut : Ctrl+Shift+M) &mdash; disponible dans tous les modes sauf Désactivé
           </li>
           <li>Surveillance audio indépendante (flux micro séparé de Google Meet)</li>
-          <li>
-            Porte de bruit pondérée par la voix &mdash; met en valeur les fréquences de la voix
-            humaine (300 Hz&ndash;3 kHz), réduisant les déclenchements intempestifs causés par le
-            clavier, le ventilateur et le bruit ambiant
-          </li>
+          <li>Porte de bruit pondérée par la voix &mdash; met en valeur les fréquences de la voix humaine (300 Hz&ndash;3 kHz), réduisant les déclenchements intempestifs causés par le clavier, le ventilateur et le bruit ambiant</li>
           <li>Conception de seuil asymétrique pour éviter les oscillations</li>
           <li>Indicateur de niveau audio en temps réel et analyseur de spectre</li>
           <li>Sensibilité et délai de grâce réglables</li>
           <li>
-            Sécurité de mise en sourdine manuelle &mdash; si vous cliquez sur le bouton de mise en
-            sourdine de Meet, l'extension passe automatiquement en mode Désactivé pour éviter les
-            interférences
+            Sécurité de mise en sourdine manuelle &mdash; si vous cliquez sur le bouton de mise en sourdine de Meet, l'extension passe automatiquement en mode Désactivé pour éviter les interférences
           </li>
           <li>Sélecteur de microphone &mdash; choisissez le micro à utiliser</li>
           <li>4 thèmes visuels (Par défaut / Radio Analogique / Boombox / Rétro Futur)</li>
-          <li>
-            Icône de barre d'outils adaptée au mode &mdash; la couleur et le badge de l'icône
-            changent en fonction du mode actif
-          </li>
+          <li>Icône de barre d'outils adaptée au mode &mdash; la couleur et le badge de l'icône changent en fonction du mode actif</li>
           <li>Prise en charge de l'anglais et du japonais avec changement manuel</li>
           <li>
-            Vous vous ennuyez en réunion ? Des mini-jeux rétro-futuristes sont inclus (Breakout /
-            Space Invaders / 2048 / Flappy Bird). Attention : les effets sonores des jeux peuvent
-            déclencher la réactivation automatique. Réglez bien votre sensibilité et profitez du
-            frisson de ne pas vous faire prendre.
+            Vous vous ennuyez en réunion ? Des mini-jeux rétro-futuristes sont inclus (Breakout / Space Invaders / 2048 / Flappy Bird). Attention : les effets sonores des jeux peuvent déclencher la réactivation automatique. Réglez bien votre sensibilité et profitez du frisson de ne pas vous faire prendre.
           </li>
         </ul>
       </div>
@@ -197,14 +174,10 @@
       <h2>Comment ça fonctionne</h2>
       <div class="card">
         <div class="flow">
-          [Entrée Micro] &rarr; [Web Audio API (RMS)] &rarr; [Détection de la parole] &rarr;
-          [Contrôle du bouton Sourdine de Meet]
+          [Entrée Micro] &rarr; [Web Audio API (RMS)] &rarr; [Détection de la parole] &rarr; [Contrôle du bouton Sourdine de Meet]
         </div>
         <p>
-          Un flux micro séparé surveille les niveaux audio. Lorsque la parole est détectée,
-          l'extension clique automatiquement sur le bouton de sourdine de Meet pour réactiver le
-          micro. Lorsque le silence revient, elle remet en sourdine après un délai de grâce
-          configurable.
+          Un flux micro séparé surveille les niveaux audio. Lorsque la parole est détectée, l'extension clique automatiquement sur le bouton de sourdine de Meet pour réactiver le micro. Lorsque le silence revient, elle remet en sourdine après un délai de grâce configurable.
         </p>
       </div>
 
@@ -223,9 +196,7 @@
           </tr>
           <tr>
             <td>Touche de raccourci</td>
-            <td>
-              Raccourci clavier pour le contrôle de la sourdine (tous les modes sauf Désactivé)
-            </td>
+            <td>Raccourci clavier pour le contrôle de la sourdine (tous les modes sauf Désactivé)</td>
             <td>Ctrl+Shift+M</td>
           </tr>
           <tr>
@@ -259,21 +230,13 @@
       <h2>Sécurité de Mise en Sourdine Manuelle</h2>
       <div class="card">
         <p>
-          Lorsque vous mettez en sourdine ou réactivez manuellement via le bouton Meet, l'extension
-          passe automatiquement en mode Désactivé. Cela empêche l'extension de réactiver votre
-          microphone de manière inattendue après l'avoir volontairement mis en sourdine.
+          Lorsque vous mettez en sourdine ou réactivez manuellement via le bouton Meet, l'extension passe automatiquement en mode Désactivé. Cela empêche l'extension de réactiver votre microphone de manière inattendue après l'avoir volontairement mis en sourdine.
         </p>
         <ul>
           <li>Surveille le bouton de sourdine de Meet via MutationObserver</li>
-          <li>
-            Distingue les changements de sourdine initiés par l'extension de ceux initiés par
-            l'utilisateur
-          </li>
+          <li>Distingue les changements de sourdine initiés par l'extension de ceux initiés par l'utilisateur</li>
           <li>Clic sur le bouton de sourdine manuel &rarr; l'extension passe en mode Désactivé</li>
-          <li>
-            Utilisez le raccourci clavier (Ctrl+Shift+M) pour contrôler la sourdine tout en gardant
-            l'extension active
-          </li>
+          <li>Utilisez le raccourci clavier (Ctrl+Shift+M) pour contrôler la sourdine tout en gardant l'extension active</li>
         </ul>
       </div>
 
@@ -285,10 +248,8 @@
           <li>Cliquer sur l'icône Hush Meet dans la barre d'outils</li>
           <li>Choisir n'importe quel mode sauf Désactivé</li>
           <li>Autoriser l'accès au microphone lorsque demandé</li>
-          <li>
-            Utilisez le raccourci (Ctrl+Shift+M) pour la sourdine &mdash; cliquer sur le bouton
-            sourdine de Meet passera l'extension en mode Désactivé
-          </li>
+          <li>Utilisez le bouton micro du popup pour couper/réactiver le micro sans le fermer &mdash; en mode Appuyer pour parler, maintenez le bouton enfoncé pour parler</li>
+          <li>Vous pouvez aussi utiliser le raccourci (Ctrl+Shift+M) sur l'onglet Meet &mdash; cliquer sur le bouton sourdine de Meet passera l'extension en mode Désactivé</li>
         </ol>
       </div>
 

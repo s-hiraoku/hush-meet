@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Meet 手動操作またはショートカットでのみミュート解除、無音で自動ミュート（騒がしい環境向け）",
     "mode_ptt": "Push-to-Talk",
     "mode_ptt_desc": "ショートカットキー長押し中のみ発話可能",
+    "feature_mic_button": "ポップアップ内マイクボタン &mdash; ポップアップを閉じずにミュート/ミュート解除が可能。Push-to-Talk モードではボタン長押しで発話（押している間だけミュート解除、離すとミュート）",
     "feature_shortcut": "カスタマイズ可能なショートカットキー（デフォルト: Ctrl+Shift+M）&mdash; Off以外の全モードで利用可能",
     "feature_independent_audio": "Google Meet 本体とは独立した音声監視（Meet のマイクとは別にストリームを取得）",
     "feature_noise_gate": "音声帯域重み付けノイズゲート &mdash; 人声の周波数帯（300Hz&ndash;3kHz）を重視し、キーボード音やファン音などの誤検知を抑制",
@@ -66,7 +67,8 @@
     "getting_started_3": "ツールバーの Hush Meet アイコンをクリック",
     "getting_started_4": "モードを Off 以外に切り替える",
     "getting_started_5": "マイクのアクセス許可を求められたら「許可」する",
-    "getting_started_6": "ショートカットキー（Ctrl+Shift+M）でミュート操作 &mdash; Meetのミュートボタンを直接操作すると拡張機能はOffモードに切り替わります",
+    "getting_started_6": "ポップアップ内のマイクボタンでミュート操作が可能 &mdash; Push-to-Talk モードではボタンを長押しして発話",
+    "getting_started_7": "Meet タブ上ではショートカットキー（Ctrl+Shift+M）でもミュート操作が可能 &mdash; Meetのミュートボタンを直接操作すると拡張機能はOffモードに切り替わります",
     "tech_stack_title": "技術スタック"
   },
   "privacy": {

@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Réactivation uniquement par le contrôle manuel de Meet ou le raccourci, mise en sourdine automatique après la parole (pour les environnements bruyants)",
     "mode_ptt": "Appuyer pour parler",
     "mode_ptt_desc": "Maintenez la touche de raccourci enfoncée pour parler",
+    "feature_mic_button": "Bouton micro dans le popup &mdash; couper/réactiver le micro directement depuis le popup sans le fermer. En mode Appuyer pour parler, le bouton fonctionne en maintien (maintenir pour réactiver, relâcher pour couper)",
     "feature_shortcut": "Touche de raccourci personnalisable (par défaut : Ctrl+Shift+M) &mdash; disponible dans tous les modes sauf Désactivé",
     "feature_independent_audio": "Surveillance audio indépendante (flux micro séparé de Google Meet)",
     "feature_noise_gate": "Porte de bruit pondérée par la voix &mdash; met en valeur les fréquences de la voix humaine (300 Hz&ndash;3 kHz), réduisant les déclenchements intempestifs causés par le clavier, le ventilateur et le bruit ambiant",
@@ -67,7 +68,8 @@
     "getting_started_4": "Choisir n'importe quel mode sauf Désactivé",
     "getting_started_5": "Autoriser l'accès au microphone lorsque demandé",
     "tech_stack_title": "Stack technique",
-    "getting_started_6": "Utilisez le raccourci (Ctrl+Shift+M) pour la sourdine &mdash; cliquer sur le bouton sourdine de Meet passera l'extension en mode Désactivé"
+    "getting_started_6": "Utilisez le bouton micro du popup pour couper/réactiver le micro sans le fermer &mdash; en mode Appuyer pour parler, maintenez le bouton enfoncé pour parler",
+    "getting_started_7": "Vous pouvez aussi utiliser le raccourci (Ctrl+Shift+M) sur l'onglet Meet &mdash; cliquer sur le bouton sourdine de Meet passera l'extension en mode Désactivé"
   },
   "privacy": {
     "title": "Politique de Confidentialité",

@@ -193,8 +193,7 @@
       <h3>1.1 오디오 분석 엔진</h3>
       <div class="card">
         <p>
-          Web Audio API의 <code>AnalyserNode</code>를 사용하여 마이크 입력 볼륨을 실시간으로
-          측정합니다.
+          Web Audio API의 <code>AnalyserNode</code>를 사용하여 마이크 입력 볼륨을 실시간으로 측정합니다.
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
@@ -319,7 +318,9 @@
 
       <h3>1.4 단축키</h3>
       <div class="card">
-        <p>사용자 지정 가능한 키보드 단축키를 제공합니다 (기본값: <code>Ctrl+Shift+M</code>).</p>
+        <p>
+          사용자 지정 가능한 키보드 단축키를 제공합니다 (기본값: <code>Ctrl+Shift+M</code>).
+        </p>
         <ul>
           <li>Off: 비활성화</li>
           <li>Auto: 음소거 토글</li>
@@ -331,7 +332,9 @@
 
       <h3>1.5 비대칭 임계값 설계</h3>
       <div class="card">
-        <p>음소거 해제와 음소거에 서로 다른 임계값을 사용하여 채터링(빈번한 전환)을 방지합니다.</p>
+        <p>
+          음소거 해제와 음소거에 서로 다른 임계값을 사용하여 채터링(빈번한 전환)을 방지합니다.
+        </p>
         <pre><code>speechThreshold (발화 시작)     = 0.025  (기본값)
 silenceThreshold (무음 판정)   = speechThreshold × 0.5 = 0.0125
 
@@ -353,21 +356,25 @@ silenceThreshold (무음 판정)   = speechThreshold × 0.5 = 0.0125
           <li>폴백: <code>Ctrl+D</code> 키보드 단축키 시뮬레이션</li>
         </ol>
         <p>
-          음소거 상태는 <code>data-is-muted</code> 속성 또는 <code>aria-label</code> 텍스트 내용으로
-          판별합니다.
+          음소거 상태는 <code>data-is-muted</code> 속성 또는 <code>aria-label</code> 텍스트 내용으로 판별합니다.
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          React 19로 구축된 설정 UI입니다. Chrome Storage API를 통해 콘텐츠 스크립트와 실시간으로
-          상태를 동기화합니다.
+          React 19로 구축된 설정 UI입니다. Chrome Storage API를 통해 콘텐츠 스크립트와 실시간으로 상태를 동기화합니다.
         </p>
         <ul>
           <li><strong>모드 선택기</strong>: Off / Auto / Auto-Off / Push-to-Talk 전환</li>
-          <li><strong>상태 표시</strong>: 현재 상태 (음소거/발화 중/유예)를 점 표시기로 표시</li>
-          <li><strong>레벨 미터</strong>: 마이크 입력 레벨을 실시간으로 표시 (임계값 마커 포함)</li>
+          <li>
+            <strong>상태 표시</strong>:
+            현재 상태 (음소거/발화 중/유예)를 점 표시기로 표시
+          </li>
+          <li>
+            <strong>레벨 미터</strong>:
+            마이크 입력 레벨을 실시간으로 표시 (임계값 마커 포함)
+          </li>
           <li>
             <strong>감도 슬라이더</strong>: <code>speechThreshold</code> 조정 (0.005&ndash;0.25)
           </li>
@@ -395,8 +402,7 @@ silenceThreshold (무음 판정)   = speechThreshold × 0.5 = 0.0125
   │                            │  hushMeetSpectrum: array (스펙트럼)
   └────────────────────────────┘</code></pre>
         <p>
-          팝업과 콘텐츠 스크립트는 직접 통신하지 않으며, Chrome Storage API 변경 이벤트를 통해
-          양방향으로 통신합니다.
+          팝업과 콘텐츠 스크립트는 직접 통신하지 않으며, Chrome Storage API 변경 이벤트를 통해 양방향으로 통신합니다.
         </p>
       </div>
 
@@ -463,8 +469,7 @@ silenceThreshold (무음 판정)   = speechThreshold × 0.5 = 0.0125
       <div class="card">
         <ul>
           <li>
-            음성 감지가 RMS(볼륨) 기반이므로 주변 소음이 큰 경우 오작동할 수 있습니다 (Auto-Off 모드
-            사용으로 완화 가능)
+            음성 감지가 RMS(볼륨) 기반이므로 주변 소음이 큰 경우 오작동할 수 있습니다 (Auto-Off 모드 사용으로 완화 가능)
           </li>
           <li>Google Meet UI 변경으로 음소거 버튼 감지가 중단될 수 있습니다</li>
           <li>발화 시작 부분이 잘릴 수 있습니다 (임계값 설정으로 조정 가능)</li>

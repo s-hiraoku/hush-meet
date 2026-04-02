@@ -64,6 +64,7 @@ export const en: Messages = {
   micToggleMute: { message: "Mute" },
   micToggleUnmute: { message: "Unmute" },
   micToggleEnable: { message: "Enable" },
+  micTogglePtt: { message: "Hold to Talk" },
 };
 
 export const ja: Messages = {
@@ -128,4 +129,5 @@ export const ja: Messages = {
   micToggleMute: { message: "ミュート" },
   micToggleUnmute: { message: "ミュート解除" },
   micToggleEnable: { message: "有効にする" },
+  micTogglePtt: { message: "長押しでマイクON" },
 };

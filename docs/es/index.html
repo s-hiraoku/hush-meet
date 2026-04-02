@@ -115,8 +115,7 @@
     <div class="container">
       <h1>Hush Meet</h1>
       <p class="tagline">
-        Una extensión de Chrome que silencia automáticamente tu micrófono en Google Meet cuando no
-        estás hablando, evitando que el ruido de fondo llegue a los demás participantes.
+        Una extensión de Chrome que silencia automáticamente tu micrófono en Google Meet cuando no estás hablando, evitando que el ruido de fondo llegue a los demás participantes.
       </p>
 
       <nav class="nav">
@@ -138,53 +137,36 @@
           <li>
             4 modos de operación:
             <ul>
+              <li><strong>Desactivado</strong> &mdash; Extensión desactivada, comportamiento predeterminado de Meet</li>
               <li>
-                <strong>Desactivado</strong> &mdash; Extensión desactivada, comportamiento
-                predeterminado de Meet
+                <strong>Auto</strong> &mdash; Activación por voz y silenciado automático (para entornos silenciosos)
               </li>
               <li>
-                <strong>Auto</strong> &mdash; Activación por voz y silenciado automático (para
-                entornos silenciosos)
+                <strong>Auto-Off</strong> &mdash; Activación solo mediante control manual de Meet o atajo, silenciado automático tras hablar (para entornos ruidosos)
               </li>
-              <li>
-                <strong>Auto-Off</strong> &mdash; Activación solo mediante control manual de Meet o
-                atajo, silenciado automático tras hablar (para entornos ruidosos)
-              </li>
-              <li>
-                <strong>Pulsar para hablar</strong> &mdash; Mantén presionada la tecla de atajo para
-                hablar
-              </li>
+              <li><strong>Pulsar para hablar</strong> &mdash; Mantén presionada la tecla de atajo para hablar</li>
             </ul>
           </li>
           <li>
-            Tecla de atajo personalizable (predeterminada: Ctrl+Shift+M) &mdash; disponible en todos
-            los modos excepto Desactivado
+            Botón de micrófono en el popup &mdash; silencia/activa el micrófono directamente desde el popup sin cerrarlo. En modo Pulsar para hablar, el botón funciona como mantener para hablar (mantén presionado para activar, suelta para silenciar)
+          </li>
+          <li>
+            Tecla de atajo personalizable (predeterminada: Ctrl+Shift+M) &mdash; disponible en todos los modos excepto Desactivado
           </li>
           <li>Monitoreo de audio independiente (flujo de micrófono separado de Google Meet)</li>
-          <li>
-            Puerta de ruido ponderada por voz &mdash; enfatiza las frecuencias de la voz humana
-            (300Hz&ndash;3kHz), reduciendo falsas activaciones por teclado, ventilador y ruido
-            ambiental
-          </li>
+          <li>Puerta de ruido ponderada por voz &mdash; enfatiza las frecuencias de la voz humana (300Hz&ndash;3kHz), reduciendo falsas activaciones por teclado, ventilador y ruido ambiental</li>
           <li>Diseño de umbral asimétrico que previene el parpadeo</li>
           <li>Medidor de nivel de audio en tiempo real y analizador de espectro</li>
           <li>Sensibilidad y período de gracia ajustables</li>
           <li>
-            Seguridad de silencio manual &mdash; si haces clic en el botón de silencio de Meet, la
-            extensión cambia automáticamente al modo Apagado para evitar interferencias
+            Seguridad de silencio manual &mdash; si haces clic en el botón de silencio de Meet, la extensión cambia automáticamente al modo Apagado para evitar interferencias
           </li>
           <li>Selector de dispositivo de micrófono &mdash; elige qué micrófono usar</li>
           <li>4 temas visuales (Predeterminado / Radio Analógica / Boombox / Retro Futuro)</li>
-          <li>
-            Icono de barra de herramientas según el modo &mdash; el color del icono y la insignia
-            cambian según el modo activo
-          </li>
+          <li>Icono de barra de herramientas según el modo &mdash; el color del icono y la insignia cambian según el modo activo</li>
           <li>Soporte de idiomas inglés y japonés con cambio manual</li>
           <li>
-            ¿Aburrido en una reunión? Minijuegos retro-futuristas incluidos (Breakout / Space
-            Invaders / 2048 / Flappy Bird). Advertencia: los efectos de sonido del juego pueden
-            activar el micrófono automáticamente. Ajusta tu sensibilidad correctamente y disfruta la
-            emoción de no ser descubierto.
+            ¿Aburrido en una reunión? Minijuegos retro-futuristas incluidos (Breakout / Space Invaders / 2048 / Flappy Bird). Advertencia: los efectos de sonido del juego pueden activar el micrófono automáticamente. Ajusta tu sensibilidad correctamente y disfruta la emoción de no ser descubierto.
           </li>
         </ul>
       </div>
@@ -192,14 +174,10 @@
       <h2>Cómo funciona</h2>
       <div class="card">
         <div class="flow">
-          [Entrada de micrófono] &rarr; [Web Audio API (RMS)] &rarr; [Detección de voz] &rarr;
-          [Control del botón de silencio de Meet]
+          [Entrada de micrófono] &rarr; [Web Audio API (RMS)] &rarr; [Detección de voz] &rarr; [Control del botón de silencio de Meet]
         </div>
         <p>
-          Un flujo de micrófono separado monitorea los niveles de audio. Cuando se detecta voz, la
-          extensión hace clic automáticamente en el botón de silencio de Meet para activar el
-          micrófono. Cuando vuelve el silencio, se vuelve a silenciar después de un período de
-          gracia configurable.
+          Un flujo de micrófono separado monitorea los niveles de audio. Cuando se detecta voz, la extensión hace clic automáticamente en el botón de silencio de Meet para activar el micrófono. Cuando vuelve el silencio, se vuelve a silenciar después de un período de gracia configurable.
         </p>
       </div>
 
@@ -252,18 +230,13 @@
       <h2>Seguridad de Silencio Manual</h2>
       <div class="card">
         <p>
-          Cuando silencias o activas el micrófono manualmente desde el botón de Meet, la extensión
-          cambia automáticamente al modo Apagado. Esto evita que la extensión encienda tu micrófono
-          inesperadamente después de haberlo silenciado intencionalmente.
+          Cuando silencias o activas el micrófono manualmente desde el botón de Meet, la extensión cambia automáticamente al modo Apagado. Esto evita que la extensión encienda tu micrófono inesperadamente después de haberlo silenciado intencionalmente.
         </p>
         <ul>
           <li>Monitorea el botón de silencio de Meet mediante MutationObserver</li>
           <li>Distingue entre cambios de silencio iniciados por la extensión y por el usuario</li>
           <li>Clic en botón de silencio manual &rarr; la extensión cambia a modo Apagado</li>
-          <li>
-            Usa la tecla de atajo (Ctrl+Shift+M) para controlar el silencio manteniendo la extensión
-            activa
-          </li>
+          <li>Usa la tecla de atajo (Ctrl+Shift+M) para controlar el silencio manteniendo la extensión activa</li>
         </ul>
       </div>
 
@@ -275,10 +248,8 @@
           <li>Hacer clic en el icono de Hush Meet en la barra de herramientas</li>
           <li>Elegir cualquier modo excepto Desactivado</li>
           <li>Permitir el acceso al micrófono cuando se solicite</li>
-          <li>
-            Usa la tecla de atajo (Ctrl+Shift+M) para silenciar &mdash; hacer clic en el botón de
-            silencio de Meet cambiará la extensión al modo Apagado
-          </li>
+          <li>Usa el botón de micrófono en el popup para silenciar/activar sin cerrarlo &mdash; en modo Pulsar para hablar, mantén presionado el botón para hablar</li>
+          <li>También puedes usar la tecla de atajo (Ctrl+Shift+M) en la pestaña de Meet &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado</li>
         </ol>
       </div>
 

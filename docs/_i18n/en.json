@@ -15,6 +15,7 @@
     "mode_auto_off_desc": "Unmute only by Meet manual control or shortcut, auto-mute after speech (for noisy environments)",
     "mode_ptt": "Push-to-Talk",
     "mode_ptt_desc": "Hold shortcut key to speak",
+    "feature_mic_button": "Popup mic button &mdash; mute/unmute directly from the popup without closing it. In Push-to-Talk mode, the button works as hold-to-talk (press and hold to unmute, release to mute)",
     "feature_shortcut": "Customizable shortcut key (default: Ctrl+Shift+M) &mdash; available in all modes except Off",
     "feature_independent_audio": "Independent audio monitoring (separate mic stream from Google Meet)",
     "feature_noise_gate": "Voice-weighted noise gate &mdash; emphasizes human voice frequencies (300Hz&ndash;3kHz), reducing false triggers from keyboard, fan, and ambient noise",
@@ -66,7 +67,8 @@
     "getting_started_3": "Click the Hush Meet icon in the toolbar",
     "getting_started_4": "Choose any mode except Off",
     "getting_started_5": "Allow microphone access when prompted",
-    "getting_started_6": "Use the shortcut key (Ctrl+Shift+M) to toggle mute &mdash; clicking Meet's mute button directly will switch the extension to Off mode",
+    "getting_started_6": "Use the mic button in the popup to mute/unmute without closing it &mdash; in Push-to-Talk mode, press and hold the button to talk",
+    "getting_started_7": "You can also use the shortcut key (Ctrl+Shift+M) on the Meet tab to toggle mute &mdash; clicking Meet's mute button directly will switch the extension to Off mode",
     "tech_stack_title": "Tech Stack"
   },
   "privacy": {

@@ -193,8 +193,7 @@
       <h3>1.1 Audio Analysis Engine</h3>
       <div class="card">
         <p>
-          Uses the Web Audio API <code>AnalyserNode</code> to measure microphone input volume in
-          real time.
+          Uses the Web Audio API <code>AnalyserNode</code> to measure microphone input volume in real time.
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
@@ -319,7 +318,9 @@
 
       <h3>1.4 Shortcut Key</h3>
       <div class="card">
-        <p>Provides a customizable keyboard shortcut (default: <code>Ctrl+Shift+M</code>).</p>
+        <p>
+          Provides a customizable keyboard shortcut (default: <code>Ctrl+Shift+M</code>).
+        </p>
         <ul>
           <li>Off: Disabled</li>
           <li>Auto: Toggle mute</li>
@@ -331,7 +332,9 @@
 
       <h3>1.5 Asymmetric Threshold Design</h3>
       <div class="card">
-        <p>Different thresholds for unmuting and muting prevent chattering (frequent toggling).</p>
+        <p>
+          Different thresholds for unmuting and muting prevent chattering (frequent toggling).
+        </p>
         <pre><code>speechThreshold (speech start)  = 0.025  (default)
 silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
 
@@ -353,41 +356,33 @@ silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
           <li>Fallback: simulate <code>Ctrl+D</code> keyboard shortcut</li>
         </ol>
         <p>
-          Mute state is determined from the <code>data-is-muted</code> attribute or the
-          <code>aria-label</code> text content.
+          Mute state is determined from the <code>data-is-muted</code> attribute or the <code>aria-label</code> text content.
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          A settings UI built with React 19. Synchronizes state with the Content Script in real time
-          via the Chrome Storage API.
+          A settings UI built with React 19. Synchronizes state with the Content Script in real time via the Chrome Storage API.
         </p>
         <ul>
+          <li><strong>Mode selector</strong>: Switch between Off / Auto / Auto-Off / Push-to-Talk</li>
           <li>
-            <strong>Mode selector</strong>: Switch between Off / Auto / Auto-Off / Push-to-Talk
+            <strong>Status display</strong>:
+            Shows the current state (muted/speaking/grace) with a dot indicator
           </li>
           <li>
-            <strong>Status display</strong>: Shows the current state (muted/speaking/grace) with a
-            dot indicator
+            <strong>Level meter</strong>:
+            Displays microphone input level in real time (with threshold markers)
           </li>
           <li>
-            <strong>Level meter</strong>: Displays microphone input level in real time (with
-            threshold markers)
+            <strong>Sensitivity slider</strong>: Adjust <code>speechThreshold</code> (0.005&ndash;0.25)
           </li>
           <li>
-            <strong>Sensitivity slider</strong>: Adjust
-            <code>speechThreshold</code> (0.005&ndash;0.25)
-          </li>
-          <li>
-            <strong>Grace period slider</strong>: Adjust
-            <code>gracePeriod</code> (500ms&ndash;4000ms)
+            <strong>Grace period slider</strong>: Adjust <code>gracePeriod</code> (500ms&ndash;4000ms)
           </li>
           <li><strong>Shortcut key settings</strong>: Customization via key recording UI</li>
-          <li>
-            <strong>Microphone device selection</strong>: Manual selection of the microphone to use
-          </li>
+          <li><strong>Microphone device selection</strong>: Manual selection of the microphone to use</li>
         </ul>
       </div>
 
@@ -407,8 +402,7 @@ silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
   │                            │  hushMeetSpectrum: array (spectrum)
   └────────────────────────────┘</code></pre>
         <p>
-          The Popup and Content Script do not communicate directly; they communicate bidirectionally
-          via Chrome Storage API change events.
+          The Popup and Content Script do not communicate directly; they communicate bidirectionally via Chrome Storage API change events.
         </p>
       </div>
 
@@ -475,8 +469,7 @@ silenceThreshold (silence)      = speechThreshold × 0.5 = 0.0125
       <div class="card">
         <ul>
           <li>
-            Voice detection is RMS (volume) based, so it may false-trigger on loud ambient noise
-            (mitigated by using Auto-Off mode)
+            Voice detection is RMS (volume) based, so it may false-trigger on loud ambient noise (mitigated by using Auto-Off mode)
           </li>
           <li>Google Meet UI changes may break mute button detection</li>
           <li>The very beginning of speech may be cut off (adjustable via threshold settings)</li>
