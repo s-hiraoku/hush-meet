@@ -76,6 +76,11 @@ export const de: Messages = {
   localeKo,
   localeEs,
   localeFr,
+  micToggle: m("Mikrofon"),
+  micToggleMute: m("Stumm"),
+  micToggleUnmute: m("Freischalten"),
+  micToggleEnable: m("Aktivieren"),
+  micTogglePtt: m("Gedrückt halten zum Sprechen"),
 };
 
 export const zh: Messages = {
@@ -128,6 +133,11 @@ export const zh: Messages = {
   localeKo,
   localeEs,
   localeFr,
+  micToggle: m("麦克风操作"),
+  micToggleMute: m("静音"),
+  micToggleUnmute: m("取消静音"),
+  micToggleEnable: m("启用"),
+  micTogglePtt: m("长按开启麦克风"),
 };
 
 export const ko: Messages = {
@@ -180,6 +190,11 @@ export const ko: Messages = {
   localeKo,
   localeEs,
   localeFr,
+  micToggle: m("마이크 조작"),
+  micToggleMute: m("음소거"),
+  micToggleUnmute: m("음소거 해제"),
+  micToggleEnable: m("활성화"),
+  micTogglePtt: m("길게 눌러서 마이크 ON"),
 };
 
 export const es: Messages = {
@@ -238,6 +253,11 @@ export const es: Messages = {
   localeKo,
   localeEs,
   localeFr,
+  micToggle: m("Micrófono"),
+  micToggleMute: m("Silenciar"),
+  micToggleUnmute: m("Activar"),
+  micToggleEnable: m("Habilitar"),
+  micTogglePtt: m("Mantener para hablar"),
 };
 
 export const fr: Messages = {
@@ -296,4 +316,9 @@ export const fr: Messages = {
   localeKo,
   localeEs,
   localeFr,
+  micToggle: m("Microphone"),
+  micToggleMute: m("Couper"),
+  micToggleUnmute: m("Activer"),
+  micToggleEnable: m("Activer"),
+  micTogglePtt: m("Maintenir pour parler"),
 };

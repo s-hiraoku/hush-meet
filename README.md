@@ -14,7 +14,10 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 2. Click the Hush Meet icon in the toolbar
 3. Choose a mode (Auto, Auto-Off, or Push-to-Talk)
 4. Allow microphone access when prompted
-5. Use `Ctrl+Shift+M` to toggle mute or hold-to-talk (Push-to-Talk)
+5. Use the **mic button** in the popup to mute/unmute without closing it — in Push-to-Talk mode, press and hold the button to talk
+6. You can also use `Ctrl+Shift+M` on the Meet tab to toggle mute or hold-to-talk (Push-to-Talk)
+
+> **Note:** If you click Meet's own mute button directly, the extension switches to Off mode to avoid interference.
 
 ### Operating Modes
 
@@ -27,15 +30,15 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 
 ### Settings
 
-| Setting            | Description                          | Default                |
-| ------------------ | ------------------------------------ | ---------------------- |
-| Mode               | Off / Auto / Auto-Off / Push-to-Talk | Auto                   |
-| Shortcut Key       | Keyboard shortcut for mute control   | Ctrl+Shift+M           |
-| Speech Sensitivity | Volume threshold to trigger unmute   | 0.025                  |
-| Grace Period       | Delay before re-muting after speech  | 1.5s                   |
-| Microphone         | Audio input device                   | System Default         |
-| Theme              | Popup visual theme (4 options)       | Default                |
-| Language           | UI language (7 languages + Auto)     | Auto (browser language)|
+| Setting            | Description                          | Default                 |
+| ------------------ | ------------------------------------ | ----------------------- |
+| Mode               | Off / Auto / Auto-Off / Push-to-Talk | Auto                    |
+| Shortcut Key       | Keyboard shortcut for mute control   | Ctrl+Shift+M            |
+| Speech Sensitivity | Volume threshold to trigger unmute   | 0.025                   |
+| Grace Period       | Delay before re-muting after speech  | 1.5s                    |
+| Microphone         | Audio input device                   | System Default          |
+| Theme              | Popup visual theme (4 options)       | Default                 |
+| Language           | UI language (7 languages + Auto)     | Auto (browser language) |
 
 ## How It Works
 
@@ -47,6 +50,7 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 - Speech detected → unmute; silence + grace period → mute
 - Voice-weighted noise gate: emphasizes 300Hz–3kHz to reduce false triggers from keyboard/fan noise
 - Asymmetric thresholds: speech threshold > silence threshold (prevents chattering)
+- Manual mute safety: if you click Meet's mute button directly, the extension switches to Off mode to avoid interference
 
 ## Development
 

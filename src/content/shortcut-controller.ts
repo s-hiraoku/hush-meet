@@ -1,5 +1,4 @@
 import type { ModeId } from "../constants.ts";
-import { isModeActive } from "../mode-control.ts";
 import { shouldHandleShortcutKeyDown, shouldHandleShortcutKeyUp } from "../shortcut.ts";
 
 export function consumeShortcutEvent(e: KeyboardEvent) {
@@ -18,7 +17,7 @@ export function shouldTriggerShortcutKeyDown(args: {
   event: KeyboardEvent;
 }) {
   return shouldHandleShortcutKeyDown({
-    enabled: args.isListening && isModeActive(args.mode),
+    enabled: true,
     event: args.event,
     mode: args.mode,
     pttKeyHeld: args.pttKeyHeld,
@@ -34,7 +33,7 @@ export function shouldTriggerShortcutKeyUp(args: {
   event: KeyboardEvent;
 }) {
   return shouldHandleShortcutKeyUp({
-    enabled: args.isListening && isModeActive(args.mode),
+    enabled: true,
     event: args.event,
     mode: args.mode,
     pttKeyHeld: args.pttKeyHeld,

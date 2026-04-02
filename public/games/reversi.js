@@ -25,7 +25,7 @@
   // Players
   const EMPTY = 0;
   const PLAYER = 1; // green
-  const CPU = 2;    // pink
+  const CPU = 2; // pink
 
   // Pre-render scanline overlay
   const scanCanvas = document.createElement("canvas");
@@ -60,16 +60,27 @@
     osc.stop(audioCtx.currentTime + dur);
   }
 
-  function beepPlace() { beep(600, 0.08); }
-  function beepCapture() { beep(880, 0.12); }
-  function beepGameOver() { beep(220, 0.5); }
+  function beepPlace() {
+    beep(600, 0.08);
+  }
+  function beepCapture() {
+    beep(880, 0.12);
+  }
+  function beepGameOver() {
+    beep(220, 0.5);
+  }
 
   // ---- Board logic ----
 
   const DIRS = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1],           [0, 1],
-    [1, -1],  [1, 0],  [1, 1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
   ];
 
   function initBoard() {
@@ -140,7 +151,8 @@
   }
 
   function countPieces(b) {
-    let p = 0, cpu = 0;
+    let p = 0,
+      cpu = 0;
     for (let r = 0; r < BOARD_SIZE; r++) {
       for (let c = 0; c < BOARD_SIZE; c++) {
         if (b[r][c] === PLAYER) p++;
@@ -154,14 +166,14 @@
 
   // Positional weight table for evaluation
   const WEIGHTS = [
-    [100, -20,  10,   5,   5,  10, -20, 100],
-    [-20, -50,  -2,  -2,  -2,  -2, -50, -20],
-    [ 10,  -2,   5,   1,   1,   5,  -2,  10],
-    [  5,  -2,   1,   1,   1,   1,  -2,   5],
-    [  5,  -2,   1,   1,   1,   1,  -2,   5],
-    [ 10,  -2,   5,   1,   1,   5,  -2,  10],
-    [-20, -50,  -2,  -2,  -2,  -2, -50, -20],
-    [100, -20,  10,   5,   5,  10, -20, 100],
+    [100, -20, 10, 5, 5, 10, -20, 100],
+    [-20, -50, -2, -2, -2, -2, -50, -20],
+    [10, -2, 5, 1, 1, 5, -2, 10],
+    [5, -2, 1, 1, 1, 1, -2, 5],
+    [5, -2, 1, 1, 1, 1, -2, 5],
+    [10, -2, 5, 1, 1, 5, -2, 10],
+    [-20, -50, -2, -2, -2, -2, -50, -20],
+    [100, -20, 10, 5, 5, 10, -20, 100],
   ];
 
   function evaluate(b) {
@@ -231,8 +243,7 @@
     // Adaptive depth based on remaining empty cells
     let empty = 0;
     for (let r = 0; r < BOARD_SIZE; r++)
-      for (let c = 0; c < BOARD_SIZE; c++)
-        if (board[r][c] === EMPTY) empty++;
+      for (let c = 0; c < BOARD_SIZE; c++) if (board[r][c] === EMPTY) empty++;
 
     let depth = empty <= 10 ? 6 : empty <= 20 ? 5 : 4;
 
@@ -284,9 +295,7 @@
   }
 
   function pieceGlow(player) {
-    return player === PLAYER
-      ? "rgba(0, 255, 170, 0.5)"
-      : "rgba(255, 42, 109, 0.5)";
+    return player === PLAYER ? "rgba(0, 255, 170, 0.5)" : "rgba(255, 42, 109, 0.5)";
   }
 
   function drawBoard() {
@@ -343,7 +352,7 @@
       radius * 0.1,
       cx,
       cy,
-      radius
+      radius,
     );
     grad.addColorStop(0, "rgba(255,255,255,0.15)");
     grad.addColorStop(1, "rgba(0,0,0,0)");
@@ -372,9 +381,7 @@
       const cx = anim.c * CELL + CELL / 2;
       const cy = anim.r * CELL + CELL / 2;
       // Scale goes from 1 -> 0 -> 1 (horizontal squish)
-      const scale = anim.t < 0.5
-        ? 1 - anim.t * 2
-        : (anim.t - 0.5) * 2;
+      const scale = anim.t < 0.5 ? 1 - anim.t * 2 : (anim.t - 0.5) * 2;
       const showPlayer = anim.t < 0.5 ? anim.fromPlayer : anim.toPlayer;
 
       // Glow pulse during flip
@@ -541,8 +548,8 @@
     const y = e.clientY - rect.top;
     const scaleX = W / rect.width;
     const scaleY = H / rect.height;
-    const c = Math.floor(x * scaleX / CELL);
-    const r = Math.floor(y * scaleY / CELL);
+    const c = Math.floor((x * scaleX) / CELL);
+    const r = Math.floor((y * scaleY) / CELL);
     if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE) return { r, c };
     return null;
   }

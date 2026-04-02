@@ -54,8 +54,9 @@ export function shouldHandleShortcutKeyDown({
   shortcut: string;
 }): boolean {
   if (!enabled || !matchesShortcut(event, shortcut)) return false;
-  if (!isModeActive(mode) || event.repeat) return false;
-  if (mode === MODES.pushToTalk && pttKeyHeld) return false;
+  if (event.repeat) return false;
+  // Allow shortcut when mode is off (caller handles re-enabling)
+  if (isModeActive(mode) && mode === MODES.pushToTalk && pttKeyHeld) return false;
   return true;
 }
 
@@ -72,7 +73,7 @@ export function shouldHandleShortcutKeyUp({
   pttKeyHeld: boolean;
   shortcut: string;
 }): boolean {
-  if (!enabled || !isModeActive(mode) || mode !== MODES.pushToTalk || !pttKeyHeld) {
+  if (!enabled || mode !== MODES.pushToTalk || !pttKeyHeld) {
     return false;
   }
   return matchesShortcut(event, shortcut);

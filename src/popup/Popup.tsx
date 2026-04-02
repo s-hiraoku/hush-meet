@@ -15,6 +15,7 @@ import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GameLauncher } from "./GameLauncher";
+import { MicToggleButton } from "./MicToggleButton";
 import { ModeGrid } from "./ModeGrid";
 import { usePopupStorage } from "./usePopupStorage";
 import { ShortcutSetting } from "./ShortcutSetting";
@@ -173,20 +174,12 @@ export function Popup() {
         </div>
       </div>
 
-      <ModeGrid isLoaded={isLoaded} mode={resolvedMode} onSelect={handleModeChange} />
-
       <div className="status">
         <span className={`status-dot ${isOff ? "" : stateInfo.css}`} />
         <span className="status-text">
           {isLoaded ? getStatusText(state, resolvedMode, stateInfo) : "Loading…"}
         </span>
       </div>
-
-      {micError && (
-        <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
-      )}
-
-      {shortcutHint && <div className="shortcut-hint">{t("shortcutHintPopup")}</div>}
 
       <div className="meter">
         <div className="meter-label">{t("micLevel")}</div>
@@ -200,6 +193,16 @@ export function Popup() {
       </div>
 
       <Equalizer />
+
+      {micError && (
+        <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
+      )}
+
+      <ModeGrid isLoaded={isLoaded} mode={resolvedMode} onSelect={handleModeChange} />
+
+      {isLoaded && <MicToggleButton mode={resolvedMode} state={state} />}
+
+      {shortcutHint && <div className="shortcut-hint">{t("shortcutHintPopup")}</div>}
 
       <div className="settings">
         <div className="setting">
@@ -246,7 +249,7 @@ export function Popup() {
       </div>
 
       {micDevices.length > 0 && (
-        <div className="settings" style={{ marginTop: "12px" }}>
+        <div className="settings" style={{ marginTop: "8px" }}>
           <div className="setting">
             <div className="setting-header">
               <span className="setting-label">{t("micDevice")}</span>

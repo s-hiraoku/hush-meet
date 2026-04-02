@@ -193,7 +193,8 @@
       <h3>1.1 Moteur d'analyse audio</h3>
       <div class="card">
         <p>
-          Utilise l'API Web Audio <code>AnalyserNode</code> pour mesurer le volume d'entrée du microphone en temps réel.
+          Utilise l'API Web Audio <code>AnalyserNode</code> pour mesurer le volume d'entrée du
+          microphone en temps réel.
         </p>
         <pre><code>getUserMedia() → AudioContext → MediaStreamSource → AnalyserNode
                                                           │
@@ -281,7 +282,10 @@
 
       <h3>1.3 Modes de fonctionnement</h3>
       <div class="card">
-        <p>Quatre modes contrôlent le comportement des transitions d'état. Off est le mode de contrôle désactivé.</p>
+        <p>
+          Quatre modes contrôlent le comportement des transitions d'état. Off est le mode de
+          contrôle désactivé.
+        </p>
         <table>
           <tr>
             <th>Mode</th>
@@ -333,7 +337,8 @@
       <h3>1.5 Conception à seuils asymétriques</h3>
       <div class="card">
         <p>
-          Des seuils différents pour la réactivation et la coupure empêchent le chattering (basculement fréquent).
+          Des seuils différents pour la réactivation et la coupure empêchent le chattering
+          (basculement fréquent).
         </p>
         <pre><code>speechThreshold (début de parole)    = 0.025  (par défaut)
 silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
@@ -351,38 +356,52 @@ silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
       <div class="card">
         <p>Détecte le bouton mute de Google Meet à l'aide de plusieurs stratégies :</p>
         <ol>
-          <li>Recherche par attribut <code>aria-label</code> (prend en charge le japonais et l'anglais)</li>
+          <li>
+            Recherche par attribut <code>aria-label</code> (prend en charge le japonais et
+            l'anglais)
+          </li>
           <li>Recherche par attribut <code>data-tooltip</code></li>
           <li>Solution de repli : simulation du raccourci clavier <code>Ctrl+D</code></li>
         </ol>
         <p>
-          L'état mute est déterminé à partir de l'attribut <code>data-is-muted</code> ou du contenu textuel de l'<code>aria-label</code>.
+          L'état mute est déterminé à partir de l'attribut <code>data-is-muted</code> ou du contenu
+          textuel de l'<code>aria-label</code>.
         </p>
       </div>
 
       <h3>2. Popup UI (<code>src/popup/</code>)</h3>
       <div class="card">
         <p>
-          Une interface de réglages construite avec React 19. Synchronise l'état avec le Content Script en temps réel via l'API Chrome Storage.
+          Une interface de réglages construite avec React 19. Synchronise l'état avec le Content
+          Script en temps réel via l'API Chrome Storage.
         </p>
         <ul>
-          <li><strong>Sélecteur de mode</strong>: Basculer entre Off / Auto / Auto-Off / Push-to-Talk</li>
           <li>
-            <strong>Affichage de l'état</strong>:
-            Affiche l'état actuel (coupé/en train de parler/grâce) avec un indicateur à pastille
+            <strong>Sélecteur de mode</strong>: Basculer entre Off / Auto / Auto-Off / Push-to-Talk
           </li>
           <li>
-            <strong>Indicateur de niveau</strong>:
-            Affiche le niveau d'entrée du microphone en temps réel (avec marqueurs de seuil)
+            <strong>Affichage de l'état</strong>: Affiche l'état actuel (coupé/en train de
+            parler/grâce) avec un indicateur à pastille
           </li>
           <li>
-            <strong>Curseur de sensibilité</strong>: Régler le <code>speechThreshold</code> (0.005&ndash;0.25)
+            <strong>Indicateur de niveau</strong>: Affiche le niveau d'entrée du microphone en temps
+            réel (avec marqueurs de seuil)
           </li>
           <li>
-            <strong>Curseur de période de grâce</strong>: Régler le <code>gracePeriod</code> (500ms&ndash;4000ms)
+            <strong>Curseur de sensibilité</strong>: Régler le
+            <code>speechThreshold</code> (0.005&ndash;0.25)
           </li>
-          <li><strong>Réglages du raccourci clavier</strong>: Personnalisation via l'interface d'enregistrement de touches</li>
-          <li><strong>Sélection du microphone</strong>: Sélection manuelle du microphone à utiliser</li>
+          <li>
+            <strong>Curseur de période de grâce</strong>: Régler le
+            <code>gracePeriod</code> (500ms&ndash;4000ms)
+          </li>
+          <li>
+            <strong>Réglages du raccourci clavier</strong>: Personnalisation via l'interface
+            d'enregistrement de touches
+          </li>
+          <li>
+            <strong>Sélection du microphone</strong>: Sélection manuelle du microphone à utiliser
+          </li>
         </ul>
       </div>
 
@@ -402,7 +421,8 @@ silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
   │                            │  hushMeetSpectrum: array (spectre)
   └────────────────────────────┘</code></pre>
         <p>
-          Le Popup et le Content Script ne communiquent pas directement ; ils communiquent de manière bidirectionnelle via les événements de changement de l'API Chrome Storage.
+          Le Popup et le Content Script ne communiquent pas directement ; ils communiquent de
+          manière bidirectionnelle via les événements de changement de l'API Chrome Storage.
         </p>
       </div>
 
@@ -469,11 +489,17 @@ silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
       <div class="card">
         <ul>
           <li>
-            La détection vocale est basée sur le RMS (volume), elle peut donc se déclencher par erreur en cas de bruit ambiant fort (atténué par l'utilisation du mode Auto-Off)
+            La détection vocale est basée sur le RMS (volume), elle peut donc se déclencher par
+            erreur en cas de bruit ambiant fort (atténué par l'utilisation du mode Auto-Off)
           </li>
-          <li>Les modifications de l'interface Google Meet peuvent casser la détection du bouton mute</li>
+          <li>
+            Les modifications de l'interface Google Meet peuvent casser la détection du bouton mute
+          </li>
           <li>Le tout début de la parole peut être coupé (ajustable via les réglages de seuil)</li>
-          <li>La touche de raccourci ne fonctionne que lorsque l'onglet Google Meet est au premier plan</li>
+          <li>
+            La touche de raccourci ne fonctionne que lorsque l'onglet Google Meet est au premier
+            plan
+          </li>
         </ul>
       </div>
 
@@ -482,8 +508,12 @@ silenceThreshold (détection silence) = speechThreshold × 0.5 = 0.0125
         <ul>
           <li>Porte de bruit pondérée par la voix pour une meilleure précision de détection</li>
           <li>Mise en mémoire tampon pré-parole pour réduire la coupure en début d'énoncé</li>
-          <li>Logique de détection automatique pour suivre les changements d'interface de Google Meet</li>
-          <li>Remplacement par Silero VAD (basé sur le ML) pour une précision de détection accrue</li>
+          <li>
+            Logique de détection automatique pour suivre les changements d'interface de Google Meet
+          </li>
+          <li>
+            Remplacement par Silero VAD (basé sur le ML) pour une précision de détection accrue
+          </li>
         </ul>
       </div>
 

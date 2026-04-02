@@ -51,6 +51,7 @@ let startupTimerId: ReturnType<typeof setTimeout> | null = null;
 let mutingByExtension = false;
 let selectedMicDeviceId: string | null = null;
 let selectedMode: ModeId = MODES.off;
+let lastActiveMode: ModeId = MODES.auto;
 let shortcutKey = DEFAULT_SHORTCUT;
 let pttKeyHeld = false;
 let listeningRunId = 0;
@@ -111,6 +112,16 @@ function clearGraceTimer() {
   graceTimer = clearTimer(graceTimer);
 }
 
+/** Switch to Off mode when the user manually operates the Meet mute button. */
+function switchToOffMode() {
+  if (selectedMode === MODES.off) return;
+  selectedMode = MODES.off;
+  pttKeyHeld = false;
+  log("手動ミュート検出 — モードをOffに切り替え");
+  stopListening();
+  void chrome.storage.local.set({ [STORAGE_KEYS.mode]: MODES.off });
+}
+
 function clearEnsureMuteTimers() {
   if (ensureMuteTimerId) {
     ensureMuteTimerId = clearIntervalTimer(ensureMuteTimerId);
@@ -128,11 +139,6 @@ function startShortcutListener() {
   log("ショートカットリスナー登録完了");
 }
 
-function stopShortcutListener() {
-  window.removeEventListener("keydown", handleShortcutKeyDown, true);
-  window.removeEventListener("keyup", handleShortcutKeyUp, true);
-}
-
 function handleShortcutKeyDown(e: KeyboardEvent) {
   if (
     !shouldTriggerShortcutKeyDown({
@@ -147,6 +153,16 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
   }
 
   consumeShortcutEvent(e);
+
+  // If mode is Off or not listening, re-enable the last active mode
+  if (!isModeActive(selectedMode) || !isListening) {
+    const modeToRestore = lastActiveMode;
+    selectedMode = modeToRestore;
+    void chrome.storage.local.set({ [STORAGE_KEYS.mode]: modeToRestore });
+    log(`ショートカットでモードを復元: ${modeToRestore}`);
+    scheduleStartListening();
+    return;
+  }
 
   if (shouldUsePushToTalkHold(selectedMode)) {
     pttKeyHeld = true;
@@ -231,12 +247,13 @@ function startMuteObserver() {
       mode: selectedMode,
       mutingByExtension,
     });
-    if (nextState === State.MUTED) {
-      log("ユーザーが手動でミュートしました");
-      transition(nextState);
-    } else if (nextState === State.SPEAKING) {
-      log("ユーザーが手動でミュート解除しました");
-      transition(nextState);
+    if (nextState === State.MUTED || nextState === State.SPEAKING) {
+      log(
+        nextState === State.MUTED
+          ? "ユーザーが手動でミュートしました"
+          : "ユーザーが手動でミュート解除しました",
+      );
+      switchToOffMode();
     }
   };
 
@@ -484,7 +501,6 @@ async function startListening() {
 
     // Start observing user mute actions
     startMuteObserver();
-    startShortcutListener();
   } catch (err) {
     const error = err as DOMException;
     let errorMsg: string;
@@ -528,7 +544,6 @@ function stopListening() {
   clearGraceTimer();
   clearEnsureMuteTimers();
   stopMuteObserver();
-  stopShortcutListener();
   pttKeyHeld = false;
   shortcutUnmuteUntil = 0;
 
@@ -571,6 +586,9 @@ chrome.storage.onChanged.addListener((changes) => {
     }
     if (newMode !== selectedMode) {
       selectedMode = newMode;
+      if (isModeActive(newMode)) {
+        lastActiveMode = newMode;
+      }
       pttKeyHeld = false;
       log("モードを変更:", selectedMode);
       if (!isModeActive(newMode)) {
@@ -584,6 +602,40 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes[STORAGE_KEYS.shortcutKey]) {
     shortcutKey = (changes[STORAGE_KEYS.shortcutKey].newValue as string) || DEFAULT_SHORTCUT;
     log("shortcut key changed:", shortcutKey);
+  }
+
+  if (changes[STORAGE_KEYS.micToggleAction]) {
+    const action = changes[STORAGE_KEYS.micToggleAction].newValue as string;
+    if (action) {
+      // Clear the action immediately so it can be triggered again
+      void chrome.storage.local.set({ [STORAGE_KEYS.micToggleAction]: "" });
+
+      // Same logic as handleShortcutKeyDown but without keyboard event
+      if (!isModeActive(selectedMode) || !isListening) {
+        // Re-enable last active mode (same as shortcut in Off mode)
+        const modeToRestore = lastActiveMode;
+        selectedMode = modeToRestore;
+        void chrome.storage.local.set({ [STORAGE_KEYS.mode]: modeToRestore });
+        scheduleStartListening();
+      } else if (action === "unmute") {
+        shortcutUnmuteUntil = Date.now() + config.gracePeriod;
+        transition(State.UNMUTING);
+      } else if (action === "mute") {
+        transition(State.MUTED);
+      } else if (action === "toggle") {
+        const muted = isMeetMuted();
+        if (muted === true || currentState === State.MUTED) {
+          shortcutUnmuteUntil = Date.now() + config.gracePeriod;
+          transition(State.UNMUTING);
+        } else if (
+          muted === false ||
+          currentState === State.SPEAKING ||
+          currentState === State.GRACE
+        ) {
+          transition(State.MUTED);
+        }
+      }
+    }
   }
 
   if (changes[STORAGE_KEYS.micDeviceId]) {
@@ -603,6 +655,9 @@ chrome.storage.local.get(
   [STORAGE_KEYS.config, STORAGE_KEYS.micDeviceId, STORAGE_KEYS.mode, STORAGE_KEYS.shortcutKey],
   (result) => {
     selectedMode = normalizeMode(result[STORAGE_KEYS.mode]);
+    if (isModeActive(selectedMode)) {
+      lastActiveMode = selectedMode;
+    }
     if (result[STORAGE_KEYS.mode] === undefined || result[STORAGE_KEYS.mode] !== selectedMode) {
       void chrome.storage.local.set({ [STORAGE_KEYS.mode]: selectedMode });
     }
@@ -614,6 +669,8 @@ chrome.storage.local.get(
     if (isModeActive(selectedMode)) {
       scheduleStartListening(2000);
     }
+    // Always register the shortcut listener so it works even in Off mode
+    startShortcutListener();
   },
 );
 

@@ -34,6 +34,7 @@ export const STORAGE_KEYS = {
   micDevices: "hushMeetMicDevices",
   mode: "hushMeetMode",
   shortcutKey: "hushMeetShortcutKey",
+  micToggleAction: "hushMeetMicToggleAction",
 } as const;
 
 export const MODES = {
