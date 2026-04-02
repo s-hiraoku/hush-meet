@@ -115,7 +115,8 @@
     <div class="container">
       <h1>Hush Meet</h1>
       <p class="tagline">
-        Eine Chrome-Erweiterung, die Ihr Mikrofon bei Google Meet automatisch stummschaltet, wenn Sie nicht sprechen, und verhindert, dass Hintergrundgeräusche andere Teilnehmer erreichen.
+        Eine Chrome-Erweiterung, die Ihr Mikrofon bei Google Meet automatisch stummschaltet, wenn
+        Sie nicht sprechen, und verhindert, dass Hintergrundgeräusche andere Teilnehmer erreichen.
       </p>
 
       <nav class="nav">
@@ -133,37 +134,58 @@
       <h2>Funktionen</h2>
       <div class="card">
         <ul>
-          <li>Automatische Stummschaltung aufheben bei Spracherkennung, automatische Stummschaltung nach dem Sprechen</li>
+          <li>
+            Automatische Stummschaltung aufheben bei Spracherkennung, automatische Stummschaltung
+            nach dem Sprechen
+          </li>
           <li>
             4 Betriebsmodi:
             <ul>
               <li><strong>Aus</strong> &mdash; Erweiterung deaktiviert, Meet-Standardverhalten</li>
               <li>
-                <strong>Auto</strong> &mdash; Sprachgesteuerte Stummschaltungsaufhebung &amp; automatische Stummschaltung (für ruhige Umgebungen)
+                <strong>Auto</strong> &mdash; Sprachgesteuerte Stummschaltungsaufhebung &amp;
+                automatische Stummschaltung (für ruhige Umgebungen)
               </li>
               <li>
-                <strong>Auto-Aus</strong> &mdash; Stummschaltung nur durch manuelle Meet-Steuerung oder Tastenkürzel aufheben, automatische Stummschaltung nach dem Sprechen (für laute Umgebungen)
+                <strong>Auto-Aus</strong> &mdash; Stummschaltung nur durch manuelle Meet-Steuerung
+                oder Tastenkürzel aufheben, automatische Stummschaltung nach dem Sprechen (für laute
+                Umgebungen)
               </li>
-              <li><strong>Push-to-Talk</strong> &mdash; Tastenkürzel gedrückt halten zum Sprechen</li>
+              <li>
+                <strong>Push-to-Talk</strong> &mdash; Tastenkürzel gedrückt halten zum Sprechen
+              </li>
             </ul>
           </li>
           <li>
-            Anpassbares Tastenkürzel (Standard: Strg+Umschalt+M) &mdash; in allen Modi außer Aus verfügbar
+            Anpassbares Tastenkürzel (Standard: Strg+Umschalt+M) &mdash; in allen Modi außer Aus
+            verfügbar
           </li>
           <li>Unabhängige Audio-Überwachung (separater Mikrofonstream von Google Meet)</li>
-          <li>Sprachgewichtetes Noise-Gate &mdash; betont menschliche Sprachfrequenzen (300Hz&ndash;3kHz) und reduziert Fehlauslösungen durch Tastatur-, Lüfter- und Umgebungsgeräusche</li>
+          <li>
+            Sprachgewichtetes Noise-Gate &mdash; betont menschliche Sprachfrequenzen
+            (300Hz&ndash;3kHz) und reduziert Fehlauslösungen durch Tastatur-, Lüfter- und
+            Umgebungsgeräusche
+          </li>
           <li>Asymmetrisches Schwellenwertdesign verhindert Flattern</li>
           <li>Echtzeit-Audiopegelmesser &amp; Spektrumanalysator</li>
           <li>Einstellbare Empfindlichkeit und Nachklingzeit</li>
           <li>
-            Manuelle Stummschaltungssicherheit &mdash; wenn Sie die Meet-Stummschaltungstaste direkt verwenden, wechselt die Erweiterung automatisch in den Aus-Modus, um Störungen zu vermeiden
+            Manuelle Stummschaltungssicherheit &mdash; wenn Sie die Meet-Stummschaltungstaste direkt
+            verwenden, wechselt die Erweiterung automatisch in den Aus-Modus, um Störungen zu
+            vermeiden
           </li>
           <li>Mikrofongeräte-Auswahl &mdash; wählen Sie das gewünschte Mikrofon</li>
           <li>4 visuelle Themes (Standard / Analogradio / Boombox / Retro Future)</li>
-          <li>Modusbewusstes Toolbar-Symbol &mdash; Symbolfarbe und Badge ändern sich je nach aktivem Modus</li>
+          <li>
+            Modusbewusstes Toolbar-Symbol &mdash; Symbolfarbe und Badge ändern sich je nach aktivem
+            Modus
+          </li>
           <li>Englische &amp; japanische Sprachunterstützung mit manueller Umschaltung</li>
           <li>
-            Gelangweilt im Meeting? Retro-Future-Minispiele enthalten (Breakout / Space Invaders / 2048 / Flappy Bird). Achtung: Spielsoundeffekte können die automatische Stummschaltungsaufhebung auslösen. Stellen Sie die Empfindlichkeit richtig ein und genießen Sie den Nervenkitzel, nicht erwischt zu werden.
+            Gelangweilt im Meeting? Retro-Future-Minispiele enthalten (Breakout / Space Invaders /
+            2048 / Flappy Bird). Achtung: Spielsoundeffekte können die automatische
+            Stummschaltungsaufhebung auslösen. Stellen Sie die Empfindlichkeit richtig ein und
+            genießen Sie den Nervenkitzel, nicht erwischt zu werden.
           </li>
         </ul>
       </div>
@@ -171,10 +193,14 @@
       <h2>Funktionsweise</h2>
       <div class="card">
         <div class="flow">
-          [Mikrofon-Eingang] &rarr; [Web Audio API (RMS)] &rarr; [Spracherkennung] &rarr; [Meet Stummschaltungstasten-Steuerung]
+          [Mikrofon-Eingang] &rarr; [Web Audio API (RMS)] &rarr; [Spracherkennung] &rarr; [Meet
+          Stummschaltungstasten-Steuerung]
         </div>
         <p>
-          Ein separater Mikrofonstream überwacht die Audiopegel. Wenn Sprache erkannt wird, klickt die Erweiterung automatisch auf die Meet-Stummschaltungstaste, um die Stummschaltung aufzuheben. Wenn wieder Stille eintritt, wird nach einer konfigurierbaren Nachklingzeit erneut stummgeschaltet.
+          Ein separater Mikrofonstream überwacht die Audiopegel. Wenn Sprache erkannt wird, klickt
+          die Erweiterung automatisch auf die Meet-Stummschaltungstaste, um die Stummschaltung
+          aufzuheben. Wenn wieder Stille eintritt, wird nach einer konfigurierbaren Nachklingzeit
+          erneut stummgeschaltet.
         </p>
       </div>
 
@@ -227,13 +253,21 @@
       <h2>Manuelle Stummschaltungssicherheit</h2>
       <div class="card">
         <p>
-          Wenn Sie über die Meet-Stummschaltungstaste manuell stumm- oder freischalten, wechselt die Erweiterung automatisch in den Aus-Modus. Dies verhindert, dass die Erweiterung Ihr Mikrofon unerwartet wieder einschaltet, nachdem Sie es absichtlich stummgeschaltet haben.
+          Wenn Sie über die Meet-Stummschaltungstaste manuell stumm- oder freischalten, wechselt die
+          Erweiterung automatisch in den Aus-Modus. Dies verhindert, dass die Erweiterung Ihr
+          Mikrofon unerwartet wieder einschaltet, nachdem Sie es absichtlich stummgeschaltet haben.
         </p>
         <ul>
           <li>Überwacht die Meet-Stummschaltungstaste über MutationObserver</li>
-          <li>Unterscheidet zwischen erweiterungsinitiierten und benutzerinitiierten Stummschaltungsänderungen</li>
+          <li>
+            Unterscheidet zwischen erweiterungsinitiierten und benutzerinitiierten
+            Stummschaltungsänderungen
+          </li>
           <li>Manuelle Stummschaltungstaste &rarr; Erweiterung wechselt in Aus-Modus</li>
-          <li>Verwenden Sie das Tastenkürzel (Strg+Umschalt+M), um die Stummschaltung zu steuern, während die Erweiterung aktiv bleibt</li>
+          <li>
+            Verwenden Sie das Tastenkürzel (Strg+Umschalt+M), um die Stummschaltung zu steuern,
+            während die Erweiterung aktiv bleibt
+          </li>
         </ul>
       </div>
 
@@ -245,7 +279,11 @@
           <li>Auf das Hush Meet-Symbol in der Symbolleiste klicken</li>
           <li>Einen beliebigen Modus außer Aus wählen</li>
           <li>Mikrofonzugriff erlauben, wenn Sie dazu aufgefordert werden</li>
-          <li>Verwenden Sie das Tastenkürzel (Strg+Umschalt+M) für die Stummschaltung &mdash; ein direkter Klick auf die Meet-Stummschaltungstaste schaltet die Erweiterung in den Aus-Modus</li>
+          <li>
+            Verwenden Sie das Tastenkürzel (Strg+Umschalt+M) für die Stummschaltung &mdash; ein
+            direkter Klick auf die Meet-Stummschaltungstaste schaltet die Erweiterung in den
+            Aus-Modus
+          </li>
         </ol>
       </div>
 

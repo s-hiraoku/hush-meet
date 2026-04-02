@@ -18,15 +18,15 @@
 
   // Tile colors by value - neon retro palette
   const TILE_COLORS = {
-    2:    { bg: "#1a1a3e", fg: "#8888cc", glow: "rgba(136,136,204,0.4)" },
-    4:    { bg: "#1e1a40", fg: "#aa88ee", glow: "rgba(170,136,238,0.4)" },
-    8:    { bg: "#2a1a44", fg: "#ff6090", glow: "rgba(255,96,144,0.5)" },
-    16:   { bg: "#301848", fg: "#ff2a6d", glow: "rgba(255,42,109,0.5)" },
-    32:   { bg: "#381050", fg: "#ff2a6d", glow: "rgba(255,42,109,0.6)" },
-    64:   { bg: "#401060", fg: "#ff1050", glow: "rgba(255,16,80,0.6)" },
-    128:  { bg: "#0a2a3a", fg: "#00e5ff", glow: "rgba(0,229,255,0.5)" },
-    256:  { bg: "#0a3040", fg: "#00e5ff", glow: "rgba(0,229,255,0.6)" },
-    512:  { bg: "#0a3a2a", fg: "#00ffaa", glow: "rgba(0,255,170,0.5)" },
+    2: { bg: "#1a1a3e", fg: "#8888cc", glow: "rgba(136,136,204,0.4)" },
+    4: { bg: "#1e1a40", fg: "#aa88ee", glow: "rgba(170,136,238,0.4)" },
+    8: { bg: "#2a1a44", fg: "#ff6090", glow: "rgba(255,96,144,0.5)" },
+    16: { bg: "#301848", fg: "#ff2a6d", glow: "rgba(255,42,109,0.5)" },
+    32: { bg: "#381050", fg: "#ff2a6d", glow: "rgba(255,42,109,0.6)" },
+    64: { bg: "#401060", fg: "#ff1050", glow: "rgba(255,16,80,0.6)" },
+    128: { bg: "#0a2a3a", fg: "#00e5ff", glow: "rgba(0,229,255,0.5)" },
+    256: { bg: "#0a3040", fg: "#00e5ff", glow: "rgba(0,229,255,0.6)" },
+    512: { bg: "#0a3a2a", fg: "#00ffaa", glow: "rgba(0,255,170,0.5)" },
     1024: { bg: "#0a4030", fg: "#00ffaa", glow: "rgba(0,255,170,0.6)" },
     2048: { bg: "#2a1000", fg: "#ffcc00", glow: "rgba(255,204,0,0.7)" },
   };
@@ -122,7 +122,8 @@
       const angle = Math.random() * Math.PI * 2;
       const speed = 1 + Math.random() * 2;
       particles.push({
-        x, y,
+        x,
+        y,
         dx: Math.cos(angle) * speed,
         dy: Math.sin(angle) * speed,
         life: 15 + Math.random() * 10,
@@ -169,7 +170,9 @@
   }
 
   function copyGrid(g) {
-    return g.map(function (row) { return row.slice(); });
+    return g.map(function (row) {
+      return row.slice();
+    });
   }
 
   // Move logic - returns true if anything moved
@@ -187,7 +190,9 @@
 
     // Slide every row left
     for (var r = 0; r < GRID_SIZE; r++) {
-      var row = grid[r].filter(function (v) { return v !== 0; });
+      var row = grid[r].filter(function (v) {
+        return v !== 0;
+      });
       var newRow = [];
       for (var i = 0; i < row.length; i++) {
         if (i < row.length - 1 && row[i] === row[i + 1]) {
@@ -212,7 +217,8 @@
 
     // Map merged cell positions back to original orientation
     function unrotatePos(pr, pc, times) {
-      var rr = pr, rc = pc;
+      var rr = pr,
+        rc = pc;
       for (var t = 0; t < (4 - times) % 4; t++) {
         var tmp = rr;
         rr = rc;
@@ -305,34 +311,42 @@
   // Input - touch/swipe
   let touchStartX = 0;
   let touchStartY = 0;
-  canvas.addEventListener("touchstart", function (e) {
-    if (state !== "PLAYING" && state !== "CONTINUE") return;
-    const touch = e.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-    e.preventDefault();
-  }, { passive: false });
+  canvas.addEventListener(
+    "touchstart",
+    function (e) {
+      if (state !== "PLAYING" && state !== "CONTINUE") return;
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      e.preventDefault();
+    },
+    { passive: false },
+  );
 
-  canvas.addEventListener("touchend", function (e) {
-    if (state !== "PLAYING" && state !== "CONTINUE") return;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartX;
-    const dy = touch.clientY - touchStartY;
-    const absDX = Math.abs(dx);
-    const absDY = Math.abs(dy);
-    const MIN_SWIPE = 30;
+  canvas.addEventListener(
+    "touchend",
+    function (e) {
+      if (state !== "PLAYING" && state !== "CONTINUE") return;
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      const absDX = Math.abs(dx);
+      const absDY = Math.abs(dy);
+      const MIN_SWIPE = 30;
 
-    if (Math.max(absDX, absDY) < MIN_SWIPE) return;
+      if (Math.max(absDX, absDY) < MIN_SWIPE) return;
 
-    let dir = null;
-    if (absDX > absDY) {
-      dir = dx > 0 ? "right" : "left";
-    } else {
-      dir = dy > 0 ? "down" : "up";
-    }
-    if (dir) move(dir);
-    e.preventDefault();
-  }, { passive: false });
+      let dir = null;
+      if (absDX > absDY) {
+        dir = dx > 0 ? "right" : "left";
+      } else {
+        dir = dy > 0 ? "down" : "up";
+      }
+      if (dir) move(dir);
+      e.preventDefault();
+    },
+    { passive: false },
+  );
 
   // Overlay click
   overlay.addEventListener("click", function () {
