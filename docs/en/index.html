@@ -115,7 +115,8 @@
     <div class="container">
       <h1>Hush Meet</h1>
       <p class="tagline">
-        A Chrome extension that automatically mutes your microphone on Google Meet when you're not speaking, preventing background noise from reaching other participants.
+        A Chrome extension that automatically mutes your microphone on Google Meet when you're not
+        speaking, preventing background noise from reaching other participants.
       </p>
 
       <nav class="nav">
@@ -139,34 +140,45 @@
             <ul>
               <li><strong>Off</strong> &mdash; Extension disabled, Meet default behavior</li>
               <li>
-                <strong>Auto</strong> &mdash; Speech-triggered unmute &amp; auto-mute (for quiet environments)
+                <strong>Auto</strong> &mdash; Speech-triggered unmute &amp; auto-mute (for quiet
+                environments)
               </li>
               <li>
-                <strong>Auto-Off</strong> &mdash; Unmute only by Meet manual control or shortcut, auto-mute after speech (for noisy environments)
+                <strong>Auto-Off</strong> &mdash; Unmute only by Meet manual control or shortcut,
+                auto-mute after speech (for noisy environments)
               </li>
               <li><strong>Push-to-Talk</strong> &mdash; Hold shortcut key to speak</li>
             </ul>
           </li>
           <li>
-            Popup mic button &mdash; mute/unmute directly from the popup without closing it. In Push-to-Talk mode, the button works as hold-to-talk (press and hold to unmute, release to mute)
+            Popup mic button &mdash; mute/unmute directly from the popup without closing it. In
+            Push-to-Talk mode, the button works as hold-to-talk (press and hold to unmute, release
+            to mute)
           </li>
           <li>
-            Customizable shortcut key (default: Ctrl+Shift+M) &mdash; available in all modes except Off
+            Customizable shortcut key (default: Ctrl+Shift+M) &mdash; available in all modes except
+            Off
           </li>
           <li>Independent audio monitoring (separate mic stream from Google Meet)</li>
-          <li>Voice-weighted noise gate &mdash; emphasizes human voice frequencies (300Hz&ndash;3kHz), reducing false triggers from keyboard, fan, and ambient noise</li>
+          <li>
+            Voice-weighted noise gate &mdash; emphasizes human voice frequencies (300Hz&ndash;3kHz),
+            reducing false triggers from keyboard, fan, and ambient noise
+          </li>
           <li>Asymmetric threshold design prevents chattering</li>
           <li>Real-time audio level meter &amp; spectrum analyzer</li>
           <li>Adjustable sensitivity and grace period</li>
           <li>
-            Manual mute safety &mdash; if you click Meet's mute button directly, the extension automatically switches to Off mode to avoid interference
+            Manual mute safety &mdash; if you click Meet's mute button directly, the extension
+            automatically switches to Off mode to avoid interference
           </li>
           <li>Microphone device selector &mdash; choose which mic to use</li>
           <li>4 visual themes (Default / Analog Radio / Boombox / Retro Future)</li>
           <li>Mode-aware toolbar icon &mdash; icon color and badge change based on active mode</li>
           <li>English &amp; Japanese language support with manual switching</li>
           <li>
-            Bored in a meeting? Retro-future mini-games included (Breakout / Space Invaders / 2048 / Flappy Bird). Fair warning: game sound effects can trigger auto-unmute. Set your sensitivity just right and enjoy the thrill of not getting caught.
+            Bored in a meeting? Retro-future mini-games included (Breakout / Space Invaders / 2048 /
+            Flappy Bird). Fair warning: game sound effects can trigger auto-unmute. Set your
+            sensitivity just right and enjoy the thrill of not getting caught.
           </li>
         </ul>
       </div>
@@ -174,10 +186,13 @@
       <h2>How It Works</h2>
       <div class="card">
         <div class="flow">
-          [Mic Input] &rarr; [Web Audio API (RMS)] &rarr; [Speech Detection] &rarr; [Meet Mute Button Control]
+          [Mic Input] &rarr; [Web Audio API (RMS)] &rarr; [Speech Detection] &rarr; [Meet Mute
+          Button Control]
         </div>
         <p>
-          A separate microphone stream monitors audio levels. When speech is detected, the extension automatically clicks the Meet mute button to unmute. When silence returns, it re-mutes after a configurable grace period.
+          A separate microphone stream monitors audio levels. When speech is detected, the extension
+          automatically clicks the Meet mute button to unmute. When silence returns, it re-mutes
+          after a configurable grace period.
         </p>
       </div>
 
@@ -230,13 +245,17 @@
       <h2>Manual Mute Safety</h2>
       <div class="card">
         <p>
-          When you manually mute or unmute via the Meet mute button, the extension automatically switches to Off mode. This prevents the extension from unexpectedly turning your mic back on after you intentionally muted it.
+          When you manually mute or unmute via the Meet mute button, the extension automatically
+          switches to Off mode. This prevents the extension from unexpectedly turning your mic back
+          on after you intentionally muted it.
         </p>
         <ul>
           <li>Monitors the Meet mute button via MutationObserver</li>
           <li>Distinguishes extension-initiated vs. user-initiated mute changes</li>
           <li>Manual mute button click &rarr; extension switches to Off mode</li>
-          <li>Use the shortcut key (Ctrl+Shift+M) to control mute while keeping the extension active</li>
+          <li>
+            Use the shortcut key (Ctrl+Shift+M) to control mute while keeping the extension active
+          </li>
         </ul>
       </div>
 
@@ -248,8 +267,14 @@
           <li>Click the Hush Meet icon in the toolbar</li>
           <li>Choose any mode except Off</li>
           <li>Allow microphone access when prompted</li>
-          <li>Use the mic button in the popup to mute/unmute without closing it &mdash; in Push-to-Talk mode, press and hold the button to talk</li>
-          <li>You can also use the shortcut key (Ctrl+Shift+M) on the Meet tab to toggle mute &mdash; clicking Meet's mute button directly will switch the extension to Off mode</li>
+          <li>
+            Use the mic button in the popup to mute/unmute without closing it &mdash; in
+            Push-to-Talk mode, press and hold the button to talk
+          </li>
+          <li>
+            You can also use the shortcut key (Ctrl+Shift+M) on the Meet tab to toggle mute &mdash;
+            clicking Meet's mute button directly will switch the extension to Off mode
+          </li>
         </ol>
       </div>
 

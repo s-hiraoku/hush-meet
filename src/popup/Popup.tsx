@@ -15,13 +15,13 @@ import { Equalizer } from "./Equalizer";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GameLauncher } from "./GameLauncher";
+import { MicToggleButton } from "./MicToggleButton";
 import { ModeGrid } from "./ModeGrid";
 import { usePopupStorage } from "./usePopupStorage";
 import { ShortcutSetting } from "./ShortcutSetting";
 import {
   savePopupConfig,
   savePopupMicDevice,
-  savePopupMicToggle,
   savePopupMode,
   savePopupShortcut,
 } from "./storage-actions";
@@ -174,82 +174,12 @@ export function Popup() {
         </div>
       </div>
 
-      <ModeGrid isLoaded={isLoaded} mode={resolvedMode} onSelect={handleModeChange} />
-
       <div className="status">
         <span className={`status-dot ${isOff ? "" : stateInfo.css}`} />
         <span className="status-text">
           {isLoaded ? getStatusText(state, resolvedMode, stateInfo) : "Loading…"}
         </span>
       </div>
-
-      {isLoaded &&
-        (() => {
-          const isPtt = resolvedMode === MODES.pushToTalk;
-          const isMuted = state === "MUTED" || state === "IDLE";
-          const micIcon = (
-            <svg
-              className="mic-toggle-icon"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" y1="19" x2="12" y2="23" />
-              <line x1="8" y1="23" x2="16" y2="23" />
-              {(isOff || isMuted) && <line x1="1" y1="1" x2="23" y2="23" />}
-            </svg>
-          );
-          const label = isOff
-            ? t("micToggleEnable")
-            : isPtt && isMuted
-              ? t("micTogglePtt")
-              : isMuted
-                ? t("micToggleUnmute")
-                : t("micToggleMute");
-          const cssClass = `mic-toggle-btn ${
-            isOff ? "mic-toggle-enable" : isMuted ? "mic-toggle-unmute" : "mic-toggle-mute"
-          }`;
-
-          if (isPtt && !isOff) {
-            // Push-to-Talk: hold to unmute, release to mute
-            return (
-              <button
-                type="button"
-                className={cssClass}
-                onMouseDown={() => savePopupMicToggle("unmute")}
-                onMouseUp={() => savePopupMicToggle("mute")}
-                onMouseLeave={() => {
-                  if (!isMuted) savePopupMicToggle("mute");
-                }}
-                onTouchStart={() => savePopupMicToggle("unmute")}
-                onTouchEnd={() => savePopupMicToggle("mute")}
-              >
-                {micIcon}
-                <span>{label}</span>
-              </button>
-            );
-          }
-
-          return (
-            <button type="button" className={cssClass} onClick={() => savePopupMicToggle("toggle")}>
-              {micIcon}
-              <span>{label}</span>
-            </button>
-          );
-        })()}
-
-      {micError && (
-        <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
-      )}
-
-      {shortcutHint && <div className="shortcut-hint">{t("shortcutHintPopup")}</div>}
 
       <div className="meter">
         <div className="meter-label">{t("micLevel")}</div>
@@ -263,6 +193,16 @@ export function Popup() {
       </div>
 
       <Equalizer />
+
+      {micError && (
+        <div className="error-banner">{t(errorMessages[micError] ?? "errorMicUnknown")}</div>
+      )}
+
+      <ModeGrid isLoaded={isLoaded} mode={resolvedMode} onSelect={handleModeChange} />
+
+      {isLoaded && <MicToggleButton mode={resolvedMode} state={state} />}
+
+      {shortcutHint && <div className="shortcut-hint">{t("shortcutHintPopup")}</div>}
 
       <div className="settings">
         <div className="setting">
