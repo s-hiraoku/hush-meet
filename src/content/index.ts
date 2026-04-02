@@ -604,6 +604,40 @@ chrome.storage.onChanged.addListener((changes) => {
     log("shortcut key changed:", shortcutKey);
   }
 
+  if (changes[STORAGE_KEYS.micToggleAction]) {
+    const action = changes[STORAGE_KEYS.micToggleAction].newValue as string;
+    if (action) {
+      // Clear the action immediately so it can be triggered again
+      void chrome.storage.local.set({ [STORAGE_KEYS.micToggleAction]: "" });
+
+      // Same logic as handleShortcutKeyDown but without keyboard event
+      if (!isModeActive(selectedMode) || !isListening) {
+        // Re-enable last active mode (same as shortcut in Off mode)
+        const modeToRestore = lastActiveMode;
+        selectedMode = modeToRestore;
+        void chrome.storage.local.set({ [STORAGE_KEYS.mode]: modeToRestore });
+        scheduleStartListening();
+      } else if (action === "unmute") {
+        shortcutUnmuteUntil = Date.now() + config.gracePeriod;
+        transition(State.UNMUTING);
+      } else if (action === "mute") {
+        transition(State.MUTED);
+      } else if (action === "toggle") {
+        const muted = isMeetMuted();
+        if (muted === true || currentState === State.MUTED) {
+          shortcutUnmuteUntil = Date.now() + config.gracePeriod;
+          transition(State.UNMUTING);
+        } else if (
+          muted === false ||
+          currentState === State.SPEAKING ||
+          currentState === State.GRACE
+        ) {
+          transition(State.MUTED);
+        }
+      }
+    }
+  }
+
   if (changes[STORAGE_KEYS.micDeviceId]) {
     const newId = (changes[STORAGE_KEYS.micDeviceId].newValue as string) || null;
     if (newId !== selectedMicDeviceId) {

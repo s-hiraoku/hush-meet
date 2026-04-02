@@ -9,13 +9,13 @@
   const W = canvas.width;
   const H = canvas.height;
 
-  // Grid dimensions
+  // Grid dimensions — sized to fit 440×520 popup canvas
   const COLS = 10;
   const ROWS = 20;
-  const CELL = 30; // 300 / 10 = 30, 600 / 20 = 30
+  const CELL = 26; // 26×20 = 520 matches canvas height, 26×10 = 260 playfield width
   const FIELD_X = 0; // playfield left edge
-  const PANEL_X = 310; // side panel left edge
-  const PANEL_W = W - PANEL_X;
+  const PANEL_X = COLS * CELL + 5; // side panel left edge (265)
+  const PANEL_W = W - PANEL_X; // side panel width (175)
 
   // Colors
   const BG = "#05050f";
@@ -27,13 +27,69 @@
   // Tetromino definitions: [shape, color]
   // Each shape is array of 4 [row, col] offsets
   const PIECES = {
-    I: { blocks: [[0,0],[0,1],[0,2],[0,3]], color: "#00e5ff" },
-    O: { blocks: [[0,0],[0,1],[1,0],[1,1]], color: "#ffdd00" },
-    T: { blocks: [[0,1],[1,0],[1,1],[1,2]], color: "#bf40ff" },
-    S: { blocks: [[0,1],[0,2],[1,0],[1,1]], color: "#00ffaa" },
-    Z: { blocks: [[0,0],[0,1],[1,1],[1,2]], color: "#ff2a6d" },
-    J: { blocks: [[0,0],[1,0],[1,1],[1,2]], color: "#3377ff" },
-    L: { blocks: [[0,2],[1,0],[1,1],[1,2]], color: "#ff8833" },
+    I: {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+      ],
+      color: "#00e5ff",
+    },
+    O: {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1],
+      ],
+      color: "#ffdd00",
+    },
+    T: {
+      blocks: [
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#bf40ff",
+    },
+    S: {
+      blocks: [
+        [0, 1],
+        [0, 2],
+        [1, 0],
+        [1, 1],
+      ],
+      color: "#00ffaa",
+    },
+    Z: {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#ff2a6d",
+    },
+    J: {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#3377ff",
+    },
+    L: {
+      blocks: [
+        [0, 2],
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#ff8833",
+    },
   };
   const PIECE_NAMES = Object.keys(PIECES);
 
@@ -78,9 +134,16 @@
     osc.stop(audioCtx.currentTime + dur);
   }
 
-  function soundRotate() { beep(600, 0.08); }
-  function soundDrop() { beep(200, 0.12); }
-  function soundLineClear() { beep(880, 0.2, "sine"); setTimeout(() => beep(1100, 0.15, "sine"), 100); }
+  function soundRotate() {
+    beep(600, 0.08);
+  }
+  function soundDrop() {
+    beep(200, 0.12);
+  }
+  function soundLineClear() {
+    beep(880, 0.2, "sine");
+    setTimeout(() => beep(1100, 0.15, "sine"), 100);
+  }
   function soundGameOver() {
     beep(300, 0.3, "sawtooth");
     setTimeout(() => beep(200, 0.3, "sawtooth"), 150);
@@ -103,7 +166,7 @@
   function createPiece(name) {
     const def = PIECES[name];
     return {
-      blocks: def.blocks.map(b => [b[0], b[1]]),
+      blocks: def.blocks.map((b) => [b[0], b[1]]),
       color: def.color,
       row: 0,
       col: Math.floor(COLS / 2) - 1,
@@ -129,19 +192,22 @@
   }
 
   function rotateBlocks(blocks, name) {
-    if (name === "O") return blocks.map(b => [b[0], b[1]]);
-    // Find bounding box center and rotate 90 CW
-    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    if (name === "O") return blocks.map((b) => [b[0], b[1]]);
+    // Find bounding box center and rotate 90° clockwise
+    let minR = Infinity,
+      maxR = -Infinity,
+      minC = Infinity,
+      maxC = -Infinity;
     for (const [r, c] of blocks) {
-      minR = Math.min(minR, r); maxR = Math.max(maxR, r);
-      minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+      minR = Math.min(minR, r);
+      maxR = Math.max(maxR, r);
+      minC = Math.min(minC, c);
+      maxC = Math.max(maxC, c);
     }
     const cr = (minR + maxR) / 2;
     const cc = (minC + maxC) / 2;
+    // 90° CW rotation around (cr, cc): (r,c) → (cr + (c - cc), cc - (r - cr))
     return blocks.map(([r, c]) => {
-      const nr = Math.round(cc - cr + r - (c - cc) + (cr - cc));
-      const nc = Math.round(cr - cc + c + (r - cr) - (cr - cc));
-      // Simplified: rotate around center
       return [Math.round(cr + (c - cc)), Math.round(cc - (r - cr))];
     });
   }
@@ -159,7 +225,7 @@
   function clearLines() {
     let cleared = 0;
     for (let r = ROWS - 1; r >= 0; r--) {
-      if (grid[r].every(cell => cell !== null)) {
+      if (grid[r].every((cell) => cell !== null)) {
         // Spawn particles along this row
         for (let c = 0; c < COLS; c++) {
           spawnParticles(FIELD_X + c * CELL + CELL / 2, r * CELL + CELL / 2, grid[r][c]);
@@ -190,7 +256,8 @@
       const angle = Math.random() * Math.PI * 2;
       const speed = 1 + Math.random() * 3;
       particles.push({
-        x, y,
+        x,
+        y,
         dx: Math.cos(angle) * speed,
         dy: Math.sin(angle) * speed,
         life: 20 + Math.random() * 10,
@@ -391,17 +458,22 @@
 
     // Draw next piece centered in panel
     if (!nextPiece) return;
-    const previewSize = 20;
+    const previewSize = 18;
     // Find bounding box
-    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    let minR = Infinity,
+      maxR = -Infinity,
+      minC = Infinity,
+      maxC = -Infinity;
     for (const [r, c] of nextPiece.blocks) {
-      minR = Math.min(minR, r); maxR = Math.max(maxR, r);
-      minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+      minR = Math.min(minR, r);
+      maxR = Math.max(maxR, r);
+      minC = Math.min(minC, c);
+      maxC = Math.max(maxC, c);
     }
     const pw = (maxC - minC + 1) * previewSize;
     const ph = (maxR - minR + 1) * previewSize;
     const ox = PANEL_X + (PANEL_W - pw) / 2 - minC * previewSize;
-    const oy = 50 + (80 - ph) / 2 - minR * previewSize;
+    const oy = 50 + (70 - ph) / 2 - minR * previewSize;
 
     for (const [br, bc] of nextPiece.blocks) {
       drawBlock(ox + bc * previewSize, oy + br * previewSize, previewSize, nextPiece.color);
@@ -412,12 +484,12 @@
     ctx.font = "11px 'Courier New', monospace";
     ctx.fillStyle = "#6060aa";
     ctx.textAlign = "center";
-    ctx.fillText("LINES", PANEL_X + PANEL_W / 2, 180);
+    ctx.fillText("LINES", PANEL_X + PANEL_W / 2, 160);
     ctx.fillStyle = NEON_GREEN;
     ctx.shadowColor = NEON_GREEN;
     ctx.shadowBlur = 4;
     ctx.font = "16px 'Courier New', monospace";
-    ctx.fillText(lines, PANEL_X + PANEL_W / 2, 200);
+    ctx.fillText(lines, PANEL_X + PANEL_W / 2, 180);
     ctx.restore();
 
     // Controls reminder

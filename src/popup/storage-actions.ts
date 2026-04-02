@@ -21,3 +21,7 @@ export function savePopupShortcut(shortcut: string) {
 export function savePopupMicDevice(deviceId: string) {
   chrome.storage.local.set({ [STORAGE_KEYS.micDeviceId]: deviceId });
 }
+
+export function savePopupMicToggle(action: string) {
+  void chrome.storage.local.set({ [STORAGE_KEYS.micToggleAction]: action });
+}

@@ -60,6 +60,10 @@ export const en: Messages = {
   localeKo: { message: "Korean" },
   localeEs: { message: "Spanish" },
   localeFr: { message: "French" },
+  micToggle: { message: "Mic Control" },
+  micToggleMute: { message: "Mute" },
+  micToggleUnmute: { message: "Unmute" },
+  micToggleEnable: { message: "Enable" },
 };
 
 export const ja: Messages = {
@@ -120,4 +124,8 @@ export const ja: Messages = {
   localeKo: { message: "한국어" },
   localeEs: { message: "Español" },
   localeFr: { message: "Français" },
+  micToggle: { message: "マイク操作" },
+  micToggleMute: { message: "ミュート" },
+  micToggleUnmute: { message: "ミュート解除" },
+  micToggleEnable: { message: "有効にする" },
 };
