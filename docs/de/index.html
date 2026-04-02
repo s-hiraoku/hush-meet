@@ -156,7 +156,7 @@
           <li>Echtzeit-Audiopegelmesser &amp; Spektrumanalysator</li>
           <li>Einstellbare Empfindlichkeit und Nachklingzeit</li>
           <li>
-            Manuelle Stummschaltungserkennung &mdash; folgt der Meet-seitigen Stummschaltung/Aufhebung ohne den gewählten Modus zu ändern
+            Manuelle Stummschaltungssicherheit &mdash; wenn Sie die Meet-Stummschaltungstaste direkt verwenden, wechselt die Erweiterung automatisch in den Aus-Modus, um Störungen zu vermeiden
           </li>
           <li>Mikrofongeräte-Auswahl &mdash; wählen Sie das gewünschte Mikrofon</li>
           <li>4 visuelle Themes (Standard / Analogradio / Boombox / Retro Future)</li>
@@ -224,16 +224,16 @@
         </table>
       </div>
 
-      <h2>Manuelle Stummschaltungserkennung</h2>
+      <h2>Manuelle Stummschaltungssicherheit</h2>
       <div class="card">
         <p>
-          Wenn Sie in Google Meet manuell stumm- oder freischalten, behält die Erweiterung den gewählten Modus bei und aktualisiert nur ihren internen Sprechstatus.
+          Wenn Sie über die Meet-Stummschaltungstaste manuell stumm- oder freischalten, wechselt die Erweiterung automatisch in den Aus-Modus. Dies verhindert, dass die Erweiterung Ihr Mikrofon unerwartet wieder einschaltet, nachdem Sie es absichtlich stummgeschaltet haben.
         </p>
         <ul>
           <li>Überwacht die Meet-Stummschaltungstaste über MutationObserver</li>
           <li>Unterscheidet zwischen erweiterungsinitiierten und benutzerinitiierten Stummschaltungsänderungen</li>
-          <li>Erfasst manuelle Stummschaltung als `MUTED` und manuelle Freischaltung als `SPEAKING`</li>
-          <li>Ändert nicht den gewählten Modus</li>
+          <li>Manuelle Stummschaltungstaste &rarr; Erweiterung wechselt in Aus-Modus</li>
+          <li>Verwenden Sie das Tastenkürzel (Strg+Umschalt+M), um die Stummschaltung zu steuern, während die Erweiterung aktiv bleibt</li>
         </ul>
       </div>
 
@@ -245,6 +245,7 @@
           <li>Auf das Hush Meet-Symbol in der Symbolleiste klicken</li>
           <li>Einen beliebigen Modus außer Aus wählen</li>
           <li>Mikrofonzugriff erlauben, wenn Sie dazu aufgefordert werden</li>
+          <li>Verwenden Sie das Tastenkürzel (Strg+Umschalt+M) für die Stummschaltung &mdash; ein direkter Klick auf die Meet-Stummschaltungstaste schaltet die Erweiterung in den Aus-Modus</li>
         </ol>
       </div>
 

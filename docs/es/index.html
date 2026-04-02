@@ -156,7 +156,7 @@
           <li>Medidor de nivel de audio en tiempo real y analizador de espectro</li>
           <li>Sensibilidad y período de gracia ajustables</li>
           <li>
-            Detección de silenciado manual &mdash; sigue el silenciado/activación del lado de Meet sin cambiar el modo seleccionado
+            Seguridad de silencio manual &mdash; si haces clic en el botón de silencio de Meet, la extensión cambia automáticamente al modo Apagado para evitar interferencias
           </li>
           <li>Selector de dispositivo de micrófono &mdash; elige qué micrófono usar</li>
           <li>4 temas visuales (Predeterminado / Radio Analógica / Boombox / Retro Futuro)</li>
@@ -224,16 +224,16 @@
         </table>
       </div>
 
-      <h2>Detección de silenciado manual</h2>
+      <h2>Seguridad de Silencio Manual</h2>
       <div class="card">
         <p>
-          Cuando silencias o activas manualmente el micrófono en Google Meet, la extensión mantiene el modo seleccionado y solo actualiza su estado interno de habla.
+          Cuando silencias o activas el micrófono manualmente desde el botón de Meet, la extensión cambia automáticamente al modo Apagado. Esto evita que la extensión encienda tu micrófono inesperadamente después de haberlo silenciado intencionalmente.
         </p>
         <ul>
           <li>Monitorea el botón de silencio de Meet mediante MutationObserver</li>
           <li>Distingue entre cambios de silencio iniciados por la extensión y por el usuario</li>
-          <li>Registra el silenciado manual como `MUTED` y la activación manual como `SPEAKING`</li>
-          <li>No cambia el modo seleccionado</li>
+          <li>Clic en botón de silencio manual &rarr; la extensión cambia a modo Apagado</li>
+          <li>Usa la tecla de atajo (Ctrl+Shift+M) para controlar el silencio manteniendo la extensión activa</li>
         </ul>
       </div>
 
@@ -245,6 +245,7 @@
           <li>Hacer clic en el icono de Hush Meet en la barra de herramientas</li>
           <li>Elegir cualquier modo excepto Desactivado</li>
           <li>Permitir el acceso al micrófono cuando se solicite</li>
+          <li>Usa la tecla de atajo (Ctrl+Shift+M) para silenciar &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado</li>
         </ol>
       </div>
 

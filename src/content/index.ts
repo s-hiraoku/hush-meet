@@ -111,6 +111,16 @@ function clearGraceTimer() {
   graceTimer = clearTimer(graceTimer);
 }
 
+/** Switch to Off mode when the user manually operates the Meet mute button. */
+function switchToOffMode() {
+  if (selectedMode === MODES.off) return;
+  selectedMode = MODES.off;
+  pttKeyHeld = false;
+  log("手動ミュート検出 — モードをOffに切り替え");
+  stopListening();
+  void chrome.storage.local.set({ [STORAGE_KEYS.mode]: MODES.off });
+}
+
 function clearEnsureMuteTimers() {
   if (ensureMuteTimerId) {
     ensureMuteTimerId = clearIntervalTimer(ensureMuteTimerId);
@@ -231,12 +241,13 @@ function startMuteObserver() {
       mode: selectedMode,
       mutingByExtension,
     });
-    if (nextState === State.MUTED) {
-      log("ユーザーが手動でミュートしました");
-      transition(nextState);
-    } else if (nextState === State.SPEAKING) {
-      log("ユーザーが手動でミュート解除しました");
-      transition(nextState);
+    if (nextState === State.MUTED || nextState === State.SPEAKING) {
+      log(
+        nextState === State.MUTED
+          ? "ユーザーが手動でミュートしました"
+          : "ユーザーが手動でミュート解除しました",
+      );
+      switchToOffMode();
     }
   };
 

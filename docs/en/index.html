@@ -156,7 +156,7 @@
           <li>Real-time audio level meter &amp; spectrum analyzer</li>
           <li>Adjustable sensitivity and grace period</li>
           <li>
-            Manual mute detection &mdash; follows Meet-side mute/unmute without changing the selected mode
+            Manual mute safety &mdash; if you click Meet's mute button directly, the extension automatically switches to Off mode to avoid interference
           </li>
           <li>Microphone device selector &mdash; choose which mic to use</li>
           <li>4 visual themes (Default / Analog Radio / Boombox / Retro Future)</li>
@@ -224,16 +224,16 @@
         </table>
       </div>
 
-      <h2>Manual Mute Detection</h2>
+      <h2>Manual Mute Safety</h2>
       <div class="card">
         <p>
-          When you manually mute or unmute in Google Meet, the extension keeps the selected mode and only updates its internal speaking state.
+          When you manually mute or unmute via the Meet mute button, the extension automatically switches to Off mode. This prevents the extension from unexpectedly turning your mic back on after you intentionally muted it.
         </p>
         <ul>
           <li>Monitors the Meet mute button via MutationObserver</li>
           <li>Distinguishes extension-initiated vs. user-initiated mute changes</li>
-          <li>Tracks manual mute as `MUTED` and manual unmute as `SPEAKING`</li>
-          <li>Does not change the selected mode</li>
+          <li>Manual mute button click &rarr; extension switches to Off mode</li>
+          <li>Use the shortcut key (Ctrl+Shift+M) to control mute while keeping the extension active</li>
         </ul>
       </div>
 
@@ -245,6 +245,7 @@
           <li>Click the Hush Meet icon in the toolbar</li>
           <li>Choose any mode except Off</li>
           <li>Allow microphone access when prompted</li>
+          <li>Use the shortcut key (Ctrl+Shift+M) to toggle mute &mdash; clicking Meet's mute button directly will switch the extension to Off mode</li>
         </ol>
       </div>
 

@@ -156,7 +156,7 @@
           <li>Indicateur de niveau audio en temps réel et analyseur de spectre</li>
           <li>Sensibilité et délai de grâce réglables</li>
           <li>
-            Détection de la mise en sourdine manuelle &mdash; suit la mise en sourdine/réactivation côté Meet sans changer le mode sélectionné
+            Sécurité de mise en sourdine manuelle &mdash; si vous cliquez sur le bouton de mise en sourdine de Meet, l'extension passe automatiquement en mode Désactivé pour éviter les interférences
           </li>
           <li>Sélecteur de microphone &mdash; choisissez le micro à utiliser</li>
           <li>4 thèmes visuels (Par défaut / Radio Analogique / Boombox / Rétro Futur)</li>
@@ -224,16 +224,16 @@
         </table>
       </div>
 
-      <h2>Détection de la mise en sourdine manuelle</h2>
+      <h2>Sécurité de Mise en Sourdine Manuelle</h2>
       <div class="card">
         <p>
-          Lorsque vous activez ou désactivez manuellement la sourdine dans Google Meet, l'extension conserve le mode sélectionné et met uniquement à jour son état interne de parole.
+          Lorsque vous mettez en sourdine ou réactivez manuellement via le bouton Meet, l'extension passe automatiquement en mode Désactivé. Cela empêche l'extension de réactiver votre microphone de manière inattendue après l'avoir volontairement mis en sourdine.
         </p>
         <ul>
           <li>Surveille le bouton de sourdine de Meet via MutationObserver</li>
           <li>Distingue les changements de sourdine initiés par l'extension de ceux initiés par l'utilisateur</li>
-          <li>Enregistre la mise en sourdine manuelle comme « MUTED » et la réactivation manuelle comme « SPEAKING »</li>
-          <li>Ne change pas le mode sélectionné</li>
+          <li>Clic sur le bouton de sourdine manuel &rarr; l'extension passe en mode Désactivé</li>
+          <li>Utilisez le raccourci clavier (Ctrl+Shift+M) pour contrôler la sourdine tout en gardant l'extension active</li>
         </ul>
       </div>
 
@@ -245,6 +245,7 @@
           <li>Cliquer sur l'icône Hush Meet dans la barre d'outils</li>
           <li>Choisir n'importe quel mode sauf Désactivé</li>
           <li>Autoriser l'accès au microphone lorsque demandé</li>
+          <li>Utilisez le raccourci (Ctrl+Shift+M) pour la sourdine &mdash; cliquer sur le bouton sourdine de Meet passera l'extension en mode Désactivé</li>
         </ol>
       </div>
 
