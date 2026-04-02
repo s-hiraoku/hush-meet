@@ -51,6 +51,7 @@ let startupTimerId: ReturnType<typeof setTimeout> | null = null;
 let mutingByExtension = false;
 let selectedMicDeviceId: string | null = null;
 let selectedMode: ModeId = MODES.off;
+let lastActiveMode: ModeId = MODES.auto;
 let shortcutKey = DEFAULT_SHORTCUT;
 let pttKeyHeld = false;
 let listeningRunId = 0;
@@ -138,11 +139,6 @@ function startShortcutListener() {
   log("ショートカットリスナー登録完了");
 }
 
-function stopShortcutListener() {
-  window.removeEventListener("keydown", handleShortcutKeyDown, true);
-  window.removeEventListener("keyup", handleShortcutKeyUp, true);
-}
-
 function handleShortcutKeyDown(e: KeyboardEvent) {
   if (
     !shouldTriggerShortcutKeyDown({
@@ -157,6 +153,16 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
   }
 
   consumeShortcutEvent(e);
+
+  // If mode is Off or not listening, re-enable the last active mode
+  if (!isModeActive(selectedMode) || !isListening) {
+    const modeToRestore = lastActiveMode;
+    selectedMode = modeToRestore;
+    void chrome.storage.local.set({ [STORAGE_KEYS.mode]: modeToRestore });
+    log(`ショートカットでモードを復元: ${modeToRestore}`);
+    scheduleStartListening();
+    return;
+  }
 
   if (shouldUsePushToTalkHold(selectedMode)) {
     pttKeyHeld = true;
@@ -495,7 +501,6 @@ async function startListening() {
 
     // Start observing user mute actions
     startMuteObserver();
-    startShortcutListener();
   } catch (err) {
     const error = err as DOMException;
     let errorMsg: string;
@@ -539,7 +544,6 @@ function stopListening() {
   clearGraceTimer();
   clearEnsureMuteTimers();
   stopMuteObserver();
-  stopShortcutListener();
   pttKeyHeld = false;
   shortcutUnmuteUntil = 0;
 
@@ -582,6 +586,9 @@ chrome.storage.onChanged.addListener((changes) => {
     }
     if (newMode !== selectedMode) {
       selectedMode = newMode;
+      if (isModeActive(newMode)) {
+        lastActiveMode = newMode;
+      }
       pttKeyHeld = false;
       log("モードを変更:", selectedMode);
       if (!isModeActive(newMode)) {
@@ -614,6 +621,9 @@ chrome.storage.local.get(
   [STORAGE_KEYS.config, STORAGE_KEYS.micDeviceId, STORAGE_KEYS.mode, STORAGE_KEYS.shortcutKey],
   (result) => {
     selectedMode = normalizeMode(result[STORAGE_KEYS.mode]);
+    if (isModeActive(selectedMode)) {
+      lastActiveMode = selectedMode;
+    }
     if (result[STORAGE_KEYS.mode] === undefined || result[STORAGE_KEYS.mode] !== selectedMode) {
       void chrome.storage.local.set({ [STORAGE_KEYS.mode]: selectedMode });
     }
@@ -625,6 +635,8 @@ chrome.storage.local.get(
     if (isModeActive(selectedMode)) {
       scheduleStartListening(2000);
     }
+    // Always register the shortcut listener so it works even in Off mode
+    startShortcutListener();
   },
 );
 
