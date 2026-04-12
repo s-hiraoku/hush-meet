@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 import { MODES, type ModeId } from "../constants";
 import { t } from "../i18n.ts";
-import { savePopupMicToggle } from "./storage-actions";
+import { savePopupMicToggle, type MicToggleAction } from "./storage-actions";
 
 const MicIcon = ({ strikeThrough }: { strikeThrough: boolean }) => (
   <svg
@@ -34,8 +34,8 @@ export function MicToggleButton({ mode, state }: Props) {
   const isMuted = state === "MUTED" || state === "IDLE";
 
   // Debounce rapid PTT writes — skip if already in the desired state
-  const lastAction = useRef("");
-  const sendAction = useCallback((action: string) => {
+  const lastAction = useRef<MicToggleAction | "">("");
+  const sendAction = useCallback((action: MicToggleAction) => {
     if (action === lastAction.current) return;
     lastAction.current = action;
     savePopupMicToggle(action);

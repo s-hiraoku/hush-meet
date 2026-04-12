@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1] - 2026-04-12
+
+### Fixed
+
+- Stabilize popup mic toggle actions so repeated clicks and press/release actions are not dropped
+- Improve popup shortcut hint timing cleanup to avoid stale UI state after repeated triggers
+
 ## [1.1.0] - 2026-04-03
 
 ### Added
@@ -120,4 +127,3 @@
 - Bump version to 1.0.1 (f32e3fe)
 
 ## [1.0.0] - 2026-03-21
-

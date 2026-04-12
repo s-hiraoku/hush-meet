@@ -84,6 +84,19 @@ const MUTE_BUTTON_ATTRS = ["aria-label", "aria-pressed", "data-tooltip", "data-i
 const log = (msg: string, ...args: unknown[]) => console.log(`[HushMeet] ${msg}`, ...args);
 const warn = (msg: string, ...args: unknown[]) => console.warn(`[HushMeet] ${msg}`, ...args);
 
+function getRequestedMicToggleAction(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (
+    value &&
+    typeof value === "object" &&
+    "action" in value &&
+    typeof (value as { action?: unknown }).action === "string"
+  ) {
+    return (value as { action: string }).action;
+  }
+  return "";
+}
+
 function markExtensionMuteAction(action: () => void) {
   mutingByExtension = true;
   runMuteAction(action, () => {
@@ -616,7 +629,7 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 
   if (changes[STORAGE_KEYS.micToggleAction]) {
-    const action = changes[STORAGE_KEYS.micToggleAction].newValue as string;
+    const action = getRequestedMicToggleAction(changes[STORAGE_KEYS.micToggleAction].newValue);
     if (action) {
       // Clear the action immediately so it can be triggered again
       void chrome.storage.local.set({ [STORAGE_KEYS.micToggleAction]: "" });

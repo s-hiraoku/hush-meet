@@ -76,4 +76,4 @@ export const THEME_LIST: { id: ThemeId; label: string }[] = [
 
 export const DEFAULT_SHORTCUT = "Ctrl+Shift+M";
 
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.1.1";

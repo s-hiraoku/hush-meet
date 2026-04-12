@@ -15,6 +15,7 @@ import {
 import {
   savePopupConfig,
   savePopupMicDevice,
+  savePopupMicToggle,
   savePopupMode,
   savePopupShortcut,
 } from "../popup/storage-actions.ts";
@@ -80,6 +81,20 @@ describe("content and popup helpers", () => {
     expect(storageSet).toHaveBeenCalledWith({ [STORAGE_KEYS.micDeviceId]: "mic-1" });
   });
 
+  it("sends mic toggle requests with unique timestamps", () => {
+    vi.spyOn(Date, "now").mockReturnValueOnce(1000).mockReturnValueOnce(1001);
+
+    savePopupMicToggle("toggle");
+    savePopupMicToggle("toggle");
+
+    expect(storageSet).toHaveBeenNthCalledWith(1, {
+      [STORAGE_KEYS.micToggleAction]: { action: "toggle", requestedAt: 1000 },
+    });
+    expect(storageSet).toHaveBeenNthCalledWith(2, {
+      [STORAGE_KEYS.micToggleAction]: { action: "toggle", requestedAt: 1001 },
+    });
+  });
+
   it("clears timers and intervals", () => {
     const timeoutId = setTimeout(() => {}, 1000);
     const intervalId = setInterval(() => {}, 1000);
@@ -97,25 +112,30 @@ describe("content and popup helpers", () => {
   });
 
   it("consumes shortcut event", () => {
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    const stopImmediatePropagation = vi.fn();
     const event = {
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
-      stopImmediatePropagation: vi.fn(),
+      preventDefault,
+      stopPropagation,
+      stopImmediatePropagation,
     } as unknown as KeyboardEvent;
     consumeShortcutEvent(event);
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(event.stopPropagation).toHaveBeenCalled();
-    expect(event.stopImmediatePropagation).toHaveBeenCalled();
+    expect(preventDefault).toHaveBeenCalled();
+    expect(stopPropagation).toHaveBeenCalled();
+    expect(stopImmediatePropagation).toHaveBeenCalled();
   });
 
   it("consumes shortcut event without stopImmediatePropagation", () => {
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
     const event = {
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
+      preventDefault,
+      stopPropagation,
     } as unknown as KeyboardEvent;
     consumeShortcutEvent(event);
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(preventDefault).toHaveBeenCalled();
+    expect(stopPropagation).toHaveBeenCalled();
   });
 
   it("delegates shortcut trigger policy", () => {

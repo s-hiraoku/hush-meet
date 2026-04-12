@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   THRESHOLD_RANGE,
   GRACE_RANGE,
@@ -63,6 +63,7 @@ export function Popup() {
   const [recordingShortcut, setRecordingShortcut] = useState(false);
   const [shortcutHint, setShortcutHint] = useState(false);
   const [, setRenderKey] = useState(0);
+  const shortcutHintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     gracePeriod,
     isLoaded,
@@ -95,11 +96,23 @@ export function Popup() {
       if (shortcutKey && matchesShortcut(e, shortcutKey)) {
         e.preventDefault();
         setShortcutHint(true);
-        setTimeout(() => setShortcutHint(false), 4000);
+        if (shortcutHintTimeoutRef.current) {
+          clearTimeout(shortcutHintTimeoutRef.current);
+        }
+        shortcutHintTimeoutRef.current = setTimeout(() => {
+          shortcutHintTimeoutRef.current = null;
+          setShortcutHint(false);
+        }, 4000);
       }
     };
     window.addEventListener("keydown", handler, true);
-    return () => window.removeEventListener("keydown", handler, true);
+    return () => {
+      window.removeEventListener("keydown", handler, true);
+      if (shortcutHintTimeoutRef.current) {
+        clearTimeout(shortcutHintTimeoutRef.current);
+        shortcutHintTimeoutRef.current = null;
+      }
+    };
   }, [shortcutKey, recordingShortcut]);
 
   const resolvedMode = mode ?? MODES.off;
