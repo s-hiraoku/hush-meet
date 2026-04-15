@@ -1,5 +1,9 @@
 import type { ModeId } from "../constants.ts";
-import { shouldHandleShortcutKeyDown, shouldHandleShortcutKeyUp } from "../shortcut.ts";
+import {
+  getFixedModeShortcutTarget,
+  shouldHandleShortcutKeyDown,
+  shouldHandleShortcutKeyUp,
+} from "../shortcut.ts";
 
 export function consumeShortcutEvent(e: KeyboardEvent) {
   e.preventDefault();
@@ -23,6 +27,10 @@ export function shouldTriggerShortcutKeyDown(args: {
     pttKeyHeld: args.pttKeyHeld,
     shortcut: args.shortcut,
   });
+}
+
+export function getModeSwitchShortcutTarget(event: KeyboardEvent) {
+  return getFixedModeShortcutTarget(event);
 }
 
 export function shouldTriggerShortcutKeyUp(args: {

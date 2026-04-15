@@ -1,5 +1,6 @@
 import { SILENCE_RATIO, STORAGE_KEYS, type ModeId } from "../constants";
 import { migrateConfig, setConfigForMode } from "../content/config.ts";
+import { persistModeSelection } from "../mode-control.ts";
 
 export type MicToggleAction = "toggle" | "mute" | "unmute";
 
@@ -21,7 +22,7 @@ export function savePopupConfig(mode: ModeId, speechThreshold: number, gracePeri
 }
 
 export function savePopupMode(mode: ModeId) {
-  void chrome.storage.local.set({ [STORAGE_KEYS.mode]: mode });
+  persistModeSelection(mode);
 }
 
 export function savePopupShortcut(shortcut: string) {

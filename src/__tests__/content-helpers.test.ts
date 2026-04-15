@@ -9,6 +9,7 @@ import {
 import { clearIntervalTimer, clearTimer } from "../content/timers.ts";
 import {
   consumeShortcutEvent,
+  getModeSwitchShortcutTarget,
   shouldTriggerShortcutKeyDown,
   shouldTriggerShortcutKeyUp,
 } from "../content/shortcut-controller.ts";
@@ -139,6 +140,28 @@ describe("content and popup helpers", () => {
   });
 
   it("delegates shortcut trigger policy", () => {
+    expect(
+      getModeSwitchShortcutTarget({
+        ctrlKey: true,
+        shiftKey: true,
+        altKey: false,
+        metaKey: false,
+        key: "2",
+        repeat: false,
+      } as KeyboardEvent),
+    ).toBe(MODES.autoOff);
+
+    expect(
+      getModeSwitchShortcutTarget({
+        ctrlKey: true,
+        shiftKey: true,
+        altKey: false,
+        metaKey: false,
+        key: "2",
+        repeat: true,
+      } as KeyboardEvent),
+    ).toBeNull();
+
     expect(
       shouldTriggerShortcutKeyDown({
         isListening: true,

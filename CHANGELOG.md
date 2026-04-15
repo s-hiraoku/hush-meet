@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-04-15
+
+### Added
+
+- Fixed keyboard shortcuts to switch modes on the Meet tab: `Ctrl+Shift+0` (Off), `Ctrl+Shift+1` (Auto), `Ctrl+Shift+2` (Auto-Off), `Ctrl+Shift+3` (Push-to-Talk)
+- The existing customizable mic-toggle shortcut (`Ctrl+Shift+M` by default) is preserved and continues to work alongside the new mode shortcuts
+
 ## [1.1.1] - 2026-04-12
 
 ### Fixed

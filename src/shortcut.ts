@@ -8,6 +8,13 @@ type ShortcutMatchEvent = Pick<
 
 type ShortcutKeyDownEvent = ShortcutMatchEvent & Pick<KeyboardEvent, "repeat">;
 
+const FIXED_MODE_SHORTCUTS = [
+  { shortcut: "Ctrl+Shift+0", mode: MODES.off },
+  { shortcut: "Ctrl+Shift+1", mode: MODES.auto },
+  { shortcut: "Ctrl+Shift+2", mode: MODES.autoOff },
+  { shortcut: "Ctrl+Shift+3", mode: MODES.pushToTalk },
+] as const;
+
 export function parseShortcut(shortcut: string) {
   const parts = shortcut.toLowerCase().split("+");
   return {
@@ -58,6 +65,12 @@ export function shouldHandleShortcutKeyDown({
   // Allow shortcut when mode is off (caller handles re-enabling)
   if (isModeActive(mode) && mode === MODES.pushToTalk && pttKeyHeld) return false;
   return true;
+}
+
+export function getFixedModeShortcutTarget(event: ShortcutKeyDownEvent): ModeId | null {
+  if (event.repeat) return null;
+  const match = FIXED_MODE_SHORTCUTS.find(({ shortcut }) => matchesShortcut(event, shortcut));
+  return match?.mode ?? null;
 }
 
 export function shouldHandleShortcutKeyUp({

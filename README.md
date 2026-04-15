@@ -16,6 +16,7 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 4. Allow microphone access when prompted
 5. Use the **mic button** in the popup to mute/unmute without closing it — in Push-to-Talk mode, press and hold the button to talk
 6. You can also use `Ctrl+Shift+M` on the Meet tab to toggle mute or hold-to-talk (Push-to-Talk)
+7. Switch modes from the Meet tab using fixed shortcuts: `Ctrl+Shift+0` (Off), `Ctrl+Shift+1` (Auto), `Ctrl+Shift+2` (Auto-Off), `Ctrl+Shift+3` (Push-to-Talk)
 
 > **Note:** If you click Meet's own mute button directly, the extension switches to Off mode to avoid interference.
 
@@ -34,6 +35,7 @@ A Chrome extension that automatically mutes your microphone on Google Meet when 
 | ------------------ | ------------------------------------ | ----------------------- |
 | Mode               | Off / Auto / Auto-Off / Push-to-Talk | Auto                    |
 | Shortcut Key       | Keyboard shortcut for mute control   | Ctrl+Shift+M            |
+| Mode Shortcuts     | Fixed keys to switch mode on Meet tab | Ctrl+Shift+0/1/2/3      |
 | Speech Sensitivity | Volume threshold to trigger unmute   | 0.025                   |
 | Grace Period       | Delay before re-muting after speech  | 1.5s                    |
 | Microphone         | Audio input device                   | System Default          |

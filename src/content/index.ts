@@ -11,10 +11,11 @@ import {
   normalizeMode,
 } from "../constants.ts";
 import type { ModeId } from "../constants.ts";
-import { isModeActive, shouldUsePushToTalkHold } from "../mode-control.ts";
+import { isModeActive, persistModeSelection, shouldUsePushToTalkHold } from "../mode-control.ts";
 import { computeVoiceBins, computeVoiceWeightedRms } from "./voice-detection.ts";
 import {
   consumeShortcutEvent,
+  getModeSwitchShortcutTarget,
   shouldTriggerShortcutKeyDown,
   shouldTriggerShortcutKeyUp,
 } from "./shortcut-controller.ts";
@@ -162,6 +163,13 @@ function startShortcutListener() {
 }
 
 function handleShortcutKeyDown(e: KeyboardEvent) {
+  const modeShortcutTarget = getModeSwitchShortcutTarget(e);
+  if (modeShortcutTarget) {
+    consumeShortcutEvent(e);
+    persistModeSelection(modeShortcutTarget);
+    return;
+  }
+
   if (
     !shouldTriggerShortcutKeyDown({
       isListening,
