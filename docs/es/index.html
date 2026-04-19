@@ -151,7 +151,7 @@
             Botón de micrófono en el popup &mdash; silencia/activa el micrófono directamente desde el popup sin cerrarlo. En modo Pulsar para hablar, el botón funciona como mantener para hablar (mantén presionado para activar, suelta para silenciar)
           </li>
           <li>
-            Tecla de atajo personalizable (predeterminada: Ctrl+Shift+M) &mdash; disponible en todos los modos excepto Desactivado
+            Atajo de silencio personalizable (predeterminado: Ctrl+Shift+M) más atajos fijos de cambio de modo en la pestaña de Meet: Ctrl+Shift+0 Desactivado, Ctrl+Shift+1 Auto, Ctrl+Shift+2 Auto-Off, Ctrl+Shift+3 Pulsar para hablar
           </li>
           <li>Monitoreo de audio independiente (flujo de micrófono separado de Google Meet)</li>
           <li>Puerta de ruido ponderada por voz &mdash; enfatiza las frecuencias de la voz humana (300Hz&ndash;3kHz), reduciendo falsas activaciones por teclado, ventilador y ruido ambiental</li>
@@ -196,7 +196,7 @@
           </tr>
           <tr>
             <td>Tecla de atajo</td>
-            <td>Atajo de teclado para control de silencio (todos los modos excepto Desactivado)</td>
+            <td>Atajo de teclado para controlar el silencio (todos los modos excepto Desactivado) más atajos fijos de modo en la pestaña de Meet: Ctrl+Shift+0/1/2/3</td>
             <td>Ctrl+Shift+M</td>
           </tr>
           <tr>
@@ -236,7 +236,7 @@
           <li>Monitorea el botón de silencio de Meet mediante MutationObserver</li>
           <li>Distingue entre cambios de silencio iniciados por la extensión y por el usuario</li>
           <li>Clic en botón de silencio manual &rarr; la extensión cambia a modo Apagado</li>
-          <li>Usa la tecla de atajo (Ctrl+Shift+M) para controlar el silencio manteniendo la extensión activa</li>
+          <li>Usa la tecla de atajo (Ctrl+Shift+M) para controlar el silencio manteniendo la extensión activa, o Ctrl+Shift+0/1/2/3 para saltar directamente a Desactivado / Auto / Auto-Off / Pulsar para hablar</li>
         </ul>
       </div>
 
@@ -249,7 +249,7 @@
           <li>Elegir cualquier modo excepto Desactivado</li>
           <li>Permitir el acceso al micrófono cuando se solicite</li>
           <li>Usa el botón de micrófono en el popup para silenciar/activar sin cerrarlo &mdash; en modo Pulsar para hablar, mantén presionado el botón para hablar</li>
-          <li>También puedes usar la tecla de atajo (Ctrl+Shift+M) en la pestaña de Meet &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado</li>
+          <li>También puedes usar Ctrl+Shift+M en la pestaña de Meet para alternar el silencio, o Ctrl+Shift+0/1/2/3 para cambiar de modo directamente &mdash; hacer clic en el botón de silencio de Meet cambiará la extensión al modo Apagado</li>
         </ol>
       </div>
 
