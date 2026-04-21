@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1] - 2026-04-21
+
+### Fixed
+
+- Mode switch shortcuts (`Ctrl+Shift+0-3`) now use physical key codes (`event.code`) instead of `event.key`, fixing the issue where Shift modified the key value on most keyboard layouts
+- Mic toggle shortcut (`Ctrl+Shift+M`) no longer changes the mode when pressed in Off mode
+- Shortcut events are no longer silently consumed when no action is taken
+
 ## [1.2.0] - 2026-04-15
 
 ### Added
