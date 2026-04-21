@@ -13,12 +13,12 @@ type ShortcutKeyDownEvent = ShortcutMatchEvent & Pick<KeyboardEvent, "code" | "r
  * because Shift changes the key value on many layouts
  * (e.g. Shift+1 = "!" on US, Shift+0 = ")" etc.).
  */
-const FIXED_MODE_SHORTCUTS: ReadonlyArray<{ code: string; mode: ModeId }> = [
+const FIXED_MODE_SHORTCUTS = [
   { code: "Digit0", mode: MODES.off },
   { code: "Digit1", mode: MODES.auto },
   { code: "Digit2", mode: MODES.autoOff },
   { code: "Digit3", mode: MODES.pushToTalk },
-];
+] as const;
 
 export function parseShortcut(shortcut: string) {
   const parts = shortcut.toLowerCase().split("+");

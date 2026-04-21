@@ -166,7 +166,6 @@ describe("content and popup helpers", () => {
 
     expect(
       shouldTriggerShortcutKeyDown({
-        isListening: true,
         mode: MODES.autoOff,
         pttKeyHeld: false,
         shortcut: "Ctrl+Shift+M",
@@ -183,7 +182,6 @@ describe("content and popup helpers", () => {
 
     expect(
       shouldTriggerShortcutKeyUp({
-        isListening: true,
         mode: MODES.pushToTalk,
         pttKeyHeld: true,
         shortcut: "Ctrl+Shift+M",

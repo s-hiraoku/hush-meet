@@ -172,7 +172,6 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
 
   if (
     !shouldTriggerShortcutKeyDown({
-      isListening,
       event: e,
       mode: selectedMode,
       pttKeyHeld,
@@ -181,8 +180,6 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
   ) {
     return;
   }
-
-  consumeShortcutEvent(e);
 
   // If mode is Off, ignore mic-toggle shortcut — use mode shortcuts (Ctrl+Shift+0-3) instead
   if (!isModeActive(selectedMode)) {
@@ -193,6 +190,8 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
   if (!isListening) {
     return;
   }
+
+  consumeShortcutEvent(e);
 
   if (shouldUsePushToTalkHold(selectedMode)) {
     pttKeyHeld = true;
@@ -214,7 +213,6 @@ function handleShortcutKeyUp(e: KeyboardEvent) {
   if (!shouldUsePushToTalkHold(selectedMode)) return;
   if (
     !shouldTriggerShortcutKeyUp({
-      isListening,
       event: e,
       mode: selectedMode,
       pttKeyHeld,
