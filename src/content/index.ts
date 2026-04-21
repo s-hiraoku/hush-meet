@@ -184,13 +184,13 @@ function handleShortcutKeyDown(e: KeyboardEvent) {
 
   consumeShortcutEvent(e);
 
-  // If mode is Off or not listening, re-enable the last active mode
-  if (!isModeActive(selectedMode) || !isListening) {
-    const modeToRestore = lastActiveMode;
-    selectedMode = modeToRestore;
-    void chrome.storage.local.set({ [STORAGE_KEYS.mode]: modeToRestore });
-    log(`ショートカットでモードを復元: ${modeToRestore}`);
-    scheduleStartListening();
+  // If mode is Off, ignore mic-toggle shortcut — use mode shortcuts (Ctrl+Shift+0-3) instead
+  if (!isModeActive(selectedMode)) {
+    return;
+  }
+
+  // If listening hasn't started yet, wait for it
+  if (!isListening) {
     return;
   }
 

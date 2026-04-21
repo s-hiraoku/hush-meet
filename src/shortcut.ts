@@ -6,14 +6,19 @@ type ShortcutMatchEvent = Pick<
   "altKey" | "ctrlKey" | "key" | "metaKey" | "shiftKey"
 >;
 
-type ShortcutKeyDownEvent = ShortcutMatchEvent & Pick<KeyboardEvent, "repeat">;
+type ShortcutKeyDownEvent = ShortcutMatchEvent & Pick<KeyboardEvent, "code" | "repeat">;
 
-const FIXED_MODE_SHORTCUTS = [
-  { shortcut: "Ctrl+Shift+0", mode: MODES.off },
-  { shortcut: "Ctrl+Shift+1", mode: MODES.auto },
-  { shortcut: "Ctrl+Shift+2", mode: MODES.autoOff },
-  { shortcut: "Ctrl+Shift+3", mode: MODES.pushToTalk },
-] as const;
+/**
+ * Fixed mode shortcuts use `event.code` (physical key) instead of `event.key`
+ * because Shift changes the key value on many layouts
+ * (e.g. Shift+1 = "!" on US, Shift+0 = ")" etc.).
+ */
+const FIXED_MODE_SHORTCUTS: ReadonlyArray<{ code: string; mode: ModeId }> = [
+  { code: "Digit0", mode: MODES.off },
+  { code: "Digit1", mode: MODES.auto },
+  { code: "Digit2", mode: MODES.autoOff },
+  { code: "Digit3", mode: MODES.pushToTalk },
+];
 
 export function parseShortcut(shortcut: string) {
   const parts = shortcut.toLowerCase().split("+");
@@ -69,7 +74,8 @@ export function shouldHandleShortcutKeyDown({
 
 export function getFixedModeShortcutTarget(event: ShortcutKeyDownEvent): ModeId | null {
   if (event.repeat) return null;
-  const match = FIXED_MODE_SHORTCUTS.find(({ shortcut }) => matchesShortcut(event, shortcut));
+  if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey) return null;
+  const match = FIXED_MODE_SHORTCUTS.find(({ code }) => event.code === code);
   return match?.mode ?? null;
 }
 

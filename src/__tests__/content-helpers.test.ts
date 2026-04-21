@@ -146,7 +146,8 @@ describe("content and popup helpers", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "2",
+        key: "@",
+        code: "Digit2",
         repeat: false,
       } as KeyboardEvent),
     ).toBe(MODES.autoOff);
@@ -157,7 +158,8 @@ describe("content and popup helpers", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "2",
+        key: "@",
+        code: "Digit2",
         repeat: true,
       } as KeyboardEvent),
     ).toBeNull();

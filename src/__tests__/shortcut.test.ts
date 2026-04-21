@@ -44,6 +44,7 @@ describe("shortcut utilities", () => {
           altKey: false,
           metaKey: false,
           key: "m",
+          code: "KeyM",
           repeat: true,
         },
         mode: MODES.autoOff,
@@ -53,14 +54,15 @@ describe("shortcut utilities", () => {
     ).toBe(false);
   });
 
-  it("maps fixed mode shortcuts to the correct modes", () => {
+  it("maps fixed mode shortcuts to the correct modes (using event.code)", () => {
     expect(
       getFixedModeShortcutTarget({
         ctrlKey: true,
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "0",
+        key: ")",
+        code: "Digit0",
         repeat: false,
       }),
     ).toBe(MODES.off);
@@ -70,7 +72,8 @@ describe("shortcut utilities", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "1",
+        key: "!",
+        code: "Digit1",
         repeat: false,
       }),
     ).toBe(MODES.auto);
@@ -80,7 +83,8 @@ describe("shortcut utilities", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "2",
+        key: "@",
+        code: "Digit2",
         repeat: false,
       }),
     ).toBe(MODES.autoOff);
@@ -90,7 +94,8 @@ describe("shortcut utilities", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "3",
+        key: "#",
+        code: "Digit3",
         repeat: false,
       }),
     ).toBe(MODES.pushToTalk);
@@ -103,7 +108,8 @@ describe("shortcut utilities", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "4",
+        key: "$",
+        code: "Digit4",
         repeat: false,
       }),
     ).toBeNull();
@@ -116,13 +122,14 @@ describe("shortcut utilities", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "1",
+        key: "!",
+        code: "Digit1",
         repeat: true,
       }),
     ).toBeNull();
   });
 
-  it("does not trigger fixed mode shortcuts when modifiers do not match", () => {
+  it("does not trigger fixed mode shortcuts when Shift is missing", () => {
     expect(
       getFixedModeShortcutTarget({
         ctrlKey: true,
@@ -130,6 +137,21 @@ describe("shortcut utilities", () => {
         altKey: false,
         metaKey: false,
         key: "0",
+        code: "Digit0",
+        repeat: false,
+      }),
+    ).toBeNull();
+  });
+
+  it("does not trigger fixed mode shortcuts when Ctrl is missing", () => {
+    expect(
+      getFixedModeShortcutTarget({
+        ctrlKey: false,
+        shiftKey: true,
+        altKey: false,
+        metaKey: false,
+        key: "!",
+        code: "Digit1",
         repeat: false,
       }),
     ).toBeNull();
@@ -145,6 +167,7 @@ describe("shortcut utilities", () => {
           altKey: false,
           metaKey: false,
           key: "m",
+          code: "KeyM",
           repeat: false,
         },
         mode: MODES.autoOff,
@@ -164,6 +187,7 @@ describe("shortcut utilities", () => {
           altKey: false,
           metaKey: false,
           key: "m",
+          code: "KeyM",
           repeat: false,
         },
         mode: MODES.auto,
@@ -183,6 +207,7 @@ describe("shortcut utilities", () => {
           altKey: true,
           metaKey: false,
           key: "u",
+          code: "KeyU",
           repeat: false,
         },
         mode: MODES.autoOff,
@@ -238,6 +263,7 @@ describe("shortcut utilities", () => {
           altKey: false,
           metaKey: false,
           key: "m",
+          code: "KeyM",
           repeat: false,
         },
         mode: MODES.pushToTalk,
