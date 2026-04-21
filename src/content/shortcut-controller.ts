@@ -14,7 +14,6 @@ export function consumeShortcutEvent(e: KeyboardEvent) {
 }
 
 export function shouldTriggerShortcutKeyDown(args: {
-  isListening: boolean;
   mode: ModeId;
   pttKeyHeld: boolean;
   shortcut: string;
@@ -34,7 +33,6 @@ export function getModeSwitchShortcutTarget(event: KeyboardEvent) {
 }
 
 export function shouldTriggerShortcutKeyUp(args: {
-  isListening: boolean;
   mode: ModeId;
   pttKeyHeld: boolean;
   shortcut: string;

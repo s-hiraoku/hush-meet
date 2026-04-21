@@ -146,7 +146,8 @@ describe("content and popup helpers", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "2",
+        key: "@",
+        code: "Digit2",
         repeat: false,
       } as KeyboardEvent),
     ).toBe(MODES.autoOff);
@@ -157,14 +158,14 @@ describe("content and popup helpers", () => {
         shiftKey: true,
         altKey: false,
         metaKey: false,
-        key: "2",
+        key: "@",
+        code: "Digit2",
         repeat: true,
       } as KeyboardEvent),
     ).toBeNull();
 
     expect(
       shouldTriggerShortcutKeyDown({
-        isListening: true,
         mode: MODES.autoOff,
         pttKeyHeld: false,
         shortcut: "Ctrl+Shift+M",
@@ -181,7 +182,6 @@ describe("content and popup helpers", () => {
 
     expect(
       shouldTriggerShortcutKeyUp({
-        isListening: true,
         mode: MODES.pushToTalk,
         pttKeyHeld: true,
         shortcut: "Ctrl+Shift+M",
