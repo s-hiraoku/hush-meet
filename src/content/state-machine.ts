@@ -22,6 +22,7 @@ export function getNextAudioState(args: {
   const { currentState, mode, rms, speechThreshold, silenceThreshold } = args;
 
   switch (currentState) {
+    case CONTENT_STATE.IDLE:
     case CONTENT_STATE.MUTED:
       if (mode === MODES.auto && rms > speechThreshold) {
         return CONTENT_STATE.UNMUTING;

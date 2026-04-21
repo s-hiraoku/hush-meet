@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2] - 2026-04-21
+
+### Fixed
+
+- Auto mode no longer silently gets stuck behaving like Off mode: if the initial mute attempt fails (e.g. Meet toolbar not yet rendered), the state machine can still recover and unmute on detected speech
+- Fixed a race where the extension's own mute click could be misinterpreted as a manual user mute and silently switch the mode to Off; extended the internal guard window from ~136ms to ~500ms (1000ms fallback) to cover Meet's delayed attribute mutations
+
 ## [1.2.1] - 2026-04-21
 
 ### Fixed

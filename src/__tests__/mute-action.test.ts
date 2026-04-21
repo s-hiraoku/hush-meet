@@ -27,11 +27,10 @@ describe("mute action helper", () => {
     expect(action).toHaveBeenCalledTimes(1);
     expect(clearFlag).not.toHaveBeenCalled();
 
-    // rAF fires (simulated as setTimeout 0) + 120ms buffer
     vi.advanceTimersByTime(0); // rAF callback
     expect(clearFlag).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(120);
+    vi.advanceTimersByTime(500);
     expect(clearFlag).toHaveBeenCalledTimes(1);
   });
 
@@ -44,7 +43,7 @@ describe("mute action helper", () => {
     markExtensionMuteAction(action, clearFlag);
     expect(clearFlag).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(599);
+    vi.advanceTimersByTime(999);
     expect(clearFlag).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(1);

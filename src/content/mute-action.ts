@@ -1,9 +1,12 @@
 /**
  * Marks a mute action as extension-initiated, then clears the flag once
- * the DOM has had time to settle. Uses a two-phase approach:
- *   1. requestAnimationFrame — waits for the next paint (DOM update applied)
- *   2. setTimeout 120ms — extra buffer for Meet's async attribute updates
- * Falls back to 600ms max timeout in case rAF never fires (background tab).
+ * the DOM has had time to settle. The flag must stay set strictly longer than
+ * the MutationObserver debounce window in index.ts, otherwise the observer
+ * can misinterpret the extension's own click as a manual user mute and
+ * silently switch the mode to Off.
+ *
+ * Timing: rAF + 500ms buffer, with a 1000ms hard fallback for background tabs
+ * where rAF may be throttled.
  */
 export function markExtensionMuteAction(action: () => void, clearFlag: () => void) {
   action();
@@ -15,11 +18,9 @@ export function markExtensionMuteAction(action: () => void, clearFlag: () => voi
     clearFlag();
   };
 
-  // Wait for the next animation frame + a short buffer
   requestAnimationFrame(() => {
-    setTimeout(clear, 120);
+    setTimeout(clear, 500);
   });
 
-  // Fallback: clear after 600ms max (e.g. if tab is in background and rAF is throttled)
-  setTimeout(clear, 600);
+  setTimeout(clear, 1000);
 }

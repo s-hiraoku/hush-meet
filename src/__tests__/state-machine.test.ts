@@ -116,7 +116,7 @@ describe("content state machine", () => {
     ).toBeNull();
   });
 
-  it("returns null for unsupported audio states", () => {
+  it("auto mode can unmute from idle on speech (recovery when initial mute failed)", () => {
     expect(
       getNextAudioState({
         currentState: CONTENT_STATE.IDLE,
@@ -125,7 +125,22 @@ describe("content state machine", () => {
         speechThreshold,
         silenceThreshold,
       }),
+    ).toBe(CONTENT_STATE.UNMUTING);
+  });
+
+  it("auto-off mode stays idle on speech", () => {
+    expect(
+      getNextAudioState({
+        currentState: CONTENT_STATE.IDLE,
+        mode: MODES.autoOff,
+        rms: speechThreshold + 0.01,
+        speechThreshold,
+        silenceThreshold,
+      }),
     ).toBeNull();
+  });
+
+  it("returns null for error state regardless of speech", () => {
     expect(
       getNextAudioState({
         currentState: CONTENT_STATE.ERROR,
